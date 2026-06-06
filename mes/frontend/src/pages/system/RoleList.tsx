@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Form, Button, Input, Tag, Popconfirm, message } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { Form, Button, Input, Tag, Popconfirm, message, Space } from 'antd'
+import { PlusOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import PageContainer from '@/components/PageContainer'
 import { ensureArray } from '@/utils/ensureArray'
@@ -40,7 +40,8 @@ export default function RoleList() {
 
   // Add / Edit mutation
   const saveMutation = useMutation({
-    mutationFn: (values: SysRole) => roleApi.addOrUpdate(values as any),
+    mutationFn: (values: SysRole & { sysMenuIds?: string[] }) =>
+      roleApi.addOrUpdate(values),
     onSuccess: () => {
       message.success('操作成功')
       setModalOpen(false)
@@ -53,7 +54,7 @@ export default function RoleList() {
   // Delete mutation (soft delete via addOrUpdate)
   const deleteMutation = useMutation({
     mutationFn: (record: SysRole) =>
-      roleApi.addOrUpdate({ ...record, deleted: '1' } as any),
+      roleApi.addOrUpdate({ ...record, deleted: '1' }),
     onSuccess: () => {
       message.success('删除成功')
       queryClient.invalidateQueries({ queryKey: ['roles'] })
@@ -82,6 +83,12 @@ export default function RoleList() {
     setModalOpen(true)
   }
 
+  const handleAuthMenu = (record: SysRole) => {
+    setEditId(record.id)
+    formInstance.resetFields()
+    setModalOpen(true)
+  }
+
   const handleDelete = (record: SysRole) => {
     deleteMutation.mutate(record)
   }
@@ -96,7 +103,7 @@ export default function RoleList() {
     saveMutation.mutate({
       ...values,
       id: editId || undefined,
-    } as any)
+    })
   }
 
   const columns = [
@@ -116,6 +123,17 @@ export default function RoleList() {
       key: 'descr',
     },
     {
+      title: '系统角色',
+      dataIndex: 'isSystem',
+      key: 'isSystem',
+      render: (val: string) =>
+        val === '1' ? (
+          <Tag color="blue">系统角色</Tag>
+        ) : (
+          <Tag color="default">普通角色</Tag>
+        ),
+    },
+    {
       title: '状态',
       dataIndex: 'deleted',
       key: 'deleted',
@@ -133,16 +151,26 @@ export default function RoleList() {
       title: '操作',
       key: 'action',
       render: (_: unknown, record: SysRole) => (
-        <span>
+        <Space>
           <Button type="link" size="small" onClick={() => handleEdit(record)}>
             编辑
           </Button>
-          <Popconfirm title="确定要删除该角色吗？" onConfirm={() => handleDelete(record)}>
-            <Button type="link" size="small" danger>
-              删除
-            </Button>
-          </Popconfirm>
-        </span>
+          <Button
+            type="link"
+            size="small"
+            icon={<SafetyCertificateOutlined />}
+            onClick={() => handleAuthMenu(record)}
+          >
+            授权菜单
+          </Button>
+          {record.isSystem !== '1' && (
+            <Popconfirm title="确定要删除该角色吗？" onConfirm={() => handleDelete(record)}>
+              <Button type="link" size="small" danger>
+                删除
+              </Button>
+            </Popconfirm>
+          )}
+        </Space>
       ),
     },
   ]
