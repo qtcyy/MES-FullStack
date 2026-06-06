@@ -13,4 +13,12 @@ import com.wangziyang.mes.system.entity.SysRoleMenu;
  */
 public interface ISysRoleMenuService extends IService<SysRoleMenu> {
 
+    /**
+     * 重新建立角色菜单关系
+     *
+     * @param roleId  角色ID
+     * @param menuIds 菜单ID数组
+     * @throws Exception 异常
+     */
+    void rebuild(String roleId, String[] menuIds) throws Exception;
 }
