@@ -20,6 +20,7 @@ import TeamList from '@/pages/system/TeamList'
 import MaterileList from '@/pages/basedata/MaterileList'
 import ManagerList from '@/pages/basedata/ManagerList'
 import ManagerItemList from '@/pages/basedata/ManagerItemList'
+import DeviceGroupPage from '@/pages/basedata/DeviceGroupPage'
 // -- technology --
 import BomList from '@/pages/technology/BomList'
 import FlowList from '@/pages/technology/FlowList'
@@ -75,6 +76,7 @@ function App() {
                   <Route path="basedata/materile" element={<MaterileList />} />
                   <Route path="basedata/manager" element={<ManagerList />} />
                   <Route path="basedata/manager-item" element={<ManagerItemList />} />
+                  <Route path="basedata/device-group" element={<DeviceGroupPage />} />
 
                   {/* Technology */}
                   <Route path="technology/bom" element={<BomList />} />
