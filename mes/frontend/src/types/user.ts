@@ -20,6 +20,8 @@ export interface SysRole {
   code: string
   descr: string
   deleted: string
+  isSystem?: string    // "0"=normal, "1"=system role
+  sysMenuIds?: string[]  // menu IDs for tree checkbox state
   createTime?: string
   createUsername?: string
   updateTime?: string

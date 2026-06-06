@@ -38,6 +38,20 @@ public class SysRole extends BaseEntity {
 	@TableField(value = "is_deleted")
     private String deleted;
 
+    /**
+     * 系统角色(0:否;1:是)
+     */
+    @TableField(value = "is_system")
+    private String isSystem;
+
+    public String getIsSystem() {
+        return isSystem;
+    }
+
+    public void setIsSystem(String isSystem) {
+        this.isSystem = isSystem;
+    }
+
 	public String getName() {
 		return name;
 	}

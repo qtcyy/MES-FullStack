@@ -17,3 +17,7 @@ export function addOrUpdate(record: SysRole & { sysMenuIds?: string[] }) {
 export function deleteById(id: string) {
   return client.post('/admin/sys/role/delete', { id })
 }
+
+export function getRoleMenuTree(roleId: string) {
+  return client.get(`/admin/sys/role/tree/${roleId}`) as Promise<string[]>
+}

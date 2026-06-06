@@ -24,6 +24,19 @@ public class SysRoleDTO extends SysRole {
      */
     List<SysMenuDTO> sysMenuDtos;
 
+    /**
+     * 角色拥有的菜单ID数组
+     */
+    private String[] sysMenuIds;
+
+    public String[] getSysMenuIds() {
+        return sysMenuIds;
+    }
+
+    public void setSysMenuIds(String[] sysMenuIds) {
+        this.sysMenuIds = sysMenuIds;
+    }
+
     public boolean getChecked() {
         return checked;
     }
