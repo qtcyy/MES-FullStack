@@ -17,14 +17,15 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * <p>
@@ -117,6 +118,19 @@ public class SpMaterileController extends BaseController {
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SpMaterile record) {
+        // Auto-generate material code if empty (new record)
+        if (StringUtils.isEmpty(record.getMateriel()) && StringUtils.isNotEmpty(record.getMatType())) {
+            String prefix = getCodePrefix(record.getMatType());
+            QueryWrapper<SpMaterile> qw = new QueryWrapper<>();
+            qw.likeRight("materiel", prefix).orderByDesc("materiel").last("LIMIT 1");
+            SpMaterile last = iSpMaterileService.getOne(qw);
+            int next = 1;
+            if (last != null && last.getMateriel() != null) {
+                String numStr = last.getMateriel().replace(prefix, "");
+                try { next = Integer.parseInt(numStr) + 1; } catch (NumberFormatException e) { /* keep 1 */ }
+            }
+            record.setMateriel(prefix + String.format("%03d", next));
+        }
         if (StrUtil.isNotBlank(record.getFlowId())) {
             SpFlow spflow = iSpFlowService.getById(record.getFlowId());
             if (Objects.nonNull(spflow)) {
@@ -125,6 +139,32 @@ public class SpMaterileController extends BaseController {
         }
         iSpMaterileService.saveOrUpdate(record);
         return Result.success();
+    }
+
+    private String getCodePrefix(String matType) {
+        switch (matType) {
+            case "产品": return "PROD-";
+            case "零件": return "PART-";
+            case "标准件": return "STD-";
+            default: return "OTHR-";
+        }
+    }
+
+    @PostMapping("/upload-image")
+    @ResponseBody
+    public Result uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) return Result.failure("文件为空");
+        String originalName = file.getOriginalFilename();
+        String ext = originalName != null && originalName.contains(".")
+            ? originalName.substring(originalName.lastIndexOf(".")) : ".jpg";
+        String fileName = UUID.randomUUID().toString().replace("-", "") + ext;
+        String uploadDir = System.getProperty("user.dir") + "/static/upload/materile/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+        file.transferTo(new File(uploadDir + fileName));
+        Map<String, String> result = new HashMap<>();
+        result.put("url", "/upload/materile/" + fileName);
+        return Result.success(result);
     }
 
 

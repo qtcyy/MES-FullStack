@@ -59,6 +59,26 @@ public class SpMaterile extends BaseEntity {
     private String model;
 
     /**
+     * 物料来源(自制/外购)
+     */
+    private String source;
+
+    /**
+     * 需求提前期(天)
+     */
+    private Integer leadTime;
+
+    /**
+     * 安全库存
+     */
+    private Integer safetyStock;
+
+    /**
+     * 物料图片路径
+     */
+    private String imageUrl;
+
+    /**
      * 状态(00:删除;01:正常;02:禁用)
      */
     @TableField(value = "is_deleted")
@@ -222,6 +242,15 @@ public class SpMaterile extends BaseEntity {
     public void setModel(String model) {
         this.model = model;
     }
+
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
+    public Integer getLeadTime() { return leadTime; }
+    public void setLeadTime(Integer leadTime) { this.leadTime = leadTime; }
+    public Integer getSafetyStock() { return safetyStock; }
+    public void setSafetyStock(Integer safetyStock) { this.safetyStock = safetyStock; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     /**
      * 获取 流程

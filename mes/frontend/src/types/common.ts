@@ -10,6 +10,10 @@ export interface Materiel {
   flowDesc?: string
   flowId?: string
   model?: string
+  source?: string
+  leadTime?: number
+  safetyStock?: number
+  imageUrl?: string
   deleted: string
   createTime?: string
   createUsername?: string

@@ -24,6 +24,7 @@ export default function MaterileList() {
   const [filters, setFilters] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
+  const [selectedRecord, setSelectedRecord] = useState<Materiel | null>(null)
   const [formInstance] = Form.useForm()
 
   const { data, isLoading } = useQuery({
@@ -68,13 +69,13 @@ export default function MaterileList() {
 
   const handleAdd = () => {
     setEditId(null)
-    formInstance.resetFields()
+    setSelectedRecord(null)
     setModalOpen(true)
   }
 
   const handleEdit = (record: Materiel) => {
     setEditId(record.id)
-    formInstance.resetFields()
+    setSelectedRecord(record)
     setModalOpen(true)
   }
 
@@ -135,6 +136,19 @@ export default function MaterileList() {
       title: '型号',
       dataIndex: 'model',
       key: 'model',
+    },
+    {
+      title: '来源',
+      dataIndex: 'source',
+      key: 'source',
+      render: (v: string) => v || '-',
+    },
+    {
+      title: '图片',
+      dataIndex: 'imageUrl',
+      key: 'imageUrl',
+      render: (v: string) =>
+        v ? <img src={v} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} /> : '-',
     },
     {
       title: '状态',
@@ -203,6 +217,7 @@ export default function MaterileList() {
       >
         <MaterileForm
           id={editId}
+          record={selectedRecord}
           formInstance={formInstance}
           onFinish={handleFormFinish}
         />
