@@ -40,8 +40,8 @@ export default function RoleList() {
 
   // Add / Edit mutation
   const saveMutation = useMutation({
-    mutationFn: (values: SysRole & { sysMenuIds?: string[] }) =>
-      roleApi.addOrUpdate(values),
+    mutationFn: (values: Partial<SysRole> & { sysMenuIds?: string[] }) =>
+      roleApi.addOrUpdate(values as any),
     onSuccess: () => {
       message.success('操作成功')
       setModalOpen(false)
