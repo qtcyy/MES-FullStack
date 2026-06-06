@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangziyang.mes.basedata.mapper.SpDeviceMapper">
+    <resultMap id="deviceResultMap" type="com.wangziyang.mes.basedata.dto.SpDeviceDTO">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="model" property="model"/>
+        <result column="specs" property="specs"/>
+        <result column="line_id" property="lineId"/>
+        <result column="location" property="location"/>
+        <result column="status" property="status"/>
+        <result column="descr" property="descr"/>
+        <result column="is_deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_username" property="createUsername"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_username" property="updateUsername"/>
+        <result column="line_name" property="lineName"/>
+    </resultMap>
+
+    <select id="pageWithRelations" resultMap="deviceResultMap">
+        SELECT d.*, l.line AS line_name
+        FROM sp_device d
+        LEFT JOIN sp_line l ON d.line_id = l.id
+        WHERE d.is_deleted != '1'
+        <if test="name != null and name != ''">
+            AND d.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="code != null and code != ''">
+            AND d.code LIKE CONCAT('%', #{code}, '%')
+        </if>
+        <if test="type != null and type != ''">
+            AND d.type LIKE CONCAT('%', #{type}, '%')
+        </if>
+        ORDER BY d.create_time DESC
+    </select>
+</mapper>
