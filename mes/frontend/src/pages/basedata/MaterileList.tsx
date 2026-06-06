@@ -186,6 +186,13 @@ export default function MaterileList() {
         <Form.Item name="materielDesc">
           <Input placeholder="物料描述" />
         </Form.Item>
+        <Form.Item>
+          <PermissionGuard perm="materile:add">
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+              新增
+            </Button>
+          </PermissionGuard>
+        </Form.Item>
       </SearchForm>
 
       <PageTable
@@ -199,13 +206,6 @@ export default function MaterileList() {
           pageSize: pagination.pageSize,
         }}
         onChange={onChange}
-        toolbar={
-          <PermissionGuard perm="materile:add">
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-              新增
-            </Button>
-          </PermissionGuard>
-        }
       />
 
       <ModalForm
