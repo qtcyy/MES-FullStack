@@ -53,11 +53,8 @@ function MaterileForm({ id, record, onFinish, formInstance }: MaterileFormProps)
     }
   }
 
-  const [uploading, setUploading] = useState(false)
-
   const handleUpload = async (options: any) => {
     const { file, onSuccess, onError } = options
-    setUploading(true)
     try {
       const formData = new FormData()
       formData.append('file', file)
@@ -73,7 +70,6 @@ function MaterileForm({ id, record, onFinish, formInstance }: MaterileFormProps)
       onError?.(new Error('上传失败'))
       message.error('上传失败')
     }
-    setUploading(false)
   }
 
   return (
