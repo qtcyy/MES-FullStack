@@ -17,6 +17,7 @@ interface PageTableProps<T> {
   rowSelection?: TableRowSelection<T>
   toolbar?: ReactNode
   scroll?: { x?: number; y?: number }
+  onRow?: (record: T) => { onClick?: () => void; style?: React.CSSProperties }
 }
 
 function PageTable<T extends object>({
@@ -30,6 +31,7 @@ function PageTable<T extends object>({
   rowSelection,
   toolbar,
   scroll,
+  onRow,
 }: PageTableProps<T>) {
   const paginationConfig = {
     current: pagination.current,
@@ -69,6 +71,7 @@ function PageTable<T extends object>({
         }}
         rowSelection={rowSelection}
         scroll={scroll}
+        onRow={onRow}
       />
     </div>
   )
