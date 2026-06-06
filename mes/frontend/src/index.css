@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* ------------------------------------------------------------------ */
+/* Admin Layout styles                                                */
+/* ------------------------------------------------------------------ */
+
+/* Logo area in the sidebar */
+.admin-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Tab bar: remove the default bottom margin from Ant Tabs */
+.admin-tabs {
+  margin-bottom: 0;
+}
+
+.admin-tabs .ant-tabs-nav {
+  margin-bottom: 0 !important;
+}
+
+/* Content area */
+.admin-content {
+  margin: 16px;
+  padding: 24px;
+  background: #fff;
+  min-height: 280px;
+  overflow-y: auto;
+}

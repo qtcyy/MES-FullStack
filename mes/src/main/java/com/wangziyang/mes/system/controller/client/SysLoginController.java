@@ -29,14 +29,13 @@ public class SysLoginController {
     Logger logger = LoggerFactory.getLogger(SysLoginController.class);
 
 	/**
-	 * 首页默认
+	 * 首页默认 - serve React SPA
 	 *
-	 * @param model
-	 * @return
+	 * @return forward to index.html for React client-side routing
 	 */
 	@GetMapping({"/", ""})
-	public String welcomeUI(Model model) {
-		return "redirect:/admin/index";
+	public String welcomeUI() {
+		return "forward:/index.html";
 	}
 
     /**

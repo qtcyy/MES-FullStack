@@ -90,9 +90,20 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/druid/**", "anon");
         filterChainDefinitionMap.put("/upload/**", "anon");
         filterChainDefinitionMap.put("/files/**", "anon");
+        // React SPA static assets
+        filterChainDefinitionMap.put("/", "anon");
+        filterChainDefinitionMap.put("/index.html", "anon");
+        filterChainDefinitionMap.put("/assets/**", "anon");
+        filterChainDefinitionMap.put("/favicon.ico", "anon");
+        filterChainDefinitionMap.put("/favicon.svg", "anon");
+        filterChainDefinitionMap.put("/icons.svg", "anon");
+        // React SPA client-side routes (must be anon so SpaController can forward to index.html)
+        filterChainDefinitionMap.put("/welcome", "anon");
+        filterChainDefinitionMap.put("/403", "anon");
+        filterChainDefinitionMap.put("/404", "anon");
+        filterChainDefinitionMap.put("/500", "anon");
         filterChainDefinitionMap.put("/logout", "logout");
         filterChainDefinitionMap.put("/client/**", "anon");
-        filterChainDefinitionMap.put("/", "authc");
         filterChainDefinitionMap.put("/blog", "anon");
         filterChainDefinitionMap.put("/blog/open/**", "anon");
         filterChainDefinitionMap.put("/**", "authc");

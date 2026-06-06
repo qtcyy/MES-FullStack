@@ -2,8 +2,10 @@ package com.wangziyang.mes.system.controller.admin;
 
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.system.entity.SysUser;
 import com.wangziyang.mes.system.service.ISysMenuService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +81,17 @@ public class SysLoginController extends BaseController {
     public Result searchTree(@PathVariable String menuName) throws Exception {
         Map<String, Object> result = sysMenuService.listIndexMenuSearchTree(menuName);
         return Result.success(result);
+    }
+
+    @ApiOperation("获取当前登录用户信息")
+    @GetMapping("/user/info")
+    @ResponseBody
+    public Result<SysUser> getUserInfo() {
+        SysUser user = (SysUser) SecurityUtils.getSubject().getPrincipal();
+        if (user != null) {
+            user.setPassword(null);
+        }
+        return Result.success(user);
     }
 
 }
