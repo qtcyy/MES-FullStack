@@ -103,7 +103,7 @@ export default function Simulation3D() {
   const selectedWh = warehouses.find((w) => w.id === selectedId)
 
   return (
-    <div style={{ width: '100%', height: 'calc(100vh - 150px)', background: '#1a1a2e', position: 'relative' }}>
+    <div style={{ width: '100%', height: 'calc(100vh - 100px)', background: '#1a1a2e', position: 'relative' }}>
       <div style={{ position: 'absolute', top: 12, left: 16, zIndex: 10, display: 'flex', gap: 12, alignItems: 'center' }}>
         <Select
           value={selectedId}
@@ -121,11 +121,13 @@ export default function Simulation3D() {
       </div>
 
       {selectedId ? (
-        <Spin spinning={loading} wrapperClassName="full-spin">
-          <Canvas camera={{ position: [20, 15, 20], fov: 60 }} shadows gl={{ antialias: true }}>
+        <>
+          {loading && <div style={{ position: 'absolute', top: 60, left: '50%', zIndex: 20, color: '#fff' }}><Spin /></div>}
+          <Canvas camera={{ position: [20, 15, 20], fov: 60 }} shadows gl={{ antialias: true }}
+            style={{ width: '100%', height: '100%' }}>
             {selectedWh && <WarehouseScene warehouse={selectedWh} locations={locations} />}
           </Canvas>
-        </Spin>
+        </>
       ) : (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <Empty description="暂无库房数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
