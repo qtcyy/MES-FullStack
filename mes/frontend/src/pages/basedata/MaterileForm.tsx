@@ -53,8 +53,11 @@ function MaterileForm({ id, record, onFinish, formInstance }: MaterileFormProps)
     }
   }
 
-  const handleUpload = async (info: any) => {
-    const file = info.file as File
+  const [uploading, setUploading] = useState(false)
+
+  const handleUpload = async (options: any) => {
+    const { file, onSuccess, onError } = options
+    setUploading(true)
     try {
       const formData = new FormData()
       formData.append('file', file)
@@ -64,18 +67,14 @@ function MaterileForm({ id, record, onFinish, formInstance }: MaterileFormProps)
       })
       const url = (res as any)?.url || ''
       setImageUrl(url)
+      onSuccess?.({ url }, file)
       message.success('上传成功')
     } catch {
+      onError?.(new Error('上传失败'))
       message.error('上传失败')
     }
+    setUploading(false)
   }
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>上传</div>
-    </div>
-  )
 
   return (
     <Form
@@ -176,27 +175,32 @@ function MaterileForm({ id, record, onFinish, formInstance }: MaterileFormProps)
       <Divider plain style={{ fontSize: 13 }}>图片与状态</Divider>
 
       <Form.Item label="物料图片">
-        {imageUrl ? (
-          <div>
-            <img src={imageUrl} alt="物料图片" style={{ maxWidth: 200, maxHeight: 200, marginBottom: 8, borderRadius: 4 }} />
-            <br />
-            <a onClick={() => setImageUrl(null)} style={{ color: 'red', fontSize: 12 }}>移除图片</a>
-          </div>
-        ) : (
-          <Upload
-            accept=".jpg,.jpeg,.png"
-            showUploadList={false}
-            beforeUpload={(file) => {
-              const isImage = file.type.startsWith('image/')
-              if (!isImage) { message.error('仅支持图片文件'); return Upload.LIST_IGNORE }
-              const isLt2M = file.size / 1024 / 1024 < 2
-              if (!isLt2M) { message.error('图片大小不能超过2MB'); return Upload.LIST_IGNORE }
-              handleUpload({ file })
-              return false
-            }}
-          >
-            {uploadButton}
-          </Upload>
+        <Upload
+          accept=".jpg,.jpeg,.png"
+          listType="picture-card"
+          showUploadList={false}
+          customRequest={handleUpload}
+          beforeUpload={(file) => {
+            const isImage = file.type.startsWith('image/')
+            if (!isImage) { message.error('仅支持图片文件'); return Upload.LIST_IGNORE }
+            const isLt2M = file.size / 1024 / 1024 < 2
+            if (!isLt2M) { message.error('图片大小不能超过2MB'); return Upload.LIST_IGNORE }
+            return true
+          }}
+        >
+          {imageUrl ? (
+            <img src={imageUrl} alt="物料图片" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 6 }} />
+          ) : (
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>上传图片</div>
+            </div>
+          )}
+        </Upload>
+        {imageUrl && (
+          <a onClick={() => setImageUrl(null)} style={{ display: 'block', marginTop: 4, color: '#ff4d4f', fontSize: 12 }}>
+            移除图片
+          </a>
         )}
       </Form.Item>
 
