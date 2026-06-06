@@ -25,6 +25,7 @@ export default function RoleList() {
   const [filters, setFilters] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
+  const [selectedRecord, setSelectedRecord] = useState<SysRole | null>(null)
   const [formInstance] = Form.useForm()
 
   // Fetch role list
@@ -73,19 +74,19 @@ export default function RoleList() {
 
   const handleAdd = () => {
     setEditId(null)
-    formInstance.resetFields()
+    setSelectedRecord(null)
     setModalOpen(true)
   }
 
   const handleEdit = (record: SysRole) => {
     setEditId(record.id)
-    formInstance.resetFields()
+    setSelectedRecord(record)
     setModalOpen(true)
   }
 
   const handleAuthMenu = (record: SysRole) => {
     setEditId(record.id)
-    formInstance.resetFields()
+    setSelectedRecord(record)
     setModalOpen(true)
   }
 
@@ -96,6 +97,7 @@ export default function RoleList() {
   const handleModalCancel = () => {
     setModalOpen(false)
     setEditId(null)
+    setSelectedRecord(null)
     formInstance.resetFields()
   }
 
@@ -212,6 +214,7 @@ export default function RoleList() {
       >
         <RoleForm
           id={editId}
+          record={selectedRecord}
           formInstance={formInstance}
           onFinish={handleFormFinish}
         />

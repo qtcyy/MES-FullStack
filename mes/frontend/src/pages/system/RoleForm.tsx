@@ -5,9 +5,11 @@ import type { DataNode } from 'antd/es/tree'
 import * as roleApi from '@/api/system/role'
 import * as menuApi from '@/api/system/menu'
 import type { TreeVO, SysMenu } from '@/types/menu'
+import type { SysRole } from '@/types/user'
 
 interface RoleFormProps {
   id?: string | null
+  record?: SysRole | null
   onFinish?: (values: any) => void
   formInstance: FormInstance
 }
@@ -20,7 +22,7 @@ function convertToTreeData(nodes: TreeVO<SysMenu>[]): DataNode[] {
   }))
 }
 
-function RoleForm({ id, onFinish, formInstance }: RoleFormProps) {
+function RoleForm({ id, record, onFinish, formInstance }: RoleFormProps) {
   const [menuTree, setMenuTree] = useState<TreeVO<SysMenu>[]>([])
   const [checkedKeys, setCheckedKeys] = useState<string[]>([])
   const [treeLoading, setTreeLoading] = useState(false)
@@ -34,25 +36,41 @@ function RoleForm({ id, onFinish, formInstance }: RoleFormProps) {
     }).finally(() => setTreeLoading(false))
   }, [])
 
-  // In edit mode, load role data and checked menu IDs
+  // In edit mode, populate form from record and load checked menu IDs
   useEffect(() => {
-    if (id) {
-      roleApi.getById(id).then((res: any) => {
-        formInstance.setFieldsValue(res)
-        if (res.sysMenuIds) {
-          setCheckedKeys(res.sysMenuIds)
-        }
+    if (id && record) {
+      // Use record data directly to avoid calling the HTML-view endpoint
+      formInstance.setFieldsValue({
+        name: record.name,
+        code: record.code,
+        descr: record.descr,
+        isSystem: record.isSystem || '0',
+        deleted: record.deleted,
       })
-      roleApi.getRoleMenuTree(id).then((menuIds: any) => {
-        const ids = Array.isArray(menuIds) ? menuIds : (menuIds as any)?.data ?? []
-        setCheckedKeys(ids)
-      }).catch(() => {
-        // Ignore if endpoint not available yet
-      })
-    } else {
+      // Set checked keys from record if available
+      if (record.sysMenuIds) {
+        setCheckedKeys(record.sysMenuIds)
+      }
+    } else if (!id) {
+      // New record: reset form and checked keys
+      formInstance.resetFields()
       setCheckedKeys([])
     }
-  }, [id, formInstance])
+  }, [id, record, formInstance])
+
+  // Load role's assigned menu IDs from backend (for edit mode)
+  useEffect(() => {
+    if (id) {
+      roleApi.getRoleMenuTree(id).then((menuIds: any) => {
+        const ids = Array.isArray(menuIds) ? menuIds : (menuIds as any)?.data ?? []
+        if (ids.length > 0) {
+          setCheckedKeys(ids)
+        }
+      }).catch(() => {
+        // Ignore if endpoint not available
+      })
+    }
+  }, [id])
 
   const handleFinish = (values: any) => {
     onFinish?.({
