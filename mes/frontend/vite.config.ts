@@ -18,6 +18,14 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      '/basedata': {
+        target: 'http://localhost:9090',
+        changeOrigin: true,
+      },
+      '/upload': {
+        target: 'http://localhost:9090',
+        changeOrigin: true,
+      },
     },
   },
   build: {

@@ -17,14 +17,14 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -150,6 +150,8 @@ public class SpMaterileController extends BaseController {
         }
     }
 
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/materile/";
+
     @PostMapping("/upload-image")
     @ResponseBody
     public Result uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
@@ -158,13 +160,25 @@ public class SpMaterileController extends BaseController {
         String ext = originalName != null && originalName.contains(".")
             ? originalName.substring(originalName.lastIndexOf(".")) : ".jpg";
         String fileName = UUID.randomUUID().toString().replace("-", "") + ext;
-        String uploadDir = System.getProperty("user.dir") + "/static/upload/materile/";
-        File dir = new File(uploadDir);
+        File dir = new File(UPLOAD_DIR);
         if (!dir.exists()) dir.mkdirs();
-        file.transferTo(new File(uploadDir + fileName));
+        file.transferTo(new File(UPLOAD_DIR + fileName));
         Map<String, String> result = new HashMap<>();
-        result.put("url", "/upload/materile/" + fileName);
+        result.put("url", "/basedata/materile/image/" + fileName);
         return Result.success(result);
+    }
+
+    @GetMapping("/image/{filename}")
+    public void getImage(@PathVariable String filename, HttpServletResponse response) throws IOException {
+        File file = new File(UPLOAD_DIR + filename);
+        if (!file.exists()) {
+            response.sendError(404);
+            return;
+        }
+        String contentType = filename.endsWith(".png") ? "image/png" : "image/jpeg";
+        response.setContentType(contentType);
+        Files.copy(file.toPath(), response.getOutputStream());
+        response.getOutputStream().flush();
     }
 
 
