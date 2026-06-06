@@ -211,6 +211,7 @@ export default function MaterileList() {
       <ModalForm
         open={modalOpen}
         title={editId ? '编辑物料' : '新增物料'}
+        width={900}
         formInstance={formInstance}
         onCancel={handleModalCancel}
         loading={saveMutation.isPending}
