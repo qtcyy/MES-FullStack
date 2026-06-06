@@ -43,6 +43,14 @@ public class SpWarehouseController {
         return Result.success(spWarehouseService.page(req, qw));
     }
 
+    @GetMapping("/list")
+    @ResponseBody
+    public Result list() {
+        QueryWrapper<SpWarehouse> qw = new QueryWrapper<>();
+        qw.ne("is_deleted", "1").orderByDesc("create_time");
+        return Result.success(spWarehouseService.list(qw));
+    }
+
     @GetMapping("/{id}")
     @ResponseBody
     public Result getById(@PathVariable String id) {

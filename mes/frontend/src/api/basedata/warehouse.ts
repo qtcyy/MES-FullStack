@@ -20,6 +20,10 @@ export function deleteById(id: string) {
   })
 }
 
+export function getList() {
+  return client.get('/basedata/warehouse/list') as Promise<SpWarehouse[]>
+}
+
 export function getLocations(warehouseId: string) {
   return client.get(`/basedata/warehouse/locations/${warehouseId}`) as Promise<SpWarehouseLocation[]>
 }
