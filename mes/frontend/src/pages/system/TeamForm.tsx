@@ -3,6 +3,7 @@ import { Form, Input, Radio, Select, TimePicker, Checkbox } from 'antd'
 import dayjs from 'dayjs'
 import type { FormInstance } from 'antd/es/form'
 import type { SpTeam } from '@/types/team'
+import client from '@/api/client'
 
 interface TeamFormProps {
   id?: string | null
@@ -25,21 +26,17 @@ function TeamForm({ id, record, onFinish, formInstance }: TeamFormProps) {
   const [lineOptions, setLineOptions] = useState<{ id: string; name: string }[]>([])
   const [workshopOptions, setWorkshopOptions] = useState<{ id: string; name: string }[]>([])
 
-  // Fetch line and workshop data from DB via API
+  // Fetch line and workshop data from backend
   useEffect(() => {
-    // Try to load lines and workshops - if endpoints don't exist yet, dropdowns will be empty
     const loadOptions = async () => {
       try {
-        const { default: client } = await import('@/api/client')
-        try {
-          const lines = await client.get('/admin/sys/team/lines') as any[]
-          setLineOptions(Array.isArray(lines) ? lines.map((l: any) => ({ id: l.id, name: l.line || l.name || '' })) : [])
-        } catch { /* endpoint not available yet */ }
-        try {
-          const workshops = await client.get('/admin/sys/team/workshops') as any[]
-          setWorkshopOptions(Array.isArray(workshops) ? workshops.map((w: any) => ({ id: w.id, name: w.workShop || w.name || '' })) : [])
-        } catch { /* endpoint not available yet */ }
-      } catch { /* ignore */ }
+        const lines = await client.get('/admin/sys/team/lines') as any[]
+        setLineOptions(Array.isArray(lines) ? lines.map((l: any) => ({ id: l.id, name: l.line || l.name || '' })) : [])
+      } catch { /* endpoint not available yet */ }
+      try {
+        const workshops = await client.get('/admin/sys/team/workshops') as any[]
+        setWorkshopOptions(Array.isArray(workshops) ? workshops.map((w: any) => ({ id: w.id, name: w.workShop || w.name || '' })) : [])
+      } catch { /* endpoint not available yet */ }
     }
     loadOptions()
   }, [])
