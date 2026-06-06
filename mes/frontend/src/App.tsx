@@ -22,6 +22,7 @@ import ManagerList from '@/pages/basedata/ManagerList'
 import ManagerItemList from '@/pages/basedata/ManagerItemList'
 import DeviceGroupPage from '@/pages/basedata/DeviceGroupPage'
 import ProcessUnitPage from '@/pages/basedata/ProcessUnitPage'
+import WarehousePage from '@/pages/basedata/WarehousePage'
 // -- technology --
 import BomList from '@/pages/technology/BomList'
 import FlowList from '@/pages/technology/FlowList'
@@ -79,6 +80,7 @@ function App() {
                   <Route path="basedata/manager-item" element={<ManagerItemList />} />
                   <Route path="basedata/device-group" element={<DeviceGroupPage />} />
                   <Route path="basedata/process-unit" element={<ProcessUnitPage />} />
+                  <Route path="basedata/warehouse" element={<WarehousePage />} />
 
                   {/* Technology */}
                   <Route path="technology/bom" element={<BomList />} />
