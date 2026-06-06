@@ -5,17 +5,24 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.system.dto.SysRoleDTO;
 import com.wangziyang.mes.system.entity.SysRole;
+import com.wangziyang.mes.system.entity.SysRoleMenu;
 import com.wangziyang.mes.system.request.SysRolePageReq;
+import com.wangziyang.mes.system.service.ISysRoleMenuService;
 import com.wangziyang.mes.system.service.ISysRoleService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -31,6 +38,9 @@ public class SysRoleController extends BaseController {
 
     @Autowired
     private ISysRoleService sysRoleService;
+
+    @Autowired
+    private ISysRoleMenuService sysRoleMenuService;
 
     @GetMapping("/list-ui")
     public String listUI(Model model) {
@@ -57,8 +67,23 @@ public class SysRoleController extends BaseController {
 
     @PostMapping("/add-or-update")
     @ResponseBody
-    public Result addOrUpdate(SysRole record) {
+    public Result addOrUpdate(SysRoleDTO record) throws Exception {
         sysRoleService.saveOrUpdate(record);
+        if (record.getSysMenuIds() != null) {
+            sysRoleMenuService.rebuild(record.getId(), record.getSysMenuIds());
+        }
         return Result.success(record.getId());
+    }
+
+    @GetMapping("/tree/{roleId}")
+    @ResponseBody
+    public Result tree(@PathVariable String roleId) {
+        QueryWrapper<SysRoleMenu> qw = new QueryWrapper<>();
+        qw.eq("role_id", roleId);
+        List<SysRoleMenu> list = sysRoleMenuService.list(qw);
+        List<String> menuIds = list.stream()
+                .map(SysRoleMenu::getMenuId)
+                .collect(Collectors.toList());
+        return Result.success(menuIds);
     }
 }
