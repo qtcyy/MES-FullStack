@@ -15,6 +15,7 @@ import RoleList from '@/pages/system/RoleList'
 import MenuList from '@/pages/system/MenuList'
 import DictList from '@/pages/system/DictList'
 import DeptList from '@/pages/system/DeptList'
+import TeamList from '@/pages/system/TeamList'
 // -- basedata --
 import MaterileList from '@/pages/basedata/MaterileList'
 import ManagerList from '@/pages/basedata/ManagerList'
@@ -68,6 +69,7 @@ function App() {
                   <Route path="system/menu" element={<MenuList />} />
                   <Route path="system/dict" element={<DictList />} />
                   <Route path="system/department" element={<DeptList />} />
+                  <Route path="system/team" element={<TeamList />} />
 
                   {/* Basedata */}
                   <Route path="basedata/materile" element={<MaterileList />} />

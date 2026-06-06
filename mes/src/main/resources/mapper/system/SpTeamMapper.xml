@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangziyang.mes.system.mapper.SpTeamMapper">
+
+    <resultMap id="teamResultMap" type="com.wangziyang.mes.system.dto.SpTeamDTO">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="descr" property="descr"/>
+        <result column="line_id" property="lineId"/>
+        <result column="workshop_id" property="workshopId"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="workdays" property="workdays"/>
+        <result column="is_deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_username" property="createUsername"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_username" property="updateUsername"/>
+        <result column="line_name" property="lineName"/>
+        <result column="workshop_name" property="workshopName"/>
+        <result column="user_count" property="userCount"/>
+    </resultMap>
+
+    <select id="pageWithRelations" resultMap="teamResultMap">
+        SELECT t.*,
+               l.line AS line_name,
+               w.work_shop AS workshop_name,
+               (SELECT COUNT(*) FROM sp_team_user tu WHERE tu.team_id = t.id) AS user_count
+        FROM sp_team t
+        LEFT JOIN sp_line l ON t.line_id = l.id
+        LEFT JOIN sp_work_shop w ON t.workshop_id = w.id
+        WHERE t.is_deleted != '1'
+        <if test="name != null and name != ''">
+            AND t.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="code != null and code != ''">
+            AND t.code LIKE CONCAT('%', #{code}, '%')
+        </if>
+        ORDER BY t.create_time DESC
+    </select>
+
+</mapper>
