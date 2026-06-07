@@ -123,7 +123,9 @@ public class SpProcessContentController extends BaseController {
     public void getImage(@PathVariable String filename, HttpServletResponse response) throws IOException {
         File file = new File(UPLOAD_DIR + filename);
         if (!file.exists()) { response.sendError(404); return; }
-        response.setContentType(filename.endsWith(".png") ? "image/png" : "image/jpeg");
+        if (filename.endsWith(".pdf")) { response.setContentType("application/pdf"); }
+        else if (filename.endsWith(".png")) { response.setContentType("image/png"); }
+        else { response.setContentType("image/jpeg"); }
         Files.copy(file.toPath(), response.getOutputStream());
         response.getOutputStream().flush();
     }
@@ -152,8 +154,8 @@ public class SpProcessContentController extends BaseController {
         String originalName = file.getOriginalFilename();
         String ext = originalName != null && originalName.contains(".")
             ? originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase() : "";
-        if (!Arrays.asList("pdf", "doc", "docx").contains(ext)) {
-            return Result.failure("只支持 PDF 和 Word（.doc/.docx）格式");
+        if (!"pdf".equals(ext)) {
+            return Result.failure("只支持 PDF 格式");
         }
         String extWithDot = originalName != null && originalName.contains(".")
             ? originalName.substring(originalName.lastIndexOf(".")) : "";

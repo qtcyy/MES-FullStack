@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Select, Button, Steps, Form, Input, Radio, Upload, Table, Popconfirm, message, Space } from 'antd'
-import { PlusOutlined, CheckCircleOutlined, InboxOutlined } from '@ant-design/icons'
+import { Select, Button, Steps, Form, Input, Radio, Upload, Table, Popconfirm, message, Space, Modal } from 'antd'
+import { PlusOutlined, CheckCircleOutlined, InboxOutlined, FilePdfOutlined } from '@ant-design/icons'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import PageContainer from '@/components/PageContainer'
 import { ensureArray } from '@/utils/ensureArray'
@@ -18,6 +18,7 @@ export default function ProcessContentPage() {
   const [inspectionImages, setInspectionImages] = useState<string[]>([])
   const [equipmentList, setEquipmentList] = useState<any[]>([])
   const [docList, setDocList] = useState<any[]>([])
+  const [previewDoc, setPreviewDoc] = useState<any>(null)
   const [equipForm] = Form.useForm()
 
   const { data: products } = useQuery({ queryKey: ['pc-products'], queryFn: () => api.getProducts() })
@@ -134,8 +135,8 @@ export default function ProcessContentPage() {
 
   const handleDocUpload = async (file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase()
-    if (!['pdf', 'doc', 'docx'].includes(ext || '')) {
-      message.error('只支持 PDF 和 Word（.doc/.docx）格式')
+    if (ext !== 'pdf') {
+      message.error('只支持 PDF 格式')
       return false
     }
     const res: any = await api.uploadDocument(file)
@@ -175,7 +176,7 @@ export default function ProcessContentPage() {
     { title: '文档名称', dataIndex: 'name' },
     { title: '操作', render: (_: any, r: any) => (
       <Space>
-        <Button type="link" size="small" onClick={() => window.open(r.filePath, '_blank')}>预览</Button>
+        <Button type="link" size="small" onClick={() => setPreviewDoc(r)}>预览</Button>
         <Popconfirm title="确定删除？" onConfirm={() => docDelMutation.mutate(r.id)}>
           <Button type="link" size="small" danger>删除</Button>
         </Popconfirm>
@@ -269,9 +270,9 @@ export default function ProcessContentPage() {
                 <h4 style={{ marginTop: 24 }}>技术文档</h4>
                 <Table rowKey="id" columns={docColumns} dataSource={docList} pagination={false} size="small" />
                 {!isCompleted && (
-                  <Dragger style={{ marginTop: 8 }} showUploadList={false} accept=".pdf,.doc,.docx"
+                  <Dragger style={{ marginTop: 8 }} showUploadList={false} accept=".pdf"
                     beforeUpload={(f) => { handleDocUpload(f); return false }}>
-                    <InboxOutlined style={{ fontSize: 36 }} /><p>点击或拖拽上传技术文档（仅支持 PDF、Word）</p>
+                    <InboxOutlined style={{ fontSize: 36 }} /><p>点击或拖拽上传技术文档（仅支持 PDF）</p>
                   </Dragger>
                 )}
 
@@ -308,6 +309,19 @@ export default function ProcessContentPage() {
           </div>
         </>
       )}
+      <Modal
+        open={!!previewDoc}
+        title={<Space><FilePdfOutlined style={{ color: '#f5222d' }} />{previewDoc?.name || 'PDF 预览'}</Space>}
+        onCancel={() => setPreviewDoc(null)}
+        footer={null}
+        width="80vw"
+        style={{ top: 20 }}
+        destroyOnClose
+      >
+        {previewDoc && (
+          <iframe src={previewDoc.filePath} style={{ width: '100%', height: '75vh', border: 'none' }} title={previewDoc.name} />
+        )}
+      </Modal>
     </PageContainer>
   )
 }
