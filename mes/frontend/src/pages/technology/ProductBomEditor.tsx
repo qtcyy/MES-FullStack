@@ -420,6 +420,7 @@ export default function ProductBomEditor() {
         onCancel={() => setAddChildModalOpen(false)}
         confirmLoading={addChildMutation.isPending}
         destroyOnClose
+        getContainer={false}
       >
         <Form form={childForm} layout="vertical">
           <Form.Item
