@@ -120,6 +120,10 @@ public class SpBomFlowController extends BaseController {
     @PostMapping("/lock/{productBomRootId}")
     @ResponseBody
     public Result lock(@PathVariable String productBomRootId) {
+        SpProductBom rootBom = spProductBomService.getById(productBomRootId);
+        if (rootBom == null || !"locked".equals(rootBom.getStatus())) {
+            return Result.failure("产品BOM尚未锁定，请先锁定BOM结构后再锁定工艺流程");
+        }
         spBomFlowService.lockProductBomFlows(productBomRootId);
         return Result.success(null);
     }

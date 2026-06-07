@@ -56,6 +56,7 @@ export default function ProcessFlowPage() {
 
   const nodeList = ensureArray(bomFlowData)
   const isAnyLocked = nodeList.some((n: any) => n.bomFlow?.status === 'locked')
+  const isBomLocked = nodeList.length > 0 && nodeList[0]?.bomNode?.status === 'locked'
 
   const handleEdit = (bomNode: any) => {
     setEditBomNode(bomNode)
@@ -179,10 +180,13 @@ export default function ProcessFlowPage() {
             value: p.id,
           }))}
         />
-        {selectedProductId && !isAnyLocked && (
+        {selectedProductId && !isAnyLocked && isBomLocked && (
           <Popconfirm title="确认锁定产品工艺？锁定后不可编辑。" onConfirm={() => lockMutation.mutate()}>
             <Button icon={<LockOutlined />} loading={lockMutation.isPending}>锁定产品工艺</Button>
           </Popconfirm>
+        )}
+        {selectedProductId && !isBomLocked && (
+          <Tag color="orange">请先锁定产品 BOM 结构</Tag>
         )}
         {isAnyLocked && <Tag color="green">产品工艺已锁定</Tag>}
       </Space>
