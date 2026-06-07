@@ -59,14 +59,33 @@ export default function ProcessContentPage() {
     }
   }, [contentData, form])
 
+  const [pendingStep, setPendingStep] = useState<number | null>(null)
+
   const saveMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) => api.save(values),
     onSuccess: (newId: any) => {
       message.success('保存成功')
       if (!contentId) setContentId(newId as string)
       refetch()
+      if (pendingStep !== null) {
+        setCurrentStep(pendingStep)
+        setPendingStep(null)
+      }
     },
   })
+
+  const handleSaveAndNext = (nextStep: number) => {
+    form.validateFields().then(values => {
+      setPendingStep(nextStep)
+      saveMutation.mutate({ id: contentId, bomId: selectedBomId, ...values })
+    })
+  }
+
+  const handleSaveOnly = () => {
+    form.validateFields().then(values => {
+      saveMutation.mutate({ id: contentId, bomId: selectedBomId, ...values })
+    })
+  }
 
   const completeMutation = useMutation({
     mutationFn: () => api.complete(contentId!),
@@ -95,11 +114,6 @@ export default function ProcessContentPage() {
 
   const isCompleted = (contentData as any)?.content?.status === 'completed'
 
-  const handleSave = (extra: Record<string, unknown> = {}) => {
-    form.validateFields().then(values => {
-      saveMutation.mutate({ id: contentId, bomId: selectedBomId, ...values, ...extra })
-    })
-  }
 
   const handleImageUpload = async (file: File, type: 'content' | 'inspection') => {
     const res: any = await api.uploadImage(file)
@@ -183,7 +197,7 @@ export default function ProcessContentPage() {
 
       {selectedBomId && (
         <>
-          <Steps current={currentStep} onChange={setCurrentStep} size="small" items={steps} style={{ marginBottom: 24 }} />
+          <Steps current={currentStep} size="small" items={steps} style={{ marginBottom: 24 }} />
 
           <div style={{ maxWidth: 800 }}>
             {currentStep === 0 && (
@@ -200,7 +214,7 @@ export default function ProcessContentPage() {
                     {!isCompleted && <PlusOutlined />}
                   </Upload>
                 </Form.Item>
-                {!isCompleted && <Button type="primary" onClick={() => handleSave()} loading={saveMutation.isPending}>保存并进入下一步</Button>}
+                {!isCompleted && <Button type="primary" onClick={() => handleSaveAndNext(1)} loading={saveMutation.isPending}>保存并进入下一步</Button>}
               </Form>
             )}
 
@@ -218,7 +232,7 @@ export default function ProcessContentPage() {
                     {!isCompleted && <PlusOutlined />}
                   </Upload>
                 </Form.Item>
-                {!isCompleted && <Button type="primary" onClick={() => handleSave()} loading={saveMutation.isPending}>保存并进入下一步</Button>}
+                {!isCompleted && <Button type="primary" onClick={() => handleSaveAndNext(2)} loading={saveMutation.isPending}>保存并进入下一步</Button>}
               </Form>
             )}
 
@@ -228,7 +242,7 @@ export default function ProcessContentPage() {
                   <Form.Item name="notes" label="注意事项">
                     <Input.TextArea rows={4} placeholder="如：操作前需佩戴防静电手环，主板需轻拿轻放..." />
                   </Form.Item>
-                  {!isCompleted && <Button onClick={() => handleSave()}>保存注意事项</Button>}
+                  {!isCompleted && <Button onClick={handleSaveOnly} loading={saveMutation.isPending}>保存注意事项</Button>}
                 </Form>
 
                 <h4 style={{ marginTop: 24 }}>工装设备</h4>
