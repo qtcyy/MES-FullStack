@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Breadcrumb, Button, Form, Input, InputNumber, Select, Popconfirm, message, Space, Table, Tree, Spin, Row, Col, Modal } from 'antd'
+import { Breadcrumb, Button, Form, Input, InputNumber, Select, Popconfirm, message, Space, Table, Tree, Spin, Row, Col } from 'antd'
 import { PlusOutlined, LockOutlined, CopyOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import PageContainer from '@/components/PageContainer'
@@ -411,30 +411,40 @@ export default function ProductBomEditor() {
               </div>
             </>
           )}
+          {addChildModalOpen && (
+            <div style={{
+              border: '1px solid #5bc0de',
+              borderRadius: 8,
+              padding: 12,
+              marginTop: 12,
+              background: '#f0f9ff',
+            }}>
+              <h4 style={{ marginBottom: 12 }}>添加子节点</h4>
+              <Form form={childForm} layout="vertical">
+                <Form.Item
+                  name="nodeName"
+                  label="节点名称"
+                  rules={[{ required: true, message: '请输入节点名称' }]}
+                >
+                  <Input placeholder="如：主板单元" />
+                </Form.Item>
+                <Form.Item name="remark" label="备注">
+                  <Input.TextArea rows={2} placeholder="请输入备注信息" />
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0 }}>
+                  <Space>
+                    <Button type="primary" onClick={handleAddChildConfirm} loading={addChildMutation.isPending}>
+                      确认添加
+                    </Button>
+                    <Button onClick={() => setAddChildModalOpen(false)}>取消</Button>
+                  </Space>
+                </Form.Item>
+              </Form>
+            </div>
+          )}
+          </div>
         </Col>
       </Row>
-      <Modal
-        title="添加子节点"
-        open={addChildModalOpen}
-        onOk={handleAddChildConfirm}
-        onCancel={() => setAddChildModalOpen(false)}
-        confirmLoading={addChildMutation.isPending}
-        destroyOnClose
-        getContainer={false}
-      >
-        <Form form={childForm} layout="vertical">
-          <Form.Item
-            name="nodeName"
-            label="节点名称"
-            rules={[{ required: true, message: '请输入节点名称' }]}
-          >
-            <Input placeholder="请输入节点名称" />
-          </Form.Item>
-          <Form.Item name="remark" label="备注">
-            <Input.TextArea rows={2} placeholder="请输入备注信息" />
-          </Form.Item>
-        </Form>
-      </Modal>
     </PageContainer>
   )
 }
