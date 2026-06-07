@@ -31,6 +31,7 @@ import ProductBomEditor from '@/pages/technology/ProductBomEditor'
 import FlowList from '@/pages/technology/FlowList'
 import FlowProcessList from '@/pages/technology/FlowProcessList'
 import ProcessFlowPage from '@/pages/technology/ProcessFlowPage'
+import ProcessContentPage from '@/pages/technology/ProcessContentPage'
 import OperList from '@/pages/technology/OperList'
 // -- order --
 import OrderList from '@/pages/order/OrderList'
@@ -96,6 +97,7 @@ function App() {
                   <Route path="technology/flowprocess" element={<FlowProcessList />} />
                   <Route path="technology/oper" element={<OperList />} />
                   <Route path="technology/process-flow" element={<ProcessFlowPage />} />
+                  <Route path="technology/process-content" element={<ProcessContentPage />} />
 
                   {/* Order */}
                   <Route path="order/production" element={<OrderList />} />

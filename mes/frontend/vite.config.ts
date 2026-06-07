@@ -22,6 +22,10 @@ export default defineConfig({
         target: 'http://localhost:9090',
         changeOrigin: true,
       },
+      '/technology/process-content/image': {
+        target: 'http://localhost:9090',
+        changeOrigin: true,
+      },
     },
   },
   build: {
