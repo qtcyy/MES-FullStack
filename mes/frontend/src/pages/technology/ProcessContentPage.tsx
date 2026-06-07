@@ -60,6 +60,10 @@ export default function ProcessContentPage() {
     }
   }, [contentData, form])
 
+  useEffect(() => {
+    setCurrentStep(0)
+  }, [selectedBomId])
+
   const [pendingStep, setPendingStep] = useState<number | null>(null)
 
   const saveMutation = useMutation({
