@@ -25,9 +25,9 @@ export function deleteDocument(id: string) {
 
 export function uploadImage(file: File) {
   const fd = new FormData(); fd.append('file', file)
-  return client.post('/technology/process-content/upload-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  return client.post('/technology/process-content/upload-image', fd)
 }
 export function uploadDocument(file: File) {
   const fd = new FormData(); fd.append('file', file)
-  return client.post('/technology/process-content/upload-document', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  return client.post('/technology/process-content/upload-document', fd)
 }

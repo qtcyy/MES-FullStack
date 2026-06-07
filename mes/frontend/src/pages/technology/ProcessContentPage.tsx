@@ -195,7 +195,7 @@ export default function ProcessContentPage() {
                   <Input.TextArea rows={5} placeholder="详细描述操作步骤..." />
                 </Form.Item>
                 <Form.Item label="工序图片">
-                  <Upload listType="picture-card" showUploadList defaultFileList={contentImages.map((url, i) => ({ uid: `-${i}`, url, name: `img-${i}`, status: 'done' }))}
+                  <Upload listType="picture-card" showUploadList fileList={contentImages.map((url, i) => ({ uid: `c-${i}`, url, name: `img-${i}`, status: 'done' as const }))}
                     beforeUpload={(f) => { handleImageUpload(f, 'content'); return false }}>
                     {!isCompleted && <PlusOutlined />}
                   </Upload>
@@ -213,7 +213,7 @@ export default function ProcessContentPage() {
                   <Radio.Group><Radio value="1">是</Radio><Radio value="0">否</Radio></Radio.Group>
                 </Form.Item>
                 <Form.Item label="检验标准图片">
-                  <Upload listType="picture-card" showUploadList defaultFileList={inspectionImages.map((url, i) => ({ uid: `-${i}`, url, name: `ins-${i}`, status: 'done' }))}
+                  <Upload listType="picture-card" showUploadList fileList={inspectionImages.map((url, i) => ({ uid: `i-${i}`, url, name: `ins-${i}`, status: 'done' as const }))}
                     beforeUpload={(f) => { handleImageUpload(f, 'inspection'); return false }}>
                     {!isCompleted && <PlusOutlined />}
                   </Upload>

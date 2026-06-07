@@ -12,7 +12,7 @@ client.interceptors.request.use((config) => {
   if (config.method === 'post' || config.method === 'put') {
     const hasContentType =
       config.headers?.['Content-Type'] || config.headers?.['content-type']
-    if (!hasContentType && config.data) {
+    if (!hasContentType && config.data && !(config.data instanceof FormData)) {
       config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
       config.data = qs.stringify(config.data)
     }
