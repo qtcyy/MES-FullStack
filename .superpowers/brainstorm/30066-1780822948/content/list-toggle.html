@@ -1,0 +1,122 @@
+<h2>产品 BOM 列表页 — 列表/树形切换</h2>
+<p class="subtitle">工具栏提供切换按钮，用户可自由选择展示方式</p>
+
+<div class="section">
+  <h3>方案：工具栏切换按钮</h3>
+
+  <div class="mockup">
+    <div class="mockup-header">列表页工具栏</div>
+    <div class="mockup-body">
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0">
+        <button class="mock-button" style="background:#5bc0de;color:#000">📋 列表视图</button>
+        <button class="mock-button">🌳 树形视图</button>
+        <span style="flex:1"></span>
+        <button class="mock-button" style="background:#5cb85c">+ 新增</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="split" style="margin-top:16px">
+    <div class="mockup">
+      <div class="mockup-header">📋 列表视图（默认）</div>
+      <div class="mockup-body">
+        <table style="width:100%;font-size:13px;border-collapse:collapse">
+          <tr style="border-bottom:1px solid #444;color:#888">
+            <th style="padding:8px;text-align:left">BOM编码</th>
+            <th style="padding:8px;text-align:left">产品物料</th>
+            <th style="padding:8px;text-align:left">节点数</th>
+            <th style="padding:8px;text-align:left">版本</th>
+            <th style="padding:8px;text-align:left">状态</th>
+            <th style="padding:8px;text-align:left">备注</th>
+            <th style="padding:8px;text-align:left">操作</th>
+          </tr>
+          <tr style="border-bottom:1px solid #333">
+            <td style="padding:8px"><a href="#" style="color:#5bc0de">PBOM-001</a></td>
+            <td style="padding:8px">台式电脑主机</td>
+            <td style="padding:8px">4</td>
+            <td style="padding:8px">V1.0</td>
+            <td style="padding:8px"><span style="color:#5cb85c">已锁定</span></td>
+            <td style="padding:8px">首批量产版本</td>
+            <td style="padding:8px"><span style="color:#5bc0de">查看</span> <span style="color:#888">编辑</span> <span style="color:#f0ad4e">新版本</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #333">
+            <td style="padding:8px"><a href="#" style="color:#5bc0de">PBOM-002</a></td>
+            <td style="padding:8px">笔记本电脑</td>
+            <td style="padding:8px">3</td>
+            <td style="padding:8px">V1.0</td>
+            <td style="padding:8px"><span style="color:#f0ad4e">草稿</span></td>
+            <td style="padding:8px">-</td>
+            <td style="padding:8px"><span style="color:#5bc0de">编辑</span> <span style="color:#d9534f">删除</span></td>
+          </tr>
+        </table>
+        <p style="font-size:11px;color:#888;margin-top:8px">分页、搜索、排序 — 与现有 PageTable 一致</p>
+      </div>
+    </div>
+
+    <div class="mockup">
+      <div class="mockup-header">🌳 树形视图（切换后）</div>
+      <div class="mockup-body">
+        <div style="font-family:monospace;font-size:13px;line-height:2.4">
+          <div style="padding:2px 8px;margin:2px 0;border-left:3px solid #5bc0de">
+            🏭 <strong>台式电脑主机</strong> <span style="color:#5cb85c">V1.0 已锁定</span>
+            <span style="float:right;font-size:12px;color:#5bc0de">查看 新版本</span>
+          </div>
+          <div style="padding:2px 8px;margin:2px 0 2px 24px;border-left:3px solid #f0ad4e">
+            🔧 台式电脑半成品
+          </div>
+          <div style="padding:2px 8px;margin:2px 0 2px 48px;border-left:3px solid #5cb85c">
+            📦 主板单元
+          </div>
+          <div style="padding:2px 8px;margin:2px 0 2px 48px;border-left:3px solid #5cb85c">
+            📦 机箱单元
+          </div>
+
+          <div style="padding:2px 8px;margin:8px 0 2px 0;border-left:3px solid #5bc0de">
+            🏭 <strong>笔记本电脑</strong> <span style="color:#f0ad4e">V1.0 草稿</span>
+            <span style="float:right;font-size:12px;color:#5bc0de">编辑 删除</span>
+          </div>
+          <div style="padding:2px 8px;margin:2px 0 2px 24px;border-left:3px solid #f0ad4e">
+            🔧 笔记本半成品
+          </div>
+          <div style="padding:2px 8px;margin:2px 0 2px 48px;border-left:3px solid #5cb85c">
+            📦 屏幕单元
+          </div>
+        </div>
+        <p style="font-size:11px;color:#888;margin-top:8px">按产品分组，展开/折叠，操作按钮内嵌在每行右侧</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>设计总结确认</h3>
+
+  <table style="width:100%;font-size:14px;border-collapse:collapse">
+    <tr style="border-bottom:1px solid #444">
+      <td style="padding:10px;color:#888;width:160px">模块定位</td>
+      <td style="padding:10px">新增独立"产品BOM管理"，与现有"工艺BOM管理"并存</td>
+    </tr>
+    <tr style="border-bottom:1px solid #444">
+      <td style="padding:10px;color:#888">数据模型</td>
+      <td style="padding:10px">sp_product_bom（树形节点）+ sp_product_bom_item（物料清单）</td>
+    </tr>
+    <tr style="border-bottom:1px solid #444">
+      <td style="padding:10px;color:#888">物料来源</td>
+      <td style="padding:10px">支持从物料主数据选择 + 手动输入</td>
+    </tr>
+    <tr style="border-bottom:1px solid #444">
+      <td style="padding:10px;color:#888">锁定机制</td>
+      <td style="padding:10px">锁定产品节点 = 整棵 BOM 树变为只读</td>
+    </tr>
+    <tr style="border-bottom:1px solid #444">
+      <td style="padding:10px;color:#888">列表页</td>
+      <td style="padding:10px">列表视图 + 树形视图，工具栏切换</td>
+    </tr>
+    <tr style="border-bottom:1px solid #444">
+      <td style="padding:10px;color:#888">编辑界面</td>
+      <td style="padding:10px">左右分栏：BOM 树 + 节点详情/物料清单</td>
+    </tr>
+  </table>
+
+  <p style="margin-top:16px;color:#ccc">以上设计是否确认？确认后我将撰写完整的设计文档。</p>
+</div>

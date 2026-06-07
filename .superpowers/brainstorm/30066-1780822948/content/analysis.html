@@ -1,0 +1,127 @@
+<h2>深入分析：选项 B（独立模块）为什么更适合</h2>
+<p class="subtitle">从数据模型、制造层级、版本锁定三个维度对比</p>
+
+<div class="section">
+  <h3>1. 数据模型差异</h3>
+  <div class="split">
+    <div class="mockup">
+      <div class="mockup-header">现有 工艺BOM (sp_bom)</div>
+      <div class="mockup-body" style="font-size:14px;line-height:1.8">
+        <code>bom_code</code> — BOM编号（手动输入）<br>
+        <code>materiel_code</code> — 物料编码<br>
+        <code>materiel_desc</code> — 物料描述<br>
+        <code>version_number</code> — 版本号<br>
+        <code>state</code> — creat/pass<br>
+        <code>factory</code> — 工厂<br>
+        <code>remark</code> — 备注<br>
+        <br>
+        <span style="color:#f0ad4e">⚠ 无 parent_id（平表）</span><br>
+        <span style="color:#f0ad4e">⚠ 无 bom_type（不区分产品/工艺）</span><br>
+        <span style="color:#f0ad4e">⚠ 无 locked 状态</span><br>
+        <span style="color:#f0ad4e">⚠ BOM Item 功能为空白</span>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">新建 产品BOM (sp_product_bom)</div>
+      <div class="mockup-body" style="font-size:14px;line-height:1.8">
+        <code>bom_code</code> — BOM编号（<strong>自动生成</strong>）<br>
+        <code>product_code</code> — 产品物料编码<br>
+        <code>product_desc</code> — 产品物料描述<br>
+        <code>parent_id</code> — 父节点ID（<strong>支持树形层级</strong>）<br>
+        <code>level</code> — 层级（0=产品/1=半成品/2=组件）<br>
+        <code>version</code> — 版本号<br>
+        <code>status</code> — draft/locked<br>
+        <code>remark</code> — 备注<br>
+        <code>locked_at</code> — 锁定时间<br>
+        <code>locked_by</code> — 锁定人<br>
+        <br>
+        <span style="color:#5cb85c">✓ 树形结构内建支持</span><br>
+        <span style="color:#5cb85c">✓ 锁定状态独立管理</span><br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>2. 制造层级结构对比</h3>
+  <div class="split">
+    <div class="mockup">
+      <div class="mockup-header">选项 A：改造现有平表</div>
+      <div class="mockup-body">
+        <pre style="font-size:12px;background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:6px">
+sp_bom (加 parent_id):
+├─ BOM-001 台式电脑主机 (parent=null)
+├─ BOM-002 台式电脑半成品 (parent=BOM-001)
+├─ BOM-003 主板单元 (parent=BOM-002)
+└─ BOM-004 机箱单元 (parent=BOM-002)</pre>
+        <p style="color:#f0ad4e;font-size:13px;margin-top:8px">
+          ⚠ 所有节点平级存储，通过 parent_id 链接<br>
+          ⚠ 工艺BOM和产品BOM的数据混在一起<br>
+          ⚠ 查询/校验需要区分类型
+        </p>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">选项 B：独立产品BOM表</div>
+      <div class="mockup-body">
+        <pre style="font-size:12px;background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:6px">
+sp_product_bom (父子结构):
+├─ PBOM-001 台式电脑主机 [level=0, locked]
+│   ├─ PBOM-002 台式电脑半成品 [level=1]
+│   │   ├─ PBOM-003 主板单元 [level=2]
+│   │   └─ PBOM-004 机箱单元 [level=2]
+│   └─ ...
+│
+sp_product_bom_item (BOM行项目):
+├─ PBOM-003 → CPU i7-13700 x1
+├─ PBOM-003 → DDR5 32GB x2
+├─ PBOM-004 → 机箱外壳 x1
+└─ PBOM-004 → 电源 750W x1</pre>
+        <p style="color:#5cb85c;font-size:13px;margin-top:8px">
+          ✓ 数据隔离，不会与工艺BOM混淆<br>
+          ✓ level字段快速定位层级<br>
+          ✓ BOM Item 挂载在每个节点的物料清单
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>3. 版本锁定机制</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:14px">
+    <tr style="background:#2a2a2a">
+      <th style="padding:10px;text-align:left;border:1px solid #444">场景</th>
+      <th style="padding:10px;text-align:left;border:1px solid #444">选项 A</th>
+      <th style="padding:10px;text-align:left;border:1px solid #444">选项 B</th>
+    </tr>
+    <tr>
+      <td style="padding:10px;border:1px solid #444">锁定操作</td>
+      <td style="padding:10px;border:1px solid #444">改 state='locked'，但要排除工艺BOM记录</td>
+      <td style="padding:10px;border:1px solid #444">改 status='locked'，记录 locked_at/locked_by</td>
+    </tr>
+    <tr>
+      <td style="padding:10px;border:1px solid #444">锁定后编辑</td>
+      <td style="padding:10px;border:1px solid #444">需在 service 层判断 state + bom 类型</td>
+      <td style="padding:10px;border:1px solid #444">controller 层统一校验 status</td>
+    </tr>
+    <tr>
+      <td style="padding:10px;border:1px solid #444">创建新版本</td>
+      <td style="padding:10px;border:1px solid #444">复制记录 + version+1，与其他BOM耦合</td>
+      <td style="padding:10px;border:1px solid #444">独立的新版本创建流程，清晰隔离</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>总结推荐</h3>
+  <div style="background:#1a3a1a;border:1px solid #5cb85c;border-radius:8px;padding:16px">
+    <p><strong>选项 B（独立模块）更适合，因为：</strong></p>
+    <ol style="margin:8px 0 0 16px;line-height:2">
+      <li>产品BOM 的<strong>树形层级结构</strong>与工艺BOM 的平表结构完全不同</li>
+      <li><strong>锁定/版本管理</strong>是产品BOM 的核心需求，独立建模更清晰</li>
+      <li>现有工艺BOM 的 Item 控制器完全空白，<strong>"新建"比"改造"付出的代价差不多</strong></li>
+      <li>数据隔离，未来两个模块各自演进，<strong>互不干扰</strong></li>
+    </ol>
+  </div>
+</div>

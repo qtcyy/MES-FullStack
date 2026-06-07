@@ -1,0 +1,101 @@
+<h2>BOM 编辑界面交互流程</h2>
+<p class="subtitle">用户从物料列表点击产品编码链接 → 进入 BOM 树编辑界面</p>
+
+<div class="section">
+  <h3>页面设计：BOM 编制界面</h3>
+  <p style="color:#aaa;font-size:13px">左右分栏：左侧 BOM 树 + 右侧节点详情/物料清单</p>
+
+  <div class="split">
+    <div class="mockup" style="flex:1">
+      <div class="mockup-header">左侧：BOM 树</div>
+      <div class="mockup-body" style="font-size:13px">
+        <pre style="font-size:12px;background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:6px;line-height:2.2">
+🌳 BOM 树形结构
+
+🏭 台式电脑主机 ← 点击选中
+  │  [锁定BOM结构]  [添加子节点]
+  │
+  └─ 🔧 台式电脑半成品 ← 点击选中
+       │  [添加子节点]  [添加物料]
+       │
+       ├─ 📦 主板单元
+       │    [添加物料]
+       │
+       └─ 📦 机箱单元
+            [添加物料]</pre>
+        <p style="font-size:11px;color:#888;margin-top:4px">
+          操作按钮根据选中节点动态显示<br>
+          产品节点显示"锁定BOM结构"<br>
+          所有节点可"添加子节点"和"添加物料"
+        </p>
+      </div>
+    </div>
+
+    <div class="mockup" style="flex:1">
+      <div class="mockup-header">右侧：选中节点详情</div>
+      <div class="mockup-body" style="font-size:13px">
+        <div style="background:#2a2a2a;padding:12px;border-radius:6px;margin-bottom:12px">
+          <strong>节点信息</strong><br>
+          名称：主板单元<br>
+          编码：PBOM-003<br>
+          层级：组件 (level 2)<br>
+          状态：草稿<br>
+          备注：包含CPU、内存、主板等核心部件<br>
+          <button class="mock-button" style="margin-top:8px">💾 保存</button>
+        </div>
+
+        <div style="background:#2a2a2a;padding:12px;border-radius:6px">
+          <strong>物料清单（BOM Items）</strong>
+          <table style="width:100%;font-size:11px;margin-top:8px;border-collapse:collapse">
+            <tr style="color:#aaa"><td>物料编码</td><td>描述</td><td>用量</td><td>操作</td></tr>
+            <tr><td>CPU-001</td><td>i7-13700K</td><td>1</td><td>✏️ 🗑</td></tr>
+            <tr><td>RAM-002</td><td>DDR5 32GB</td><td>2</td><td>✏️ 🗑</td></tr>
+          </table>
+          <button class="mock-button" style="margin-top:8px">+ 添加物料</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>操作流程</h3>
+  <div style="display:flex;gap:16px;font-size:13px">
+    <div style="flex:1;background:#2a2a2a;padding:12px;border-radius:8px">
+      <strong>步骤 1：创建根节点</strong>
+      <p style="color:#aaa;margin:4px 0">在物料列表中点击"台式电脑主机"编码链接 → 自动创建产品BOM根节点 → 跳转到BOM编制界面</p>
+    </div>
+    <div style="flex:1;background:#2a2a2a;padding:12px;border-radius:8px">
+      <strong>步骤 2：搭建层级</strong>
+      <p style="color:#aaa;margin:4px 0">产品节点下添加"台式电脑半成品" → 半成品下添加"主板单元"和"机箱单元" → 每个节点填写备注</p>
+    </div>
+    <div style="flex:1;background:#2a2a2a;padding:12px;border-radius:8px">
+      <strong>步骤 3：填写物料</strong>
+      <p style="color:#aaa;margin:4px 0">选中每个节点 → 添加物料清单 → 从物料主数据选择或手动输入 → 设置用量和单位</p>
+    </div>
+    <div style="flex:1;background:#2a2a2a;padding:12px;border-radius:8px">
+      <strong>步骤 4：锁定定版</strong>
+      <p style="color:#aaa;margin:4px 0">检查BOM层次 → 确认无误后点击产品节点的"锁定BOM结构" → 整个BOM树变为只读</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>需要确认</h3>
+  <div class="options">
+    <div class="option" data-choice="a" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>锁定 = 锁定整个BOM树</h3>
+        <p>点击产品节点的"锁定BOM结构"后，整个树（包括所有子节点和物料清单）全部变为只读。锁定的是整个产品的BOM版本。</p>
+      </div>
+    </div>
+    <div class="option" data-choice="b" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>锁定 = 只锁定产品节点</h3>
+        <p>只锁定产品根节点，子节点仍可独立编辑。允许多个子版本并存，最终统一锁定。</p>
+      </div>
+    </div>
+  </div>
+</div>

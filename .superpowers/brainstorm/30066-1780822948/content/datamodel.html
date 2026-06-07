@@ -1,0 +1,119 @@
+<h2>BOM 数据模型设计</h2>
+<p class="subtitle">产品 BOM = 树形节点（制造层级）+ 行项目（物料清单）</p>
+
+<div class="section">
+  <h3>核心概念</h3>
+
+  <div class="split">
+    <div class="mockup">
+      <div class="mockup-header">BOM 节点树（sp_product_bom）</div>
+      <div class="mockup-body">
+        <pre style="font-size:13px;background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:6px;line-height:2">
+🏭 <strong>台式电脑主机</strong> [level=0, 产品]
+  └─ 🔧 <strong>台式电脑半成品</strong> [level=1, 半成品]
+      ├─ 📦 <strong>主板单元</strong> [level=2, 组件]
+      └─ 📦 <strong>机箱单元</strong> [level=2, 组件]</pre>
+      <p style="font-size:12px;color:#aaa;margin-top:8px">
+        每个节点代表<strong>制造过程中的一个步骤</strong><br>
+        节点具有父子关系，构成完整的制造层级
+      </p>
+    </div>
+
+    <div class="mockup">
+      <div class="mockup-header">BOM 行项目（sp_product_bom_item）</div>
+      <div class="mockup-body">
+        <pre style="font-size:12px;background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:6px;line-height:2">
+<strong>主板单元</strong> 的物料清单：
+  ├─ CPU i7-13700K    x1
+  ├─ DDR5 32GB        x2
+  ├─ SSD 1TB NVMe     x1
+  ├─ 主板 Z790         x1
+  └─ 散热器            x1
+
+<strong>机箱单元</strong> 的物料清单：
+  ├─ 机箱外壳 ATX      x1
+  ├─ 电源 750W 金牌    x1
+  └─ 散热风扇 120mm    x3
+
+<strong>台式电脑半成品</strong> 的物料清单：
+  ├─ 主板单元           x1 ← 引用BOM节点
+  └─ 机箱单元           x1 ← 引用BOM节点</pre>
+        <p style="font-size:12px;color:#aaa;margin-top:8px">
+          每个节点有对应的物料清单<br>
+          行项目可引用<strong>物料</strong>或<strong>其他BOM节点</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>表结构设计</h3>
+
+  <div class="mockup">
+    <div class="mockup-header">sp_product_bom（BOM 节点表）</div>
+    <div class="mockup-body">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <tr style="background:#2a2a2a">
+          <th style="padding:8px;text-align:left;border:1px solid #444">字段</th>
+          <th style="padding:8px;text-align:left;border:1px solid #444">类型</th>
+          <th style="padding:8px;text-align:left;border:1px solid #444">说明</th>
+        </tr>
+        <tr><td style="padding:8px;border:1px solid #444">id</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">Snowflake 主键</td></tr>
+        <tr style="background:#1e1e1e"><td style="padding:8px;border:1px solid #444">bom_code</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">BOM编码，自动生成 PBOM-XXX</td></tr>
+        <tr><td style="padding:8px;border:1px solid #444">product_code</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">产品物料编码（根节点）</td></tr>
+        <tr style="background:#1e1e1e"><td style="padding:8px;border:1px solid #444">node_name</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">节点名称（产品名/半成品名/组件名）</td></tr>
+        <tr><td style="padding:8px;border:1px solid #444">parent_id</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">父节点ID（null=根节点）</td></tr>
+        <tr style="background:#1e1e1e"><td style="padding:8px;border:1px solid #444">level</td><td style="padding:8px;border:1px solid #444">int</td><td style="padding:8px;border:1px solid #444">层级 0=产品 1=半成品 2=组件</td></tr>
+        <tr><td style="padding:8px;border:1px solid #444">version</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">版本号，如 V1.0</td></tr>
+        <tr style="background:#1e1e1e"><td style="padding:8px;border:1px solid #444">status</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">draft=草稿 / locked=已锁定</td></tr>
+        <tr><td style="padding:8px;border:1px solid #444">remark</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">备注信息</td></tr>
+        <tr style="background:#1e1e1e"><td style="padding:8px;border:1px solid #444">locked_at</td><td style="padding:8px;border:1px solid #444">datetime</td><td style="padding:8px;border:1px solid #444">锁定时间</td></tr>
+        <tr><td style="padding:8px;border:1px solid #444">locked_by</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">锁定人</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="mockup" style="margin-top:16px">
+    <div class="mockup-header">sp_product_bom_item（BOM 行项目表）</div>
+    <div class="mockup-body">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <tr style="background:#2a2a2a">
+          <th style="padding:8px;text-align:left;border:1px solid #444">字段</th>
+          <th style="padding:8px;text-align:left;border:1px solid #444">类型</th>
+          <th style="padding:8px;text-align:left;border:1px solid #444">说明</th>
+        </tr>
+        <tr><td style="padding:8px;border:1px solid #444">id</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">Snowflake 主键</td></tr>
+        <tr style="background:#1e1e1e"><td style="padding:8px;border:1px solid #444">bom_id</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">所属 BOM 节点 ID</td></tr>
+        <tr><td style="padding:8px;border:1px solid #444">item_type</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">material=物料 / bom_ref=BOM节点引用</td></tr>
+        <tr style="background:#1e1e1e"><td style="padding:8px;border:1px solid #444">material_code</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">物料编码</td></tr>
+        <tr><td style="padding:8px;border:1px solid #444">material_desc</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">物料描述</td></tr>
+        <tr style="background:#1e1e1e"><td style="padding:8px;border:1px solid #444">quantity</td><td style="padding:8px;border:1px solid #444">decimal</td><td style="padding:8px;border:1px solid #444">用量</td></tr>
+        <tr><td style="padding:8px;border:1px solid #444">unit</td><td style="padding:8px;border:1px solid #444">varchar</td><td style="padding:8px;border:1px solid #444">单位</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>需要确认的问题</h3>
+  <div style="background:#1a1a3a;border:1px solid #5bc0de;border-radius:8px;padding:16px">
+    <p style="margin:0 0 12px 0">关于 BOM 行项目的物料来源：</p>
+    <div class="options">
+      <div class="option" data-choice="a" onclick="toggleSelect(this)">
+        <div class="letter">A</div>
+        <div class="content">
+          <h3>从物料主数据中选择</h3>
+          <p>BOM 行项目的物料从已有的"物料信息定义"（sp_materile）中选取，确保数据一致性</p>
+        </div>
+      </div>
+      <div class="option" data-choice="b" onclick="toggleSelect(this)">
+        <div class="letter">B</div>
+        <div class="content">
+          <h3>可以手动输入 + 选择物料</h3>
+          <p>既可以关联已有物料，也可以手动输入临时物料名称（灵活性更高）</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

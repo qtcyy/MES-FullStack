@@ -26,6 +26,8 @@ import WarehousePage from '@/pages/basedata/WarehousePage'
 import ComponentPage from '@/pages/basedata/ComponentPage'
 // -- technology --
 import BomList from '@/pages/technology/BomList'
+import ProductBomList from '@/pages/technology/ProductBomList'
+import ProductBomEditor from '@/pages/technology/ProductBomEditor'
 import FlowList from '@/pages/technology/FlowList'
 import FlowProcessList from '@/pages/technology/FlowProcessList'
 // -- order --
@@ -86,6 +88,8 @@ function App() {
 
                   {/* Technology */}
                   <Route path="technology/bom" element={<BomList />} />
+                  <Route path="technology/product-bom" element={<ProductBomList />} />
+                  <Route path="technology/product-bom/:id" element={<ProductBomEditor />} />
                   <Route path="technology/flow" element={<FlowList />} />
                   <Route path="technology/flowprocess" element={<FlowProcessList />} />
 

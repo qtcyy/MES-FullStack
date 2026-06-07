@@ -1,0 +1,51 @@
+<h2>架构选择：如何处理 BOM 模块？</h2>
+<p class="subtitle">当前系统中已有"工艺BOM管理"（SpBom + SpBomItem），需要决定新模块与现有模块的关系</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>增强现有"工艺BOM管理"</h3>
+      <p>在现有 SpBom/SpBomItem 基础上增加层级关系（parentId）、锁定状态、BOM 树形编辑界面。将"工艺BOM管理"升级为完整的"产品BOM管理"。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4>
+          <ul>
+            <li>复用已有的 BOM 数据结构和 API</li>
+            <li>改动范围小，不影响其他模块</li>
+            <li>与现有物料、流程的关联保持不变</li>
+          </ul>
+        </div>
+        <div class="cons"><h4>Cons</h4>
+          <ul>
+            <li>"工艺BOM"和"产品BOM"概念混在一个表里</li>
+            <li>需要兼容现有的 flat BOM 数据</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>新增独立的"产品BOM管理"</h3>
+      <p>创建全新的表（sp_product_bom + sp_product_bom_item）和模块，与现有工艺BOM完全独立。支持层级结构、版本锁定等完整功能。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4>
+          <ul>
+            <li>概念清晰，产品BOM与工艺BOM完全分离</li>
+            <li>可以按产品BOM的需求自由设计表结构</li>
+            <li>不影响现有"工艺BOM管理"功能</li>
+          </ul>
+        </div>
+        <div class="cons"><h4>Cons</h4>
+          <ul>
+            <li>新建表、实体、API、页面，工作量更大</li>
+            <li>与现有物料关联需要重新建立</li>
+            <li>两套 BOM 系统并存可能造成混淆</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -60,6 +60,38 @@ export interface Bom {
   updateUsername?: string
 }
 
+// Product BOM types
+export interface ProductBom {
+  id: string
+  bomCode: string
+  productCode: string
+  nodeName: string
+  parentId?: string
+  level: number
+  version: string
+  status: string // 'draft' | 'locked'
+  remark?: string
+  sortOrder?: number
+  childCount?: number
+  itemCount?: number
+  children?: ProductBom[]
+  createTime?: string
+  createUsername?: string
+  updateTime?: string
+  updateUsername?: string
+}
+
+export interface ProductBomItem {
+  id?: string
+  bomId: string
+  itemType?: string // 'material' | 'bom_ref'
+  materialCode: string
+  materialDesc: string
+  quantity: number
+  unit: string
+  sortOrder?: number
+}
+
 // Flow / process types
 export interface Flow {
   id: string

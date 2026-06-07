@@ -1,0 +1,10 @@
+{"type":"server-started","port":50249,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:50249","screen_dir":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content","state_dir":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/state"}
+{"type":"screen-added","file":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content/approach.html"}
+{"source":"user-event","type":"click","text":"B\n    \n      新增独立的\"产品BOM管理\"\n      创建全新的表（sp_product_bom + sp_product_bom_item）和模块，与现有工艺BOM完全独立。支持层级结构、版本锁定等完整功能。\n      \n        Pros\n          \n            概念清晰，产品BOM与工艺BOM完全分离\n            可以按产品BOM的需求自由设计表结构\n            不影响现有\"工艺BOM管理\"功能\n          \n        \n        Cons\n          \n            新建表、实体、API、页面，工作量更大\n            与现有物料关联需要重新建立\n            两套 BOM 系统并存可能造成混淆","choice":"b","id":null,"timestamp":1780823064661}
+{"type":"screen-added","file":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content/analysis.html"}
+{"type":"screen-added","file":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content/datamodel.html"}
+{"type":"screen-added","file":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content/editor-flow.html"}
+{"type":"screen-added","file":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content/editor-flow-v2.html"}
+{"type":"screen-added","file":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content/list-page.html"}
+{"type":"screen-added","file":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content/list-toggle.html"}
+{"type":"screen-added","file":"/Users/chengyiyang/Desktop/Projects/class-work/MES-FullStack/.superpowers/brainstorm/30066-1780822948/content/waiting.html"}
