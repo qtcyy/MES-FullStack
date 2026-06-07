@@ -87,7 +87,7 @@ export default function ProcessFlowPage() {
       title: '层级',
       dataIndex: ['bomNode', 'level'],
       key: 'level',
-      width: 60,
+      width: 100,
       render: (val: number) => val === 0 ? '🏭 产品' : val === 1 ? '🔧 半成品' : '📦 组件',
     },
     {
