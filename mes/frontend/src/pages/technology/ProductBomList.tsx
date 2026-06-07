@@ -218,45 +218,7 @@ export default function ProductBomList() {
   const buildTreeNodes = (nodes: ProductBom[]): DataNode[] => {
     return nodes.map((node: ProductBom) => ({
       key: node.id,
-      title: (
-        <span>
-          {node.level === 0 ? '🏭 ' : node.level === 1 ? '🔧 ' : '📦 '}
-          <strong>{node.nodeName}</strong>
-          <Tag color={node.status === 'locked' ? 'green' : 'default'} style={{ marginLeft: 8 }}>
-            {node.status === 'locked' ? '已锁定' : '草稿'}
-          </Tag>
-          <span style={{ color: '#888', fontSize: 12, marginLeft: 8 }}>{node.version}</span>
-          <span style={{ float: 'right' }}>
-            {node.level === 0 && (
-              <>
-                <a
-                  onClick={(e) => { e.stopPropagation(); handleEdit(node) }}
-                  style={{ marginRight: 8, fontSize: 12 }}
-                >
-                  {node.status === 'locked' ? '查看' : '编辑'}
-                </a>
-                {node.status === 'draft' ? (
-                  <Popconfirm
-                    title="确认锁定BOM结构？锁定后不可编辑。"
-                    onConfirm={() => handleLock(node)}
-                    onPopupClick={(e: any) => e.stopPropagation()}
-                  >
-                    <a onClick={(e) => e.stopPropagation()} style={{ fontSize: 12 }}>锁定</a>
-                  </Popconfirm>
-                ) : (
-                  <Popconfirm
-                    title={`将在 ${node.version} 基础上创建新版本？`}
-                    onConfirm={() => handleNewVersion(node)}
-                    onPopupClick={(e: any) => e.stopPropagation()}
-                  >
-                    <a onClick={(e) => e.stopPropagation()} style={{ fontSize: 12 }}>新版本</a>
-                  </Popconfirm>
-                )}
-              </>
-            )}
-          </span>
-        </span>
-      ),
+      title: `${node.level === 0 ? '🏭 ' : node.level === 1 ? '🔧 ' : '📦 '}${node.nodeName || ''} [${node.status === 'locked' ? '已锁定' : '草稿'}] ${node.version || ''}`,
       children: node.children ? buildTreeNodes(node.children) : undefined,
     }))
   }

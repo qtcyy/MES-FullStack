@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Breadcrumb, Button, Form, Input, InputNumber, Select, Popconfirm, message, Space, Table, Tree, Tag, Spin, Row, Col, Modal } from 'antd'
+import { Breadcrumb, Button, Form, Input, InputNumber, Select, Popconfirm, message, Space, Table, Tree, Spin, Row, Col, Modal } from 'antd'
 import { PlusOutlined, LockOutlined, CopyOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import PageContainer from '@/components/PageContainer'
@@ -157,22 +157,18 @@ export default function ProductBomEditor() {
     if (item.id) deleteItemMutation.mutate(item.id)
   }
 
-  const buildTreeNode = (node: ProductBom): DataNode => ({
-    key: node.id,
-    title: (
-      <span>
-        {node.level === 0 ? '🏭 ' : node.level === 1 ? '🔧 ' : '📦 '}
-        {node.nodeName}
-        <Tag color={node.status === 'locked' ? 'green' : 'default'} style={{ marginLeft: 8, fontSize: 10 }}>
-          {node.status === 'locked' ? '已锁定' : '草稿'}
-        </Tag>
-      </span>
-    ),
-    children: allNodes
-      .filter(n => n.parentId === node.id)
-      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-      .map(buildTreeNode),
-  })
+  const buildTreeNode = (node: ProductBom): DataNode => {
+    const levelIcon = node.level === 0 ? '🏭 ' : node.level === 1 ? '🔧 ' : '📦 '
+    const statusText = node.status === 'locked' ? ' [已锁定]' : ' [草稿]'
+    return {
+      key: node.id,
+      title: `${levelIcon}${node.nodeName || ''}${statusText}`,
+      children: allNodes
+        .filter(n => n.parentId === node.id)
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        .map(buildTreeNode),
+    }
+  }
 
   const treeData: DataNode[] = rootNode ? [buildTreeNode(rootNode)] : []
 
