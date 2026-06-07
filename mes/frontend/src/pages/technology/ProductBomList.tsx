@@ -271,7 +271,6 @@ export default function ProductBomList() {
       ) : (
         <div style={{ padding: 16 }}>
           <Tree
-            showLine={{ showLeafIcon: false }}
             defaultExpandAll
             treeData={buildTreeNodes(ensureArray(treeData) as ProductBom[])}
           />

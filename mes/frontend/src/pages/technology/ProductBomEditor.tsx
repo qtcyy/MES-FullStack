@@ -285,7 +285,6 @@ export default function ProductBomEditor() {
               </Space>
             </div>
             <Tree
-              showLine={{ showLeafIcon: false }}
               treeData={treeData}
               selectedKeys={selectedNode ? [selectedNode.id] : []}
               expandedKeys={expandedKeys}
@@ -420,6 +419,7 @@ export default function ProductBomEditor() {
         onOk={handleAddChildConfirm}
         onCancel={() => setAddChildModalOpen(false)}
         confirmLoading={addChildMutation.isPending}
+        destroyOnClose
       >
         <Form form={childForm} layout="vertical">
           <Form.Item
