@@ -32,6 +32,7 @@ import FlowList from '@/pages/technology/FlowList'
 import FlowProcessList from '@/pages/technology/FlowProcessList'
 import ProcessFlowPage from '@/pages/technology/ProcessFlowPage'
 import ProcessContentPage from '@/pages/technology/ProcessContentPage'
+import ProcessQueryPage from '@/pages/technology/ProcessQueryPage'
 import OperList from '@/pages/technology/OperList'
 // -- order --
 import OrderList from '@/pages/order/OrderList'
@@ -98,6 +99,7 @@ function App() {
                   <Route path="technology/oper" element={<OperList />} />
                   <Route path="technology/process-flow" element={<ProcessFlowPage />} />
                   <Route path="technology/process-content" element={<ProcessContentPage />} />
+                  <Route path="technology/process-query" element={<ProcessQueryPage />} />
 
                   {/* Order */}
                   <Route path="order/production" element={<OrderList />} />
