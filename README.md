@@ -1,233 +1,270 @@
-#  章鱼师兄。真的智造！ 
+# MES-FullStack — 章鱼师兄制造执行系统
 
-## 黑科更名为章鱼师兄
-## 个人参与开发的MES项目
-* **杭州东方通信股份**  (三星SDS麦康平台)
-* **浙江大华技术股份**  (三星SDS麦康平台)
-* **天能集团**  (自研平台0到1)
+基于 Spring Boot + React 的全栈 MES（Manufacturing Execution System），覆盖系统管理、基础数据、工艺管理、生产订单、质量管理、设备管理等核心制造业务模块。
 
-## 界面展示
-* 演示地址（新）
-* http://www.meswozuiniu.icu:8887
-用户名admin  密码123
+## 技术栈
 
+| 层级 | 技术 |
+|------|------|
+| **后端** | Java 8, Spring Boot 2.1.7, MyBatis-Plus 3.1.2, Apache Shiro 1.4.0 |
+| **前端** | React 19, TypeScript, Vite 8, Ant Design 6, TanStack Query, Zustand |
+| **数据库** | MySQL 8, Druid 连接池 |
+| **缓存** | Ehcache（本地）/ Redis（可切换） |
+| **构建** | Maven + frontend-maven-plugin, Docker |
+| **3D** | Three.js, @react-three/fiber, @react-three/drei |
 
-## 章鱼师兄规划
-![1.1](https://s3.ax1x.com/2020/12/12/rV9p0s.png)
-<table style="text-align:center">
-    <tr>
-        <th bgcolor=#218868 ><font color=#0F0F0F >系统管理</font></th> 
-        <th bgcolor=#218868 ><font color=#0F0F0F >工艺管理</font></th> 
-        <th bgcolor=#218868 ><font color=#0F0F0F >计划管理</font></th> 
-        <th bgcolor=#218868 ><font color=#0F0F0F >物料管理</font></th> 
-   </tr>
-    <tr >
-        <td bgcolor=#C6E2FF ><font color=#EE0000 >*用户管理*</font></td>
-        <td bgcolor=#C6E2FF><font color=#EE0000 >*工艺路线管理*</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >工单下达</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >物料出入库</font></td>
-   </tr>
- <tr>
-        <td bgcolor=#D1D1D1><font color=#EE0000 >*组织管理*</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >MOM管理</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >工序工单分解</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >智能货架</font></td>
-   </tr>
-   <tr>
-        <td bgcolor=#C6E2FF><font color=#EE0000 >*菜单管理*</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >BOM管理</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >工单流程变更</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >物料标签管理</font></td>
-       
-   </tr>
-    <tr>
-        <td bgcolor=#D1D1D1><font color=#EE0000 >*基础数据维护*</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >SOP管理</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >工单锁定</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >AGV+WCS</font></td>
-   </tr>
-    <tr>
-        <td bgcolor=#C6E2FF><font color=#EE0000 >*基础数据配置*</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >其他工艺文件</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >工单特殊设置</font></td>
-        <td bgcolor=#C6E2FF><font color=#EE0000 >*物料基础数据*</font></td>
-       
-   </tr>
-    
-  
-</table>
+## 功能模块
 
+### 系统管理
+- **用户管理** — 系统用户 CRUD
+- **角色管理** — 角色 + 菜单权限树分配 + 预设角色（超级管理员/质检员/工艺员等 7 个）
+- **菜单管理** — 动态菜单权限树
+- **部门管理** — 组织架构
+- **班组员工定义** — 班组 + 班次 + 员工分配
+- **数据字典** — 字典项管理
 
---------------------------
+### 基础数据
+- **物料信息定义** — 物料编码自动生成（PROD-/PART-/STD-/OTHR-），含图片上传、来源、提前期、安全库存
+- **零部件定义** — 自动 COMP-xxx 编码
+- **库房库位定义** — 库房规格设定，库位编码自动生成（支持 组-行列层 格式）
+- **编组设备定义** — 设备 + 设备组 + 设备分配，删除前校验生产订单
+- **加工单元定义** — 加工单元 + 班组绑定
 
+### 工艺管理
+- **产品 BOM 管理** — 树形层级 BOM 编制，支持产品→半成品→组件多级结构，BOM 锁定定版，版本管理
+- **工序信息定义** — 工序编码自动生成（OPR-xxx），绑定加工单元，工时/制造周期管理
+- **工艺流程管理** — BOM 节点绑定工艺路线和工序序列，产品工艺锁定
+- **工艺内容编制** — 五步向导式 SOP 编制（主信息→工序要求→辅助信息→物料核对→完成），图片/PDF 上传
+- **产品工艺查询** — BOM 树展示 + 工艺详情只读查询
+- **工艺路线管理** — 现有流程-工序关联管理
 
-<table style="text-align:center">
-    <tr>
-        <th bgcolor=#218868 ><font color=#0F0F0F >设备管理</font></th> 
-        <th bgcolor=#218868 ><font color=#0F0F0F >SN码管理</font></th> 
-        <th bgcolor=#218868 ><font color=#0F0F0F >在制品管理</font></th> 
-        <th bgcolor=#218868 ><font color=#0F0F0F >质量管理</font></th> 
-   </tr>
-    <tr>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >设备档案</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >SN码规则管理</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >工序过站</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >IOC</font></td>
-       
-   </tr>
- <tr>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >设备维修保养</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >分配SN管理</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >在线维修管理</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >OQC</font></td>
-   </tr>
-    <tr>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >设备出入库</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >SN标签+打印</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >自动化对接</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >FQC</font></td>
-       
-   </tr>
- <tr>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >设备稼动率</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F ></font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >SN返工管理</font></td>
-        <td bgcolor=#D1D1D1><font color=#0F0F0F >质检项维护</font></td>
-   </tr>
-    <tr>
-        <td bgcolor=#C6E2FF style="text-align:left"><font color=#0F0F0F >说明：</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F ></font></td>
-        <td bgcolor=#C6E2FF><font color=#EE0000 >*完成</font></td>
-        <td bgcolor=#C6E2FF><font color=#0F0F0F >未开发</font></td>
-       
-   </tr>
-</table>
+### 生产订单
+- 工单下达、生产计划
 
-## 专属知识星球。智友们上车了
-![1.0](https://z3.ax1x.com/2021/04/15/cgKBK1.png)   
+### 数字化平台
+- **智慧大屏** — ECharts 数据看板
+- **3D 仿真** — Three.js 仓库 3D 场景，连接实际库房库位数据
 
- ## MOM平台规划
-![1.](https://s1.ax1x.com/2020/04/11/GHGLcV.jpg)
+## 快速开始（开发环境）
 
-## ISA-95 层级
-![1.0](https://s1.ax1x.com/2020/04/03/GN9vid.png)
+### 前置要求
 
- 四大类: 资源、能力、产品定义和生产计划
- 
- 九大模型
- * 人力资源模型
- * 设备资源模型
- * 材料资源模型
- * 过程段模型(过程端模型，过程能力模型)
- * 生产能力模型
- * 产品定义模型
- * 生产计划模型
- * 生产性能模型
- 
-![1.0](https://s1.ax1x.com/2020/04/03/GN9aVg.png)
+- JDK 8
+- Node.js 22+
+- MySQL 8（本地 localhost:3306）
+- Maven 3.6+
 
-登录界面[MES]
-![1.1](https://s2.ax1x.com/2020/03/06/3bQLqI.png)
+### 1. 初始化数据库
 
-数字孪生仓库
-![1.1.2](https://s1.ax1x.com/2020/07/21/U56OlF.png)
+```bash
+# 创建数据库
+mysql -h localhost -u root -p -e "CREATE DATABASE IF NOT EXISTS mes_data DEFAULT CHARSET utf8mb4"
 
-数字化平台 echarts
-![1.1.3](https://s1.ax1x.com/2020/03/23/8o7wbq.png)
-### 功能界面
-* 主数据展示
-![1.1.3](https://s2.ax1x.com/2020/03/11/8AMcA1.png)
+# 导入主表结构
+mysql -h localhost -u root -p mes_data < scripts/sql/MySQL-20210225.sql
 
-* 计划甘特图
-![1.1.4](https://s1.ax1x.com/2020/07/02/NH4Su4.png)
+# 导入扩展模块表
+mysql -h localhost -u root -p mes_data < scripts/sql/role-management-update.sql
+mysql -h localhost -u root -p mes_data < scripts/sql/team-management.sql
+mysql -h localhost -u root -p mes_data < scripts/sql/device-management.sql
+mysql -h localhost -u root -p mes_data < scripts/sql/product-bom.sql
+```
 
-* 工艺路线界面
-![1.1.4](https://s1.ax1x.com/2020/03/16/8GOl28.png)
+### 2. 配置数据库连接
 
-* 物料维护界面
-![1.1.5](https://s1.ax1x.com/2020/03/23/8HrLin.png)
+编辑 `mes/src/main/resources/application-dev.yml`，确保数据库连接信息正确：
 
-* BOM维护界面
-![1.1.6](https://s1.ax1x.com/2020/04/09/G4yQMt.png)
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/mes_data?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 你的密码
+```
 
-### swaggerAPI管理界面
-![2](https://s2.ax1x.com/2020/03/06/3qC4Yt.png)
-## 技术架构
+### 3. 启动后端
 
-### springBoot+mybatis-plus+redis+shiro+hutool+layui+swagger+freemarker+mysql8+echarts
-### jenkins+docker+nginx
+```bash
+cd mes
+mvn spring-boot:run -DskipTests
+```
 
-## MES个人笔记
+后端启动于 `http://localhost:9090`
 
-[MESA战略计划](http://note.youdao.com/noteshare?id=3d843775354cc7a503ad247a29997848)
+### 4. 启动前端
 
-[10点技巧，教你成MES实施王者](http://note.youdao.com/noteshare?id=2d4cf9c9827c2f906d36ec4c146e7557)
+```bash
+cd mes/frontend
+npm install
+npm run dev
+```
 
-[MES需求收益评估，如何计算ROI，真香又学知识了](http://note.youdao.com/noteshare?id=5add9a164e26b5e039e7b0016daa19a4)
+前端启动于 `http://localhost:3000`，API 请求自动代理到 `localhost:9090`
 
-[做MES重点不是学习别人的成功，而是明白他犯的错误](http://note.youdao.com/noteshare?id=ba5f58ec23376ebee9a9c09d95c3dcfa)
+### 5. 登录
 
-[MES相关术语，字母缩写含义！看一遍就懂。不懂请再看一遍](http://note.youdao.com/noteshare?id=222fcb0a12288b8e5cc76ba94e1bb32d)
-## 部署云平台 使用阿里云 （https://www.aliyun.com）
-实现功能：
-1. 用户管理：用户是系统操作者，该功能主要完成系统用户配置。
-2. 主数据管理：动态配置表以及所需要显示的字段，只需要简单维护既可以完成增删改成操作。
-3. 赋码管理：动态配置码规则项。例如6位年月日 3位，流水号，随机号。根据用户配置自动创建SN。
-4. 菜单管理：配置系统菜单，操作权限，按钮权限标识等。
-5. 角色管理：角色菜单权限分配、设置角色按机构进行数据范围权限划分。
-6. 字典管理：对系统中经常使用的一些较为固定的数据进行维护，如：是否、男女、类别、级别等。
-7. 物料进出管理：包含物料叫料，配料，发料，确认收料，上料
-8. 工单管理：工单下达，工单分解，工单状态调整，工单特殊设置
-9. 在制品管理：过站工序记录，数据绑定成箱成剁
-10. 质量管理： 质检项维护，根据物料或者型号管理质检项目。检验页面，抽检确认
-11. 工艺文件管理 ：工艺参数，BOM文件，导入导出
-12. 报表：图形化展示
-13. 设备管理： 设备信息录入，使用记录，设备台账，设备维保
-14. 操作日志：系统正常操作日志记录和查询；系统异常信息日志记录和查询。
-15. 连接池监视：监视当期系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈。
-16. 工作流引擎：实现业务工单流转、在线流程设计器。
-17. 数字化平台：支撑数据展示，定时动态刷新数据。热部署（SQL视图）
+浏览器访问 `http://localhost:3000`，默认账号：`admin` / `123456`
 
-#### 使用注意事项
-* 前端
-    * 日期工具库：static/lib/dayjs.min.js
-    * Javascript 工具库：static/lib/lodash.min.js
-    * Layui 树形表格插件
-        * https://gitee.com/whvse/treetable-lay
-    * 图标库使用
-        * http://www.fontawesome.com.cn/faicons
-    * echart
-        * https://www.echartsjs.com/zh/api.html#echarts    
-    * 发送 Ajax 示例：[详情](./docs/ajax.md)
-    * FreeMarker 文档：[详情](./docs/FreeMarker.md)
-    * Layui 自定义组件 spLayer：[详情](./docs/spLayer.md)
-    * Layui 自定义组件 spTable：[详情](./docs/spTable.md)
-    * 下拉框 初始化数据： [详情](./docs/layuiSelect.md)
-* 后端 
-    * Hutool 是一个小而全的Java工具类库，通过静态方法封装，降低相关API的学习成本，提高工作效率，使Java拥有函数式语言般的优雅，让Java语言也可以“甜甜的”。
-    * 枚举
-        * 公共枚举类：CommonEnum
-        * 不同模块下的枚举：如 com.songpeng.sparchetype.system.enums
-    * 请求参数
-        * 每张表的分页查询参数，严格按照一张表对应一个请求参数对象进行开发，如系统用户分页查询参数：SysUserPageReq
-# 总结
-欢迎想一起开发的小伙伴。。此项目也支持大学生毕业设计。
-# MES国际
-[![MES](https://s1.ax1x.com/2020/04/10/GIRPEt.png "MESA认证")](http://www.mesa.org/)
+## 生产部署
 
-[![synfactory](https://s1.ax1x.com/2020/04/11/GHrk01.png "synf官服资料")](https://www.syntropicfactory.com/)
+### 构建
 
-[![ISA](https://s1.ax1x.com/2020/05/14/YBPeVH.png "ISA自动化学会")](https://www.isa.org/)
+```bash
+# 完整构建（前端 + 后端打包为 JAR）
+cd mes
+mvn clean package -DskipTests
+```
 
-## QQ Group808898316(此群已满)
-[![QQ](https://img.shields.io/badge/QQ-808898316-green.svg?logo=tencent%20qq&logoColor=red)](http://qm.qq.com/cgi-bin/qm/qr?k=vjfiAHPYgOgO5XxeUFxNfxTlQom2wZFZ)
+构建产物：`mes/target/mes-1.0.0.jar`（内嵌 React 前端静态资源）
 
-## QQ Group87652870(此群已满)
-[![QQ](https://img.shields.io/badge/QQ-87652870-green.svg?logo=tencent%20qq&logoColor=red)](https://jq.qq.com/?_wv=1027&k=55NGCxl)
+### Docker 部署
 
-## QQ Group595803231(请加此群)
-[![QQ](https://img.shields.io/badge/QQ-595803231-green.svg?logo=tencent%20qq&logoColor=red)]
+```bash
+# 构建 Docker 镜像
+cd mes
+mvn docker:build
 
-## 特别鸣谢
+# 运行容器
+docker run -d \
+  --name mes-app \
+  -p 80:80 \
+  -e SPRING_PROFILES_ACTIVE=pro \
+  -e SPRING_DATASOURCE_URL="jdbc:mysql://<db-host>:3306/mes_data?...(参数同开发环境)" \
+  -e SPRING_DATASOURCE_USERNAME="root" \
+  -e SPRING_DATASOURCE_PASSWORD="<生产密码>" \
+  sparchetype/mes:1.0.0
+```
 
-[![MES-智能制造/MES-Springboot](https://gitee.com/wangziyangyang/MES-Springboot/widgets/widget_card.svg?colors=393222,ebdfc1,fffae5,d8ca9f,393222,a28b40)](https://gitee.com/wangziyangyang/MES-Springboot)
+Dockerfile 位于 `mes/src/main/docker/Dockerfile`：
+- 基础镜像：`openjdk:8-jdk-alpine`
+- 时区：`Asia/Shanghai`
+- 暴露端口：`80`
+- 启动命令：`java -jar /app.jar`
+
+### Nginx 反向代理
+
+生产环境建议在 Spring Boot 前放置 Nginx：
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:9090;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # 静态资源缓存
+    location /assets/ {
+        proxy_pass http://127.0.0.1:9090;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+### 环境变量
+
+生产环境通过 `application-pro.yml` 配置，以下参数建议通过环境变量覆盖：
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `SPRING_PROFILES_ACTIVE` | 激活配置 | `pro` |
+| `SPRING_DATASOURCE_URL` | 数据库 URL | `jdbc:mysql://localhost:3306/mes_data?...` |
+| `SPRING_DATASOURCE_USERNAME` | 数据库用户 | `root` |
+| `SPRING_DATASOURCE_PASSWORD` | 数据库密码 | — |
+| `SPRING_REDIS_HOST` | Redis 地址 | `localhost` |
+| `SPRING_REDIS_PORT` | Redis 端口 | `6379` |
+| `SPRING_CACHE_TYPE` | 缓存类型 | `ehcache`（可选 `redis`） |
+
+## 项目结构
+
+```
+MES-FullStack/
+├── README.md
+├── CLAUDE.md                          # Claude Code 项目指南
+├── LICENSE                            # AGPL-3.0
+├── docs/                              # 开发文档（FreeMarker/Layui 参考）
+├── scripts/sql/                       # 数据库脚本
+│   ├── MySQL-20210225.sql            # 主表结构
+│   ├── product-bom.sql               # 产品 BOM 扩展
+│   ├── device-management.sql         # 设备管理扩展
+│   ├── team-management.sql           # 班组管理扩展
+│   └── role-management-update.sql    # 角色管理更新
+└── mes/                               # 主 Maven 模块
+    ├── pom.xml                        # Maven 配置
+    ├── src/main/java/com/wangziyang/mes/
+    │   ├── SparchetypeApplication.java
+    │   ├── common/                    # BaseEntity, Result, BaseController, 配置
+    │   ├── system/                    # 用户/角色/菜单/部门/字典 + Shiro 安全
+    │   ├── basedata/                  # 物料/设备/加工单元/库房/零部件
+    │   ├── technology/                # BOM/Flow/Oper/工艺内容/工艺流程
+    │   ├── order/                     # 生产订单
+    │   └── digitization/              # 数据看板/3D 仿真
+    ├── src/main/resources/
+    │   ├── application.yml           # 共享配置
+    │   ├── application-dev.yml       # 开发环境
+    │   ├── application-pro.yml       # 生产环境
+    │   ├── mapper/                   # MyBatis XML
+    │   ├── templates/                # 旧 Freemarker 模板（保留参考）
+    │   └── static/                   # React 构建输出
+    └── frontend/                      # React SPA
+        ├── package.json
+        ├── vite.config.ts            # Vite 配置 + API 代理
+        └── src/
+            ├── api/                  # 后端 API 调用
+            ├── pages/                # 页面组件（按模块）
+            ├── components/           # 共享组件（PageTable, ModalForm 等）
+            ├── stores/               # Zustand 状态
+            ├── layouts/              # AdminLayout
+            ├── hooks/                # 自定义 Hooks
+            ├── types/                # TypeScript 类型
+            └── utils/                # 工具函数
+```
+
+## 开发约定
+
+### 后端
+
+- **分层模式**：`controller → service/impl → mapper + entity/dto/request`
+- **API 响应**：统一 `Result<T>` 包装 `{code: 0, data: T, msg: ""}`
+- **分页**：请求 `current + size`，响应 `{records, total, size, current, pages}`
+- **ID 策略**：Snowflake 算法（`IdType.ID_WORKER_STR`）
+- **软删除**：`is_deleted` 字段（0=正常, 1=删除, 2=禁用）
+- **JSON 接口**：标注 `@RequestBody` 的方法前端需设 `Content-Type: application/json`
+
+### 前端
+
+- **API 客户端**：axios 实例 `api/client.ts`，自动 form 编码 POST，响应解包 Result
+- **权限**：`<PermissionGuard perm="xxx:add">` 基于菜单权限 Set
+- **CRUD 模式**：`useQuery` + `useMutation` → `SearchForm` → `PageTable` → `ModalForm` → `Form`
+- **参考页面**：`pages/system/user/UserList.tsx` + `UserForm.tsx`
+
+## 常见问题
+
+### 前端构建失败
+```bash
+cd mes/frontend && npm install   # 确保依赖安装
+npm run build                     # 重新构建
+npx tsc --noEmit                 # 单独检查 TS 错误
+```
+
+### 后端启动失败
+- 检查 MySQL 是否运行且数据库 `mes_data` 已创建
+- 检查 `application-dev.yml` 中数据库密码是否正确
+- 确认所有 SQL 脚本已导入
+
+### API 返回 302 重定向
+- Shiro 认证拦截，确认已通过 `/login` 登录
+- 前端 API 调用在 DEV 模式下通过 `/api` 前缀代理（baseURL 自动设置）
+
+### 图片上传不显示
+- 检查 `vite.config.ts` 中图片路径代理配置
+- 确认文件上传目录 `{user.dir}/uploads/` 有写入权限
+
+## License
+
+AGPL-3.0 — 详见 [LICENSE](./LICENSE)
