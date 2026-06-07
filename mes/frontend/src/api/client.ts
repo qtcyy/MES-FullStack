@@ -7,8 +7,10 @@ const client = axios.create({
   withCredentials: true,
 })
 
-// Request interceptor: form-encode POST/PUT data unless Content-Type is explicitly set
+// Request interceptor: form-encode POST/PUT data, add AJAX header
 client.interceptors.request.use((config) => {
+  // Mark as AJAX so backend returns JSON on errors
+  config.headers['X-Requested-With'] = 'XMLHttpRequest'
   if (config.method === 'post' || config.method === 'put') {
     const hasContentType =
       config.headers?.['Content-Type'] || config.headers?.['content-type']
