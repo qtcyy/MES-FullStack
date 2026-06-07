@@ -169,11 +169,11 @@ export default function ProcessContentPage() {
     { title: '设备名称', dataIndex: 'name' },
     { title: '数量', dataIndex: 'quantity' },
     { title: '备注', dataIndex: 'remark' },
-    { title: '操作', render: (_: any, r: any) => (
+    { title: '操作', render: (_: any, r: any) => !isCompleted ? (
       <Popconfirm title="确定删除？" onConfirm={() => equipDelMutation.mutate(r.id)}>
         <Button type="link" size="small" danger>删除</Button>
       </Popconfirm>
-    )},
+    ) : null },
   ]
 
   const docColumns = [
@@ -181,9 +181,11 @@ export default function ProcessContentPage() {
     { title: '操作', render: (_: any, r: any) => (
       <Space>
         <Button type="link" size="small" onClick={() => setPreviewDoc(r)}>预览</Button>
-        <Popconfirm title="确定删除？" onConfirm={() => docDelMutation.mutate(r.id)}>
-          <Button type="link" size="small" danger>删除</Button>
-        </Popconfirm>
+        {!isCompleted && (
+          <Popconfirm title="确定删除？" onConfirm={() => docDelMutation.mutate(r.id)}>
+            <Button type="link" size="small" danger>删除</Button>
+          </Popconfirm>
+        )}
       </Space>
     )},
   ]
@@ -210,7 +212,7 @@ export default function ProcessContentPage() {
 
       {selectedBomId && (
         <>
-          <Steps current={currentStep} size="small" items={steps} style={{ marginBottom: 24 }} />
+          <Steps current={currentStep} onChange={isCompleted ? setCurrentStep : undefined} size="small" items={steps} style={{ marginBottom: 24 }} />
 
           <div style={{ maxWidth: 800 }}>
             {currentStep === 0 && (
