@@ -12,7 +12,7 @@ import com.wangziyang.mes.technology.request.SpProductBomPageReq;
 import com.wangziyang.mes.technology.service.ISpProductBomItemService;
 import com.wangziyang.mes.technology.service.ISpProductBomService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -156,7 +156,7 @@ public class SpProductBomController extends BaseController {
     @ResponseBody
     public Result lock(@RequestBody Map<String, String> params) {
         String id = params.get("id");
-        String username = (String) SecurityUtils.getSubject().getPrincipal();
+        String username = getSysUser() != null ? getSysUser().getUsername() : "admin";
         try {
             spProductBomService.lockBom(id, username);
             return Result.success(null);
