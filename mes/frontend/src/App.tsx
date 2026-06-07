@@ -30,6 +30,7 @@ import ProductBomList from '@/pages/technology/ProductBomList'
 import ProductBomEditor from '@/pages/technology/ProductBomEditor'
 import FlowList from '@/pages/technology/FlowList'
 import FlowProcessList from '@/pages/technology/FlowProcessList'
+import OperList from '@/pages/technology/OperList'
 // -- order --
 import OrderList from '@/pages/order/OrderList'
 // -- digitization --
@@ -92,6 +93,7 @@ function App() {
                   <Route path="technology/product-bom/:id" element={<ProductBomEditor />} />
                   <Route path="technology/flow" element={<FlowList />} />
                   <Route path="technology/flowprocess" element={<FlowProcessList />} />
+                  <Route path="technology/oper" element={<OperList />} />
 
                   {/* Order */}
                   <Route path="order/production" element={<OrderList />} />

@@ -132,6 +132,20 @@ export interface ProductionOrder {
   updateUsername?: string
 }
 
+// Oper types
+export interface Oper {
+  id: string
+  oper: string
+  operCode?: string
+  operDesc: string
+  processUnitId?: string
+  laborHours?: number
+  manufacturingCycle?: number
+  generatePlan?: string
+  remark?: string
+  createTime?: string
+}
+
 // Gantt chart data
 export interface GanttItem {
   id: string
