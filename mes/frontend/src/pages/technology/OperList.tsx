@@ -170,7 +170,7 @@ export default function OperList() {
         }}
         onChange={onChange}
         toolbar={
-          <PermissionGuard perm="oper:add">
+          <PermissionGuard perm="oper:list">
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
               新增
             </Button>
