@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Arrays;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -150,8 +151,13 @@ public class SpProcessContentController extends BaseController {
         if (file.isEmpty()) return Result.failure("文件为空");
         String originalName = file.getOriginalFilename();
         String ext = originalName != null && originalName.contains(".")
+            ? originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase() : "";
+        if (!Arrays.asList("pdf", "doc", "docx").contains(ext)) {
+            return Result.failure("只支持 PDF 和 Word（.doc/.docx）格式");
+        }
+        String extWithDot = originalName != null && originalName.contains(".")
             ? originalName.substring(originalName.lastIndexOf(".")) : "";
-        String fileName = UUID.randomUUID().toString().replace("-", "") + ext;
+        String fileName = UUID.randomUUID().toString().replace("-", "") + extWithDot;
         File dir = new File(UPLOAD_DIR);
         if (!dir.exists()) dir.mkdirs();
         file.transferTo(new File(UPLOAD_DIR + fileName));

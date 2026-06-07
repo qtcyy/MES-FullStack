@@ -133,6 +133,11 @@ export default function ProcessContentPage() {
   }
 
   const handleDocUpload = async (file: File) => {
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    if (!['pdf', 'doc', 'docx'].includes(ext || '')) {
+      message.error('只支持 PDF 和 Word（.doc/.docx）格式')
+      return false
+    }
     const res: any = await api.uploadDocument(file)
     const url = res?.url || res?.data?.url
     const name = res?.name || res?.data?.name || file.name
@@ -169,9 +174,12 @@ export default function ProcessContentPage() {
   const docColumns = [
     { title: '文档名称', dataIndex: 'name' },
     { title: '操作', render: (_: any, r: any) => (
-      <Popconfirm title="确定删除？" onConfirm={() => docDelMutation.mutate(r.id)}>
-        <Button type="link" size="small" danger>删除</Button>
-      </Popconfirm>
+      <Space>
+        <Button type="link" size="small" onClick={() => window.open(r.filePath, '_blank')}>预览</Button>
+        <Popconfirm title="确定删除？" onConfirm={() => docDelMutation.mutate(r.id)}>
+          <Button type="link" size="small" danger>删除</Button>
+        </Popconfirm>
+      </Space>
     )},
   ]
 
@@ -261,8 +269,9 @@ export default function ProcessContentPage() {
                 <h4 style={{ marginTop: 24 }}>技术文档</h4>
                 <Table rowKey="id" columns={docColumns} dataSource={docList} pagination={false} size="small" />
                 {!isCompleted && (
-                  <Dragger style={{ marginTop: 8 }} showUploadList={false} beforeUpload={(f) => { handleDocUpload(f); return false }}>
-                    <InboxOutlined style={{ fontSize: 36 }} /><p>点击或拖拽上传技术文档</p>
+                  <Dragger style={{ marginTop: 8 }} showUploadList={false} accept=".pdf,.doc,.docx"
+                    beforeUpload={(f) => { handleDocUpload(f); return false }}>
+                    <InboxOutlined style={{ fontSize: 36 }} /><p>点击或拖拽上传技术文档（仅支持 PDF、Word）</p>
                   </Dragger>
                 )}
 
