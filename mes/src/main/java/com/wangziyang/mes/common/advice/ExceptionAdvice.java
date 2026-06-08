@@ -43,7 +43,6 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler({Exception.class})
-    @ResponseBody
     public Object handleException(Exception e, HttpServletRequest request) {
         logger.error(e.getMessage(), e);
         if (HttpUtil.isAjax(request)) {
