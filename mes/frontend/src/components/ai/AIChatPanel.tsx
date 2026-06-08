@@ -161,6 +161,70 @@ export default function AIChatPanel() {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
         }
+
+        /* ---- Markdown styles for AI assistant messages ---- */
+        .chat-bubble--assistant p {
+          margin: 0 0 8px 0;
+        }
+        .chat-bubble--assistant p:last-child {
+          margin-bottom: 0;
+        }
+        .chat-bubble--assistant ul,
+        .chat-bubble--assistant ol {
+          margin: 4px 0;
+          padding-left: 20px;
+        }
+        .chat-bubble--assistant li {
+          margin-bottom: 2px;
+        }
+        .chat-bubble--assistant code {
+          background: rgba(0,0,0,0.06);
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+          font-size: 13px;
+        }
+        .chat-bubble--assistant pre {
+          background: #1e1e1e;
+          color: #d4d4d4;
+          padding: 12px;
+          border-radius: 8px;
+          overflow-x: auto;
+          margin: 8px 0;
+          font-size: 13px;
+          line-height: 1.5;
+        }
+        .chat-bubble--assistant pre code {
+          background: none;
+          padding: 0;
+          border-radius: 0;
+          color: inherit;
+          font-size: inherit;
+        }
+        .chat-bubble--assistant table {
+          border-collapse: collapse;
+          margin: 8px 0;
+          font-size: 13px;
+        }
+        .chat-bubble--assistant th,
+        .chat-bubble--assistant td {
+          border: 1px solid #ddd;
+          padding: 6px 10px;
+          text-align: left;
+        }
+        .chat-bubble--assistant th {
+          background: #f0f0f0;
+          font-weight: 600;
+        }
+        .chat-bubble--assistant blockquote {
+          border-left: 3px solid #1677ff;
+          margin: 8px 0;
+          padding: 4px 12px;
+          color: #666;
+        }
+        .chat-bubble--assistant strong {
+          font-weight: 600;
+        }
       `}</style>
     </div>
   )

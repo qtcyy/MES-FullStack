@@ -1,4 +1,6 @@
 import { UserOutlined, RobotOutlined } from '@ant-design/icons'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import type { Message } from '@/stores/aiChatStore'
 
 interface ChatMessageProps {
@@ -39,6 +41,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
       {/* Bubble */}
       <div
+        className={`chat-bubble ${isUser ? 'chat-bubble--user' : 'chat-bubble--assistant'}`}
         style={{
           maxWidth: '80%',
           padding: '10px 14px',
@@ -49,11 +52,19 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           color: '#333',
           fontSize: 14,
           lineHeight: 1.6,
-          whiteSpace: 'pre-wrap',
+          whiteSpace: isUser ? 'pre-wrap' : 'normal',
           wordBreak: 'break-word',
         }}
       >
-        {message.content || (
+        {message.content ? (
+          isUser ? (
+            message.content
+          ) : (
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content}
+            </ReactMarkdown>
+          )
+        ) : (
           <span
             style={{
               display: 'inline-block',
