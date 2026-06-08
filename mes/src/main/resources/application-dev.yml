@@ -59,4 +59,4 @@ logging:
     config: classpath:logback.xml
 
 deepseek:
-  api-key:
+  api-key: ${DEEPSEEK_API_KEY:}
