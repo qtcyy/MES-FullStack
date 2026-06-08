@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Input, Button, Space, Typography } from 'antd'
+import { Input, Button, Space } from 'antd'
 import { CloseOutlined, SendOutlined, DeleteOutlined } from '@ant-design/icons'
 import ChatMessage from './ChatMessage'
 import QuickPrompts from './QuickPrompts'
@@ -7,7 +7,6 @@ import useAIChatStore from '@/stores/aiChatStore'
 import { fetchQuickPrompts } from '@/api/ai'
 import type { QuickPrompt } from '@/types/ai'
 
-const { Text } = Typography
 
 export default function AIChatPanel() {
   const {
