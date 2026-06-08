@@ -74,6 +74,13 @@ public class SysUserController extends BaseController {
         return "admin/system/user/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SysUser result = sysUserService.getById(id);
+        return Result.success(result);
+    }
+
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SysUserDTO record) throws Exception {

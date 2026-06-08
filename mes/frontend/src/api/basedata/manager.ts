@@ -7,7 +7,7 @@ export function page(params: PageParams & { tableName?: string; tableDesc?: stri
 }
 
 export function getById(id: string) {
-  return client.get('/basedata/manager/add-or-update-ui', { params: { id } })
+  return client.get('/basedata/manager/get-by-id', { params: { id } })
 }
 
 // addOrUpdate uses @RequestBody JSON — explicitly set Content-Type to application/json

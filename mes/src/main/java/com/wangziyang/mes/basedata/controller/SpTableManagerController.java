@@ -80,6 +80,14 @@ public class SpTableManagerController extends BaseController {
         return "basedata/manager/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SpTableManager result = iSpTableManagerService.getById(id);
+        if (result == null) return Result.failure("记录不存在");
+        return Result.success(result);
+    }
+
 
     /**
      * 主数据表头分页查询

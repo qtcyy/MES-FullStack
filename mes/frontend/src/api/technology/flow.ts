@@ -7,7 +7,7 @@ export function page(params: PageParams & { flow?: string; flowDesc?: string }) 
 }
 
 export function getById(id: string) {
-  return client.get('/basedata/flow/add-or-update-ui', { params: { id } })
+  return client.get('/basedata/flow/get-by-id', { params: { id } })
 }
 
 // Flow process add-or-update (also used for Flow create/edit)

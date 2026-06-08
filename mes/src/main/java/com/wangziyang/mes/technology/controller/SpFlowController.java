@@ -66,4 +66,11 @@ public class SpFlowController extends BaseController {
         return Result.success(list);
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SpFlow result = iSpFlowService.getById(id);
+        return Result.success(result);
+    }
+
 }

@@ -7,7 +7,7 @@ export function page(params: PageParams & { nameLike?: string }) {
 }
 
 export function getById(id: string) {
-  return client.get('/admin/sys/dict/add-or-update-ui', { params: { id } })
+  return client.get('/admin/sys/dict/get-by-id', { params: { id } })
 }
 
 export function addOrUpdate(record: SysDict) {

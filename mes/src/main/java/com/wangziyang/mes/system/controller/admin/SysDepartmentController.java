@@ -64,6 +64,13 @@ public class SysDepartmentController extends BaseController {
         return "admin/system/department/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SysDepartment result = sysDepartmentService.getById(id);
+        return Result.success(result);
+    }
+
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SysDepartment record) {

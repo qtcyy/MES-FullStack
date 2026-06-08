@@ -7,7 +7,7 @@ export function page(params: PageParams & { materielCode?: string; materielCodeL
 }
 
 export function getById(id: string) {
-  return client.get('/technology/bom/add-or-update-ui', { params: { id } })
+  return client.get('/technology/bom/get-by-id', { params: { id } })
 }
 
 export function addOrUpdate(record: Record<string, unknown>) {

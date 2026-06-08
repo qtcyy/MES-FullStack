@@ -7,7 +7,7 @@ export function page(params: PageParams & { materiel?: string; materielDesc?: st
 }
 
 export function getById(id: string) {
-  return client.get('/basedata/materile/add-or-update-ui', { params: { id } })
+  return client.get('/basedata/materile/get-by-id', { params: { id } })
 }
 
 export function addOrUpdate(record: Record<string, unknown>) {

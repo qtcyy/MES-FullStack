@@ -69,6 +69,13 @@ public class SpOrderController extends BaseController {
         return "/order/production/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SpOrder result = iSpOrderService.getById(id);
+        return Result.success(result);
+    }
+
 
     /**
      * 生产订单界面分页查询

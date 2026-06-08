@@ -70,6 +70,13 @@ public class SpBomController extends BaseController {
         return "technology/bom/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SpBom result = iSpBomService.getById(id);
+        return Result.success(result);
+    }
+
 
     /**
      * 工艺BOM分页查询

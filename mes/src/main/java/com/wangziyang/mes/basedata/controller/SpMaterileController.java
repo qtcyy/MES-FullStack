@@ -83,6 +83,13 @@ public class SpMaterileController extends BaseController {
         return "basedata/materile/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SpMaterile result = iSpMaterileService.getById(id);
+        return Result.success(result);
+    }
+
 
     /**
      * 物料管理界面分页查询

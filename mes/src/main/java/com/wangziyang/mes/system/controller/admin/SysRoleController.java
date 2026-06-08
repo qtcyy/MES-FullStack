@@ -65,6 +65,13 @@ public class SysRoleController extends BaseController {
         return "admin/system/role/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SysRole result = sysRoleService.getById(id);
+        return Result.success(result);
+    }
+
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SysRoleDTO record) throws Exception {

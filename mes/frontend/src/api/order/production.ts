@@ -7,7 +7,7 @@ export function page(params: PageParams & { orderCode?: string; materiel?: strin
 }
 
 export function getById(id: string) {
-  return client.get('/order/release/add-or-update-ui', { params: { id } })
+  return client.get('/order/release/get-by-id', { params: { id } })
 }
 
 export function addOrUpdate(record: Record<string, unknown>) {

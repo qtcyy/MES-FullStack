@@ -11,7 +11,7 @@ export function tree() {
 }
 
 export function getById(id: string) {
-  return client.get('/admin/sys/menu/add-or-update-ui', { params: { id } })
+  return client.get('/admin/sys/menu/get-by-id', { params: { id } })
 }
 
 export function addOrUpdate(record: SysMenu) {

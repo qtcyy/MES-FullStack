@@ -63,6 +63,13 @@ public class SysDictController extends BaseController {
         return "admin/system/dict/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SysDict result = sysDictService.getById(id);
+        return Result.success(result);
+    }
+
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SysDict record) {

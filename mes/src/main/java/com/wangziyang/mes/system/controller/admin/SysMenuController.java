@@ -56,6 +56,13 @@ public class SysMenuController extends BaseController {
         return "admin/system/menu/addOrUpdate";
     }
 
+    @GetMapping("/get-by-id")
+    @ResponseBody
+    public Result getById(String id) {
+        SysMenu result = sysMenuService.getById(id);
+        return Result.success(result);
+    }
+
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SysMenu record) {
