@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 
 /**
  * AI 对话控制器 — SSE 流式端点
  * <p>
- * streamChat 在请求线程中直接调用（需要 Shiro SecurityManager），
- * RestTemplate 每收到一个 DeepSeek chunk 就通过 SseEmitter.send() 推送给客户端。
+ * 直接写入 HttpServletResponse 输出流，避免 SseEmitter 异步分发
+ * 导致 Shiro ThreadContext 丢失。
  * </p>
  */
 @RestController
@@ -30,25 +30,36 @@ public class AiChatController {
     private IAiChatService aiChatService;
 
     @PostMapping("/chat")
-    public SseEmitter chat(@RequestBody AiChatRequest request) {
-        SseEmitter emitter = new SseEmitter(300_000L);
+    public void chat(@RequestBody AiChatRequest request, HttpServletResponse response) {
+        response.setContentType("text/event-stream");
+        response.setCharacterEncoding("UTF-8");
 
-        try {
+        try (PrintWriter writer = response.getWriter()) {
             aiChatService.streamChat(request.getMessages(), chunk -> {
-                try {
-                    emitter.send(SseEmitter.event().data(chunk));
-                } catch (IOException e) {
-                    // 客户端断开连接 — 取消发送
-                    throw new RuntimeException("Client disconnected", e);
-                }
+                writer.write("data: " + chunk + "\n\n");
+                writer.flush();
             });
-            emitter.send(SseEmitter.event().data("[DONE]"));
-            emitter.complete();
+            writer.write("data: [DONE]\n\n");
+            writer.flush();
         } catch (Exception e) {
             logger.error("AI chat error", e);
-            emitter.completeWithError(e);
+            // 如果响应尚未提交，尝试写入错误信息
+            if (!response.isCommitted()) {
+                try (PrintWriter writer = response.getWriter()) {
+                    writer.write("data: {\"error\":\"" + escapeJson(e.getMessage()) + "\"}\n\n");
+                    writer.flush();
+                } catch (Exception ignored) {
+                    // 无法写入，忽略
+                }
+            }
         }
+    }
 
-        return emitter;
+    private static String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
     }
 }
