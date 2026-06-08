@@ -24,30 +24,29 @@ export default function QuickPrompts({ prompts, onPromptClick }: QuickPromptsPro
         lineHeight: 2.2,
         fontSize: 13,
         color: '#555',
+        width: '100%',
       }}
     >
-      <p style={{ margin: '0 0 8px 0' }}>👋 您好！我可以帮您：</p>
+      <style>{`
+.quick-prompt-link {
+  color: #1677ff;
+  border-bottom: 1px dashed #1677ff;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.quick-prompt-link:hover {
+  color: #0958d9;
+  border-bottom-color: #0958d9;
+  border-bottom-style: solid;
+}
+`}</style>
+      <p style={{ margin: '0 0 8px 0' }}>&#128075; 您好！我可以帮您：</p>
       {prompts.map((prompt) => (
         <p key={prompt.id} style={{ margin: '4px 0' }}>
           {prompt.icon && <span style={{ marginRight: 4 }}>{prompt.icon}</span>}
           <span
+            className="quick-prompt-link"
             onClick={() => onPromptClick(prompt)}
-            style={{
-              color: '#1677ff',
-              borderBottom: '1px dashed #1677ff',
-              cursor: 'pointer',
-              transition: 'color 0.2s, border-color 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#0958d9'
-              e.currentTarget.style.borderBottomColor = '#0958d9'
-              e.currentTarget.style.borderBottomStyle = 'solid'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#1677ff'
-              e.currentTarget.style.borderBottomColor = '#1677ff'
-              e.currentTarget.style.borderBottomStyle = 'dashed'
-            }}
           >
             {prompt.displayText}
           </span>
