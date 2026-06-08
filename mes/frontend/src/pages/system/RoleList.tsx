@@ -207,6 +207,7 @@ export default function RoleList() {
       <ModalForm
         open={modalOpen}
         title={editId ? '编辑角色' : '新增角色'}
+        width={820}
         formInstance={formInstance}
         onCancel={handleModalCancel}
         loading={saveMutation.isPending}
