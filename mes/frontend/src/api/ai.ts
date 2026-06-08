@@ -1,3 +1,5 @@
+import type { QuickPrompt } from '@/types/ai'
+
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
@@ -78,4 +80,51 @@ export async function streamChat(
   } finally {
     reader.cancel()
   }
+}
+
+/** 默认快捷提示词（前端常量，后续可从后端获取） */
+const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
+  {
+    id: '1',
+    text: '今天有哪些待处理的工单？',
+    displayText: '今日待处理工单',
+    icon: '📋',
+  },
+  {
+    id: '2',
+    text: '当前产线运行状态如何？',
+    displayText: '当前产线运行状态',
+    icon: '📊',
+  },
+  {
+    id: '3',
+    text: '设备OEE数据怎么看？',
+    displayText: '设备OEE数据分析',
+    icon: '🏭',
+  },
+  {
+    id: '4',
+    text: '如何创建工艺路线？',
+    displayText: '创建工艺路线的方法',
+    icon: '🔄',
+  },
+  {
+    id: '5',
+    text: 'BOM表如何录入和维护？',
+    displayText: 'BOM表录入与维护',
+    icon: '📝',
+  },
+]
+
+/**
+ * 获取快捷提示词列表
+ *
+ * 当前返回前端默认常量，后续可改为 HTTP GET 请求从后端获取，
+ * 以支持后台动态配置提示词。
+ */
+export function fetchQuickPrompts(): Promise<QuickPrompt[]> {
+  // TODO: 后续替换为后端 API 调用
+  // return fetch('/api/admin/ai/prompts', { credentials: 'include' })
+  //   .then(res => res.json())
+  return Promise.resolve(DEFAULT_QUICK_PROMPTS)
 }
