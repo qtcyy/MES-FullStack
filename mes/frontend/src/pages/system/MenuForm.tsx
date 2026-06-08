@@ -51,84 +51,77 @@ function MenuForm({ id, onFinish, formInstance }: MenuFormProps) {
       onFinish={handleFinish}
       initialValues={{ type: 1 }}
     >
-      <Form.Item
-        name="parentId"
-        label="上级菜单"
-      >
-        <TreeSelect
-          treeData={treeSelectData}
-          placeholder="请选择上级菜单"
-          allowClear
-          treeDefaultExpandAll
-        />
-      </Form.Item>
+      <div style={{ display: 'flex', gap: 24 }}>
+        {/* Left: Basic info */}
+        <div style={{ flex: '0 0 300px' }}>
+          <Form.Item name="parentId" label="上级菜单">
+            <TreeSelect
+              treeData={treeSelectData}
+              placeholder="请选择上级菜单"
+              allowClear
+              treeDefaultExpandAll
+            />
+          </Form.Item>
 
-      <Form.Item
-        name="name"
-        label="菜单名称"
-        rules={[{ required: true, message: '请输入菜单名称' }]}
-      >
-        <Input placeholder="请输入菜单名称" />
-      </Form.Item>
+          <Form.Item
+            name="name"
+            label="菜单名称"
+            rules={[{ required: true, message: '请输入菜单名称' }]}
+          >
+            <Input placeholder="请输入菜单名称" />
+          </Form.Item>
 
-      <Form.Item
-        name="code"
-        label="菜单编码"
-        rules={[{ required: true, message: '请输入菜单编码' }]}
-      >
-        <Input placeholder="请输入菜单编码" />
-      </Form.Item>
+          <Form.Item
+            name="code"
+            label="菜单编码"
+            rules={[{ required: true, message: '请输入菜单编码' }]}
+          >
+            <Input placeholder="请输入菜单编码" />
+          </Form.Item>
 
-      <Form.Item
-        name="type"
-        label="类型"
-        rules={[{ required: true, message: '请选择类型' }]}
-      >
-        <Select placeholder="请选择类型">
-          <Select.Option value={0}>目录</Select.Option>
-          <Select.Option value={1}>菜单</Select.Option>
-          <Select.Option value={2}>按钮</Select.Option>
-        </Select>
-      </Form.Item>
+          <Form.Item
+            name="type"
+            label="类型"
+            rules={[{ required: true, message: '请选择类型' }]}
+          >
+            <Select placeholder="请选择类型">
+              <Select.Option value={0}>目录</Select.Option>
+              <Select.Option value={1}>菜单</Select.Option>
+              <Select.Option value={2}>按钮</Select.Option>
+            </Select>
+          </Form.Item>
 
-      <Form.Item
-        name="icon"
-        label="图标"
-      >
-        <Input placeholder="如 fa-user" />
-      </Form.Item>
+          <Form.Item name="icon" label="图标">
+            <Input placeholder="如 setting, user" />
+          </Form.Item>
+        </div>
 
-      <Form.Item
-        name="url"
-        label="路径"
-      >
-        <Input placeholder="请输入路径" />
-      </Form.Item>
+        {/* Right: Additional config */}
+        <div
+          style={{
+            flex: 1,
+            borderLeft: '1px solid #f0f0f0',
+            paddingLeft: 24,
+            minWidth: 0,
+          }}
+        >
+          <Form.Item name="url" label="路径">
+            <Input placeholder="请输入路径" />
+          </Form.Item>
 
-      <Form.Item
-        name="permission"
-        label="权限标识"
-      >
-        <Input placeholder="请输入权限标识" />
-      </Form.Item>
+          <Form.Item name="permission" label="权限标识">
+            <Input placeholder="请输入权限标识" />
+          </Form.Item>
 
-      <Form.Item
-        name="sortNum"
-        label="排序"
-      >
-        <InputNumber
-          style={{ width: '100%' }}
-          placeholder="请输入排序号"
-          min={0}
-        />
-      </Form.Item>
+          <Form.Item name="sortNum" label="排序">
+            <InputNumber style={{ width: '100%' }} placeholder="请输入排序号" min={0} />
+          </Form.Item>
 
-      <Form.Item
-        name="descr"
-        label="描述"
-      >
-        <Input.TextArea rows={3} placeholder="请输入描述" />
-      </Form.Item>
+          <Form.Item name="descr" label="描述">
+            <Input.TextArea rows={3} placeholder="请输入描述" />
+          </Form.Item>
+        </div>
+      </div>
     </Form>
   )
 }

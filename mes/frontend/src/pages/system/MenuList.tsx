@@ -154,6 +154,7 @@ export default function MenuList() {
       <ModalForm
         open={modalOpen}
         title={editId ? '编辑菜单' : '新增菜单'}
+        width={820}
         formInstance={formInstance}
         onCancel={handleModalCancel}
         loading={saveMutation.isPending}
