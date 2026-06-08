@@ -1,45 +1,60 @@
 import type { ComponentType } from 'react'
 import {
-  HomeOutlined,
-  SettingOutlined,
-  UserOutlined,
-  TeamOutlined,
-  MenuOutlined,
+  ApartmentOutlined,
   AppstoreOutlined,
-  DatabaseOutlined,
-  ToolOutlined,
-  BarChartOutlined,
-  OrderedListOutlined,
-  FileTextOutlined,
-  ScheduleOutlined,
-  ExperimentOutlined,
-  DashboardOutlined,
-  ShopOutlined,
+  BranchesOutlined,
   CloudServerOutlined,
-  SafetyCertificateOutlined,
+  ClusterOutlined,
+  CodeSandboxOutlined,
+  ControlOutlined,
+  DashboardOutlined,
+  DatabaseOutlined,
+  ExperimentOutlined,
+  FileTextOutlined,
+  FlagOutlined,
+  HomeOutlined,
+  MenuOutlined,
+  PieChartOutlined,
+  ScanOutlined,
+  ScheduleOutlined,
+  SettingOutlined,
+  ShopOutlined,
+  TeamOutlined,
+  ToolOutlined,
+  UserOutlined,
 } from '@ant-design/icons'
 
+/**
+ * Maps semantic icon keys (stored in DB sp_sys_menu.icon) to Ant Design icon components.
+ * Keys match the updated SQL seed data.
+ */
 const iconMap: Record<string, ComponentType> = {
-  'fa-home': HomeOutlined,
-  'fa-user': UserOutlined,
-  'fa-users': TeamOutlined,
-  'fa-cog': SettingOutlined,
-  'fa-bars': MenuOutlined,
-  'fa-database': DatabaseOutlined,
-  'fa-wrench': ToolOutlined,
-  'fa-bar-chart': BarChartOutlined,
-  'fa-file-text': FileTextOutlined,
-  'fa-list': OrderedListOutlined,
-  'fa-calendar': ScheduleOutlined,
-  'fa-flask': ExperimentOutlined,
-  'fa-dashboard': DashboardOutlined,
-  'fa-shopping-cart': ShopOutlined,
-  'fa-server': CloudServerOutlined,
-  'fa-shield': SafetyCertificateOutlined,
+  home: HomeOutlined,
+  setting: SettingOutlined,
+  user: UserOutlined,
+  team: TeamOutlined,
+  menu: MenuOutlined,
+  apartment: ApartmentOutlined,
+  database: DatabaseOutlined,
+  tool: ToolOutlined,
+  schedule: ScheduleOutlined,
+  flag: FlagOutlined,
+  shop: ShopOutlined,
+  experiment: ExperimentOutlined,
+  branches: BranchesOutlined,
+  'file-text': FileTextOutlined,
+  cluster: ClusterOutlined,
+  scan: ScanOutlined,
+  'pie-chart': PieChartOutlined,
+  dashboard: DashboardOutlined,
+  'cloud-server': CloudServerOutlined,
+  control: ControlOutlined,
+  appstore: AppstoreOutlined,
+  codepen: CodeSandboxOutlined,
 }
 
 /**
- * Retrieve the matching Ant Design icon component for a Font Awesome class name.
+ * Retrieve the matching Ant Design icon component for a semantic icon key.
  * Falls back to AppstoreOutlined when no match is found.
  */
 export function getIcon(iconClass: string): ComponentType {
