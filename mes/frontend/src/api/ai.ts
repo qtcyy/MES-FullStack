@@ -25,6 +25,8 @@ export async function streamChat(
 ): Promise<void> {
   const response = await fetch('/api/admin/ai/chat', {
     method: 'POST',
+    credentials: 'include',
+    redirect: 'error',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'text/event-stream',

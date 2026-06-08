@@ -31,14 +31,18 @@ public class AiChatController {
 
     @PostMapping("/chat")
     public void chat(@RequestBody AiChatRequest request, HttpServletResponse response) {
+        logger.info("AI chat request received, messages count: {}", request.getMessages() != null ? request.getMessages().size() : 0);
+
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");
 
         try (PrintWriter writer = response.getWriter()) {
+            logger.info("Starting DeepSeek stream...");
             aiChatService.streamChat(request.getMessages(), chunk -> {
                 writer.write("data: " + chunk + "\n\n");
                 writer.flush();
             });
+            logger.info("DeepSeek stream completed");
             writer.write("data: [DONE]\n\n");
             writer.flush();
         } catch (Exception e) {
