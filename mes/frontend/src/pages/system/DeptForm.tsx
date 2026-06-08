@@ -57,6 +57,8 @@ function DeptForm({ id, onFinish, formInstance }: DeptFormProps) {
       deptApi.getById(id).then((res: any) => {
         formInstance.setFieldsValue(res)
       })
+    } else {
+      formInstance.resetFields()
     }
   }, [id, formInstance])
 

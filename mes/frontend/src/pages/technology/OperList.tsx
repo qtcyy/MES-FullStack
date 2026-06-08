@@ -65,7 +65,6 @@ export default function OperList() {
   const handleAdd = () => {
     setEditId(null)
     setSelectedRecord(null)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
@@ -83,7 +82,6 @@ export default function OperList() {
     setModalOpen(false)
     setEditId(null)
     setSelectedRecord(null)
-    formInstance.resetFields()
   }
 
   const handleFormFinish = (values: Record<string, unknown>) => {

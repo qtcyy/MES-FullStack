@@ -98,7 +98,6 @@ export default function RoleList() {
     setModalOpen(false)
     setEditId(null)
     setSelectedRecord(null)
-    formInstance.resetFields()
   }
 
   const handleFormFinish = (values: Record<string, unknown>) => {

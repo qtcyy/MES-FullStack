@@ -23,6 +23,8 @@ function OperForm({ record, onFinish, formInstance }: OperFormProps) {
   useEffect(() => {
     if (record) {
       formInstance.setFieldsValue(record)
+    } else {
+      formInstance.resetFields()
     }
   }, [record, formInstance])
 

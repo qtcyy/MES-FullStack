@@ -202,7 +202,6 @@ export default function TeamList() {
           setModalOpen(false)
           setEditId(null)
           setSelectedRecord(null)
-          formInstance.resetFields()
         }}
         loading={saveMutation.isPending}
       >

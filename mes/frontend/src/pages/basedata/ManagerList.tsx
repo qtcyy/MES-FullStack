@@ -67,13 +67,11 @@ export default function ManagerList() {
 
   const handleAdd = () => {
     setEditId(null)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
   const handleEdit = (record: Manager) => {
     setEditId(record.id)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
@@ -84,7 +82,6 @@ export default function ManagerList() {
   const handleModalCancel = () => {
     setModalOpen(false)
     setEditId(null)
-    formInstance.resetFields()
   }
 
   const handleFormFinish = (values: Record<string, unknown>) => {

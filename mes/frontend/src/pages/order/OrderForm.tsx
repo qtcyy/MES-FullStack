@@ -26,7 +26,6 @@ function OrderForm({ id, onFinish, formInstance }: OrderFormProps) {
   useEffect(() => {
     if (id) {
       productionApi.getById(id).then((res: any) => {
-        // Convert date strings to dayjs objects for DatePicker
         if (res.planStartTime) {
           res.planStartTime = dayjs(res.planStartTime)
         }
@@ -35,6 +34,8 @@ function OrderForm({ id, onFinish, formInstance }: OrderFormProps) {
         }
         formInstance.setFieldsValue(res)
       })
+    } else {
+      formInstance.resetFields()
     }
   }, [id, formInstance])
 

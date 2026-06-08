@@ -76,13 +76,11 @@ export default function FlowProcessList() {
 
   const handleAdd = () => {
     setEditId(null)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
   const handleEdit = (record: Flow) => {
     setEditId(record.id)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
@@ -93,7 +91,6 @@ export default function FlowProcessList() {
   const handleModalCancel = () => {
     setModalOpen(false)
     setEditId(null)
-    formInstance.resetFields()
   }
 
   const handleFormFinish = (values: Record<string, unknown>) => {

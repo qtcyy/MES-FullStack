@@ -17,6 +17,8 @@ function BomForm({ id, onFinish, formInstance }: BomFormProps) {
       bomApi.getById(id).then((res: any) => {
         formInstance.setFieldsValue(res)
       })
+    } else {
+      formInstance.resetFields()
     }
   }, [id, formInstance])
 

@@ -16,6 +16,8 @@ function DictForm({ id, onFinish, formInstance }: DictFormProps) {
       dictApi.getById(id).then((res: any) => {
         formInstance.setFieldsValue(res)
       })
+    } else {
+      formInstance.resetFields()
     }
   }, [id, formInstance])
 

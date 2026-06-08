@@ -95,13 +95,11 @@ export default function DeptList() {
 
   const handleAdd = () => {
     setEditId(null)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
   const handleEdit = (record: SysDepartment) => {
     setEditId(record.id)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
@@ -112,7 +110,6 @@ export default function DeptList() {
   const handleModalCancel = () => {
     setModalOpen(false)
     setEditId(null)
-    formInstance.resetFields()
   }
 
   const handleFormFinish = (values: Record<string, unknown>) => {

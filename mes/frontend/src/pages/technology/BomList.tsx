@@ -68,13 +68,11 @@ export default function BomList() {
 
   const handleAdd = () => {
     setEditId(null)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
   const handleEdit = (record: Bom) => {
     setEditId(record.id)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
@@ -85,7 +83,6 @@ export default function BomList() {
   const handleModalCancel = () => {
     setModalOpen(false)
     setEditId(null)
-    formInstance.resetFields()
   }
 
   const handleFormFinish = (values: Record<string, unknown>) => {

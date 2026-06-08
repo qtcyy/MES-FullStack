@@ -95,7 +95,6 @@ export default function ComponentPage() {
   const handleModalCancel = () => {
     setModalOpen(false)
     setEditId(null)
-    formInstance.resetFields()
   }
 
   const handleFormFinish = (values: Record<string, unknown>) => {

@@ -50,12 +50,15 @@ function FlowProcessForm({ id, onFinish, formInstance }: FlowProcessFormProps) {
         setSelectedFlow(res.flow)
         formInstance.setFieldsValue({ flow: res.flow })
 
-        // If the process field contains operation keys, parse them
         if (res.process) {
           const ops = res.process.split('→').filter(Boolean)
           setTargetKeys(ops)
         }
       })
+    } else {
+      formInstance.resetFields()
+      setSelectedFlow(undefined)
+      setTargetKeys([])
     }
   }, [id, formInstance])
 

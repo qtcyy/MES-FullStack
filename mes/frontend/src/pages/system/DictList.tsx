@@ -72,13 +72,11 @@ export default function DictList() {
 
   const handleAdd = () => {
     setEditId(null)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
   const handleEdit = (record: SysDict) => {
     setEditId(record.id)
-    formInstance.resetFields()
     setModalOpen(true)
   }
 
@@ -89,7 +87,6 @@ export default function DictList() {
   const handleModalCancel = () => {
     setModalOpen(false)
     setEditId(null)
-    formInstance.resetFields()
   }
 
   const handleFormFinish = (values: Record<string, unknown>) => {

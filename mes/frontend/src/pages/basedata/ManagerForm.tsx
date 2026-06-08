@@ -15,7 +15,6 @@ function ManagerForm({ id, onFinish, formInstance }: ManagerFormProps) {
   useEffect(() => {
     if (id) {
       managerApi.getById(id).then((res: any) => {
-        // Parse fields JSON string to array for Form.List
         if (typeof res.fields === 'string') {
           try {
             res.fields = JSON.parse(res.fields)
@@ -25,6 +24,8 @@ function ManagerForm({ id, onFinish, formInstance }: ManagerFormProps) {
         }
         formInstance.setFieldsValue(res)
       })
+    } else {
+      formInstance.resetFields()
     }
   }, [id, formInstance])
 

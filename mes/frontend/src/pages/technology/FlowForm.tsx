@@ -16,6 +16,8 @@ function FlowForm({ id, onFinish, formInstance }: FlowFormProps) {
       flowApi.getById(id).then((res: any) => {
         formInstance.setFieldsValue(res)
       })
+    } else {
+      formInstance.resetFields()
     }
   }, [id, formInstance])
 
