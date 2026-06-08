@@ -197,6 +197,7 @@ export default function TeamList() {
       <ModalForm
         open={modalOpen}
         title={editId ? '编辑班组' : '新增班组'}
+        width={820}
         formInstance={formInstance}
         onCancel={() => {
           setModalOpen(false)

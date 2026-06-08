@@ -72,43 +72,72 @@ function TeamForm({ id, record, onFinish, formInstance }: TeamFormProps) {
       onFinish={handleFinish}
       initialValues={{ deleted: '0', workdays: [] }}
     >
-      <Form.Item name="code" label="班组代码" rules={[{ required: true, message: '请输入班组代码' }]}>
-        <Input placeholder="请输入班组代码" />
-      </Form.Item>
+      {/* Top: Left-right layout for basic fields */}
+      <div style={{ display: 'flex', gap: 24 }}>
+        {/* Left column */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <Form.Item
+            name="code"
+            label="班组代码"
+            rules={[{ required: true, message: '请输入班组代码' }]}
+          >
+            <Input placeholder="请输入班组代码" />
+          </Form.Item>
 
-      <Form.Item name="name" label="班组名称" rules={[{ required: true, message: '请输入班组名称' }]}>
-        <Input placeholder="请输入班组名称" />
-      </Form.Item>
+          <Form.Item
+            name="name"
+            label="班组名称"
+            rules={[{ required: true, message: '请输入班组名称' }]}
+          >
+            <Input placeholder="请输入班组名称" />
+          </Form.Item>
 
-      <Form.Item name="descr" label="备注">
-        <Input.TextArea rows={2} placeholder="请输入备注" />
-      </Form.Item>
+          <Form.Item name="descr" label="备注">
+            <Input.TextArea rows={2} placeholder="请输入备注" />
+          </Form.Item>
 
-      <Form.Item name="lineId" label="所属生产线">
-        <Select placeholder="请选择生产线" allowClear>
-          {lineOptions.map((l) => (
-            <Select.Option key={l.id} value={l.id}>{l.name}</Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
+          <Form.Item name="lineId" label="所属生产线">
+            <Select placeholder="请选择生产线" allowClear>
+              {lineOptions.map((l) => (
+                <Select.Option key={l.id} value={l.id}>{l.name}</Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </div>
 
-      <Form.Item name="workshopId" label="所属车间">
-        <Select placeholder="请选择车间" allowClear>
-          {workshopOptions.map((w) => (
-            <Select.Option key={w.id} value={w.id}>{w.name}</Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
+        {/* Right column */}
+        <div
+          style={{
+            flex: 1,
+            borderLeft: '1px solid #f0f0f0',
+            paddingLeft: 24,
+            minWidth: 0,
+          }}
+        >
+          <Form.Item name="workshopId" label="所属车间">
+            <Select placeholder="请选择车间" allowClear>
+              {workshopOptions.map((w) => (
+                <Select.Option key={w.id} value={w.id}>{w.name}</Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-      <Form.Item name="startTime" label="上班时间">
-        <TimePicker format="HH:mm" placeholder="上班时间" style={{ width: '100%' }} />
-      </Form.Item>
+          <Form.Item name="startTime" label="上班时间">
+            <TimePicker format="HH:mm" placeholder="上班时间" style={{ width: '100%' }} />
+          </Form.Item>
 
-      <Form.Item name="endTime" label="下班时间">
-        <TimePicker format="HH:mm" placeholder="下班时间" style={{ width: '100%' }} />
-      </Form.Item>
+          <Form.Item name="endTime" label="下班时间">
+            <TimePicker format="HH:mm" placeholder="下班时间" style={{ width: '100%' }} />
+          </Form.Item>
+        </div>
+      </div>
 
-      <Form.Item name="workdays" label="工作日">
+      {/* Bottom: Full-width fields */}
+      <Form.Item
+        name="workdays"
+        label="工作日"
+        style={{ marginTop: 8, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}
+      >
         <Checkbox.Group options={WEEKDAY_OPTIONS} />
       </Form.Item>
 
