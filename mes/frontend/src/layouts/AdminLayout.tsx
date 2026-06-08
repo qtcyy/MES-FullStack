@@ -15,6 +15,8 @@ import useAppStore from '@/stores/appStore'
 import { getIcon } from '@/utils/iconMap'
 import { toReactRoute } from '@/utils/urlMap'
 import type { TreeVO, SysMenu } from '@/types/menu'
+import FloatButton from '@/components/ai/FloatButton'
+import AIChatPanel from '@/components/ai/AIChatPanel'
 
 // ---------------------------------------------------------------------------
 // Helper: build Ant Design Menu items from the TreeVO structure
@@ -355,6 +357,10 @@ export default function AdminLayout() {
           </Form>
         </Modal>
       </Layout>
+
+      {/* AI Chat Assistant */}
+      <AIChatPanel />
+      <FloatButton />
     </Layout>
   )
 }
