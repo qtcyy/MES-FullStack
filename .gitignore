@@ -6,3 +6,5 @@
 mes/frontend/uploads/
 mes/frontend/node/
 .superpowers/
+.DS_Store
+**/.DS_Store
