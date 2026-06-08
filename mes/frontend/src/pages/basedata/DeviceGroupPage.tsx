@@ -160,7 +160,7 @@ export default function DeviceGroupPage() {
                 onChange={devOnChange}
                 toolbar={<PermissionGuard perm="device:add"><Button type="primary" icon={<PlusOutlined />}
                   onClick={() => { setDevEditId(null); setDevRecord(null); setDevModalOpen(true) }}>新增设备</Button></PermissionGuard>} />
-              <ModalForm open={devModalOpen} title={devEditId ? '编辑设备' : '新增设备'} formInstance={devForm}
+              <ModalForm open={devModalOpen} title={devEditId ? '编辑设备' : '新增设备'} width={820} formInstance={devForm}
                 onCancel={() => { setDevModalOpen(false); setDevEditId(null); setDevRecord(null); devForm.resetFields() }}
                 loading={devSave.isPending}>
                 <DeviceForm id={devEditId} record={devRecord} formInstance={devForm} onFinish={(v) => devSave.mutate({ ...v, id: devEditId || undefined })} />
@@ -181,7 +181,7 @@ export default function DeviceGroupPage() {
                 onChange={grpOnChange}
                 toolbar={<PermissionGuard perm="device:add"><Button type="primary" icon={<PlusOutlined />}
                   onClick={() => { setGrpEditId(null); setGrpRecord(null); setGrpModalOpen(true) }}>新增编组</Button></PermissionGuard>} />
-              <ModalForm open={grpModalOpen} title={grpEditId ? '编辑编组' : '新增编组'} formInstance={grpForm}
+              <ModalForm open={grpModalOpen} title={grpEditId ? '编辑编组' : '新增编组'} width={720} formInstance={grpForm}
                 onCancel={() => { setGrpModalOpen(false); setGrpEditId(null); setGrpRecord(null); grpForm.resetFields() }}
                 loading={grpSave.isPending}>
                 <DeviceGroupForm id={grpEditId} record={grpRecord} formInstance={grpForm} onFinish={(v) => grpSave.mutate({ ...v, id: grpEditId || undefined })} />
