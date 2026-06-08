@@ -18,6 +18,8 @@ function UserForm({ id, onFinish, formInstance }: UserFormProps) {
       userApi.getById(id).then((res: any) => {
         formInstance.setFieldsValue(res)
       })
+    } else {
+      formInstance.resetFields()
     }
   }, [id, formInstance])
 
