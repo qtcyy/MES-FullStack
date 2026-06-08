@@ -93,7 +93,8 @@ const useAIChatStore = create<AIChatState>((set, get) => ({
         abortController.signal,
       )
     } catch (err: unknown) {
-      if (err instanceof DOMException && err.name === 'AbortError') return
+      const errName = (err as any)?.name
+      if (errName === 'AbortError') return
 
       const errorMsg =
         err instanceof Error ? err.message : '网络连接失败，请稍后重试'
