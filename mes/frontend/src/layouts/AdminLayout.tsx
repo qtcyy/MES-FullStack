@@ -193,7 +193,7 @@ export default function AdminLayout() {
   // -----------------------------------------------------------------------
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ height: '100vh', overflow: 'hidden' }}>
       {/* ---- Sidebar ---- */}
       <Layout.Sider
         collapsible
@@ -201,22 +201,25 @@ export default function AdminLayout() {
         onCollapse={toggleSidebar}
         theme="dark"
         width={256}
+        style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
       >
         <div className="admin-logo">{sidebarCollapsed ? 'MES' : 'MES 章鱼师兄'}</div>
 
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={selectedKeys}
-          openKeys={openKeys}
-          onOpenChange={setOpenKeys}
-          items={menuItems}
-          onClick={handleMenuClick}
-        />
+        <div className="admin-menu-scroll">
+          <Menu
+            theme="dark"
+            mode="inline"
+            selectedKeys={selectedKeys}
+            openKeys={openKeys}
+            onOpenChange={setOpenKeys}
+            items={menuItems}
+            onClick={handleMenuClick}
+          />
+        </div>
       </Layout.Sider>
 
       {/* ---- Main area ---- */}
-      <Layout>
+      <Layout style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
         {contextHolder}
 
         {/* Header */}
@@ -290,7 +293,8 @@ export default function AdminLayout() {
             margin: 16,
             padding: 24,
             background: '#fff',
-            minHeight: 280,
+            flex: 1,
+            overflowY: 'auto',
           }}
         >
           <Outlet />
