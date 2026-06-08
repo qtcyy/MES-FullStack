@@ -199,15 +199,15 @@ export default function AdminLayout() {
         collapsible
         collapsed={sidebarCollapsed}
         onCollapse={toggleSidebar}
-        theme="dark"
+        theme="light"
         width={256}
-        style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+        style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#e8f4fd' }}
       >
         <div className="admin-logo">{sidebarCollapsed ? 'MES' : 'MES 章鱼师兄'}</div>
 
         <div className="admin-menu-scroll">
           <Menu
-            theme="dark"
+            theme="light"
             mode="inline"
             selectedKeys={selectedKeys}
             openKeys={openKeys}
