@@ -63,7 +63,11 @@ const useMenuStore = create<MenuState>()(
         search(result.menuInfo)
 
         if (matchedKeys.length > 0) {
-          set({ selectedKeys: matchedKeys, openKeys: matchedParents })
+          // Merge current-route parents with existing persisted openKeys so
+          // previously expanded menus stay open across refreshes.
+          const existingOpenKeys = useMenuStore.getState().openKeys
+          const mergedOpenKeys = Array.from(new Set([...existingOpenKeys, ...matchedParents]))
+          set({ selectedKeys: matchedKeys, openKeys: mergedOpenKeys })
         }
       },
 
@@ -76,7 +80,7 @@ const useMenuStore = create<MenuState>()(
     }),
     {
       name: 'menu-storage',
-      partialize: (state) => ({ sidebarCollapsed: state.sidebarCollapsed }),
+      partialize: (state) => ({ sidebarCollapsed: state.sidebarCollapsed, openKeys: state.openKeys }),
     },
   ),
 )
