@@ -57,18 +57,11 @@
 ### 1. 初始化数据库
 
 ```bash
-# 创建数据库
-mysql -h localhost -u root -p -e "CREATE DATABASE IF NOT EXISTS mes_data DEFAULT CHARSET utf8mb4"
-
-# 导入主表结构
-mysql -h localhost -u root -p mes_data < scripts/sql/MySQL-20210225.sql
-
-# 导入扩展模块表
-mysql -h localhost -u root -p mes_data < scripts/sql/role-management-update.sql
-mysql -h localhost -u root -p mes_data < scripts/sql/team-management.sql
-mysql -h localhost -u root -p mes_data < scripts/sql/device-management.sql
-mysql -h localhost -u root -p mes_data < scripts/sql/product-bom.sql
+# 一键导入全部 39 张表结构 + 种子数据
+mysql -h localhost -u root -p < scripts/sql/MySQL-init-all.sql
 ```
+
+该脚本包含完整的数据库初始化（自动创建数据库 `mes_data`），无需单独执行其他 SQL 文件。
 
 ### 2. 配置数据库连接
 
@@ -189,7 +182,8 @@ MES-FullStack/
 ├── LICENSE                            # AGPL-3.0
 ├── docs/                              # 开发文档（FreeMarker/Layui 参考）
 ├── scripts/sql/                       # 数据库脚本
-│   ├── MySQL-20210225.sql            # 主表结构
+│   ├── MySQL-init-all.sql            # 完整初始化（推荐，39 表 + 种子数据）
+│   ├── MySQL-20210225.sql            # 原始主表结构
 │   ├── product-bom.sql               # 产品 BOM 扩展
 │   ├── device-management.sql         # 设备管理扩展
 │   ├── team-management.sql           # 班组管理扩展
@@ -255,7 +249,7 @@ npx tsc --noEmit                 # 单独检查 TS 错误
 ### 后端启动失败
 - 检查 MySQL 是否运行且数据库 `mes_data` 已创建
 - 检查 `application-dev.yml` 中数据库密码是否正确
-- 确认所有 SQL 脚本已导入
+- 确认已执行 `scripts/sql/MySQL-init-all.sql` 初始化脚本
 
 ### API 返回 302 重定向
 - Shiro 认证拦截，确认已通过 `/login` 登录
