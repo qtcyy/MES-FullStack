@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Input, Button, Space, Typography } from 'antd'
 import { CloseOutlined, SendOutlined, DeleteOutlined } from '@ant-design/icons'
 import ChatMessage from './ChatMessage'
+import QuickPrompts from './QuickPrompts'
 import useAIChatStore from '@/stores/aiChatStore'
+import { fetchQuickPrompts } from '@/api/ai'
+import type { QuickPrompt } from '@/types/ai'
 
 const { Text } = Typography
 
@@ -17,7 +20,13 @@ export default function AIChatPanel() {
   } = useAIChatStore()
 
   const [inputValue, setInputValue] = useState('')
+  const [quickPrompts, setQuickPrompts] = useState<QuickPrompt[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Load quick prompts on mount
+  useEffect(() => {
+    fetchQuickPrompts().then(setQuickPrompts)
+  }, [])
 
   // 新消息自动滚底
   useEffect(() => {
@@ -43,6 +52,10 @@ export default function AIChatPanel() {
     if (e.key === 'Escape') {
       close()
     }
+  }
+
+  const handlePromptClick = (prompt: QuickPrompt) => {
+    sendMessage(prompt.text)
   }
 
   if (!isOpen) return null
@@ -106,19 +119,20 @@ export default function AIChatPanel() {
           background: '#fafafa',
         }}
       >
-        {messages.length === 0 && (
+        {messages.length === 0 && quickPrompts.length > 0 && (
           <div
             style={{
-              textAlign: 'center',
-              color: '#bbb',
-              marginTop: 120,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '100%',
+              paddingTop: 40,
             }}
           >
-            <Text type="secondary">
-              👋 你好！我是 MES 章鱼师兄的 AI 助手
-              <br />
-              可以问我关于系统功能的任何问题
-            </Text>
+            <QuickPrompts
+              prompts={quickPrompts}
+              onPromptClick={handlePromptClick}
+            />
           </div>
         )}
         {messages.map((msg) => (
