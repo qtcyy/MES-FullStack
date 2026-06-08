@@ -23,8 +23,9 @@ function CaptchaImage({ className, style }: CaptchaImageProps) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 4,
+        gap: 6,
         cursor: 'pointer',
+        userSelect: 'none',
         ...style,
       }}
       onClick={handleRefresh}
@@ -32,9 +33,9 @@ function CaptchaImage({ className, style }: CaptchaImageProps) {
       <img
         src={captchaUrl}
         alt="验证码"
-        style={{ height: 28, borderRadius: 4 }}
+        style={{ height: 32, borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.12)' }}
       />
-      <span style={{ fontSize: 12, color: '#1890ff', whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: 12, color: '#3b82f6', whiteSpace: 'nowrap' }}>
         换一张
       </span>
     </div>
