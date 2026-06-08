@@ -16,3 +16,8 @@ swagger:
   licenseUrl: https://gitee.com/wangziyangyang/MES-Sprongboot
   title: 王子杨的API 管理
   version: 1.0.0
+
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY:}
+  base-url: https://api.deepseek.com
+  model: deepseek-chat

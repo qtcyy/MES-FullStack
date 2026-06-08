@@ -57,3 +57,6 @@ logging:
     root: info
     com.wangziyang: debug
     config: classpath:logback.xml
+
+deepseek:
+  api-key:
