@@ -106,6 +106,9 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/client/**", "anon");
         filterChainDefinitionMap.put("/blog", "anon");
         filterChainDefinitionMap.put("/blog/open/**", "anon");
+        // 图片服务路径（<img> 标签请求无 AJAX 头，需放行避免 Shiro 重定向到登录页）
+        filterChainDefinitionMap.put("/technology/process-content/image/**", "anon");
+        filterChainDefinitionMap.put("/basedata/materile/image/**", "anon");
         filterChainDefinitionMap.put("/**", "authc");
 
         Map<String, Filter> filters = new HashMap<>(2);
