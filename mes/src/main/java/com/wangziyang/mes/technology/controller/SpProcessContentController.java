@@ -3,6 +3,7 @@ package com.wangziyang.mes.technology.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.common.util.MinioUtil;
 import com.wangziyang.mes.technology.entity.*;
 import com.wangziyang.mes.technology.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.Arrays;
-import java.nio.file.Files;
 import java.util.*;
 
 @Controller
@@ -25,6 +22,7 @@ public class SpProcessContentController extends BaseController {
     @Autowired private ISpProcessDocumentService documentService;
     @Autowired private ISpProductBomService bomService;
     @Autowired private ISpProductBomItemService bomItemService;
+    @Autowired private MinioUtil minioUtil;
 
     @GetMapping("/get/{bomId}")
     @ResponseBody
@@ -100,34 +98,18 @@ public class SpProcessContentController extends BaseController {
         return Result.success(null);
     }
 
-    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/process/";
-
     @PostMapping("/upload-image")
     @ResponseBody
-    public Result uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+    public Result uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) return Result.failure("文件为空");
-        String ext = ".jpg";
-        String originalName = file.getOriginalFilename();
-        if (originalName != null && originalName.contains("."))
-            ext = originalName.substring(originalName.lastIndexOf("."));
-        String fileName = UUID.randomUUID().toString().replace("-", "") + ext;
-        File dir = new File(UPLOAD_DIR);
-        if (!dir.exists()) dir.mkdirs();
-        file.transferTo(new File(UPLOAD_DIR + fileName));
-        Map<String, String> result = new HashMap<>();
-        result.put("url", "/technology/process-content/image/" + fileName);
-        return Result.success(result);
-    }
-
-    @GetMapping("/image/{filename}")
-    public void getImage(@PathVariable String filename, HttpServletResponse response) throws IOException {
-        File file = new File(UPLOAD_DIR + filename);
-        if (!file.exists()) { response.sendError(404); return; }
-        if (filename.endsWith(".pdf")) { response.setContentType("application/pdf"); }
-        else if (filename.endsWith(".png")) { response.setContentType("image/png"); }
-        else { response.setContentType("image/jpeg"); }
-        Files.copy(file.toPath(), response.getOutputStream());
-        response.getOutputStream().flush();
+        try {
+            String url = minioUtil.uploadAndGetUrl(file, "process");
+            Map<String, String> result = new HashMap<>();
+            result.put("url", url);
+            return Result.success(result);
+        } catch (Exception e) {
+            return Result.failure("上传失败: " + e.getMessage());
+        }
     }
 
     @PostMapping("/document/save")
@@ -149,7 +131,7 @@ public class SpProcessContentController extends BaseController {
 
     @PostMapping("/upload-document")
     @ResponseBody
-    public Result uploadDocument(@RequestParam("file") MultipartFile file) throws IOException {
+    public Result uploadDocument(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) return Result.failure("文件为空");
         String originalName = file.getOriginalFilename();
         String ext = originalName != null && originalName.contains(".")
@@ -157,16 +139,15 @@ public class SpProcessContentController extends BaseController {
         if (!"pdf".equals(ext)) {
             return Result.failure("只支持 PDF 格式");
         }
-        String extWithDot = originalName != null && originalName.contains(".")
-            ? originalName.substring(originalName.lastIndexOf(".")) : "";
-        String fileName = UUID.randomUUID().toString().replace("-", "") + extWithDot;
-        File dir = new File(UPLOAD_DIR);
-        if (!dir.exists()) dir.mkdirs();
-        file.transferTo(new File(UPLOAD_DIR + fileName));
-        Map<String, String> result = new HashMap<>();
-        result.put("url", "/technology/process-content/image/" + fileName);
-        result.put("name", originalName);
-        return Result.success(result);
+        try {
+            String url = minioUtil.uploadAndGetUrl(file, "process");
+            Map<String, String> result = new HashMap<>();
+            result.put("url", url);
+            result.put("name", originalName);
+            return Result.success(result);
+        } catch (Exception e) {
+            return Result.failure("上传失败: " + e.getMessage());
+        }
     }
 
     @GetMapping("/bom-items/{bomId}")
