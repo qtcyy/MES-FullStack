@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Form, Button, Input, Tag, Popconfirm, message } from 'antd'
+import { Form, Button, Input, Tag, Popconfirm, message, Image } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import PageContainer from '@/components/PageContainer'
@@ -147,7 +147,15 @@ export default function MaterileList() {
       dataIndex: 'imageUrl',
       key: 'imageUrl',
       render: (v: string) =>
-        v ? <img src={v} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} /> : '-',
+        v ? (
+          <Image
+            src={v}
+            width={40}
+            height={40}
+            style={{ objectFit: 'cover', borderRadius: 4 }}
+            fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNjY2MiIGZvbnQtc2l6ZT0iOCI+5Zu+54mHPC90ZXh0Pjwvc3ZnPg=="
+          />
+        ) : '-',
     },
     {
       title: '状态',
