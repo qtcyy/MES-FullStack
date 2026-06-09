@@ -10,6 +10,7 @@ import com.wangziyang.mes.basedata.request.spMaterileReq;
 import com.wangziyang.mes.basedata.service.ISpMaterileService;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.common.util.MinioUtil;
 import com.wangziyang.mes.technology.entity.SpFlow;
 import com.wangziyang.mes.technology.service.ISpFlowService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -22,9 +23,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -157,35 +155,21 @@ public class SpMaterileController extends BaseController {
         }
     }
 
-    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/materile/";
+    @Autowired
+    private MinioUtil minioUtil;
 
     @PostMapping("/upload-image")
     @ResponseBody
-    public Result uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+    public Result uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) return Result.failure("文件为空");
-        String originalName = file.getOriginalFilename();
-        String ext = originalName != null && originalName.contains(".")
-            ? originalName.substring(originalName.lastIndexOf(".")) : ".jpg";
-        String fileName = UUID.randomUUID().toString().replace("-", "") + ext;
-        File dir = new File(UPLOAD_DIR);
-        if (!dir.exists()) dir.mkdirs();
-        file.transferTo(new File(UPLOAD_DIR + fileName));
-        Map<String, String> result = new HashMap<>();
-        result.put("url", "/basedata/materile/image/" + fileName);
-        return Result.success(result);
-    }
-
-    @GetMapping("/image/{filename}")
-    public void getImage(@PathVariable String filename, HttpServletResponse response) throws IOException {
-        File file = new File(UPLOAD_DIR + filename);
-        if (!file.exists()) {
-            response.sendError(404);
-            return;
+        try {
+            String url = minioUtil.uploadAndGetUrl(file, "materile");
+            Map<String, String> result = new HashMap<>();
+            result.put("url", url);
+            return Result.success(result);
+        } catch (Exception e) {
+            return Result.failure("上传失败: " + e.getMessage());
         }
-        String contentType = filename.endsWith(".png") ? "image/png" : "image/jpeg";
-        response.setContentType(contentType);
-        Files.copy(file.toPath(), response.getOutputStream());
-        response.getOutputStream().flush();
     }
 
 
