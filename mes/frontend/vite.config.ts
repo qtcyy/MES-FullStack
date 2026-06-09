@@ -18,14 +18,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
-      '/basedata/materile/image': {
-        target: 'http://localhost:9090',
-        changeOrigin: true,
-      },
-      '/technology/process-content/image': {
-        target: 'http://localhost:9090',
-        changeOrigin: true,
-      },
     },
   },
   build: {
