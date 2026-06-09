@@ -171,11 +171,11 @@
             <version>5.1.5</version>
         </dependency>
 
-        <!-- MinIO Object Storage SDK -->
+        <!-- MinIO Object Storage SDK (7.x for okhttp3 compatibility with Spring Boot 2.x) -->
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
-            <version>8.5.7</version>
+            <version>7.1.4</version>
         </dependency>
 
     </dependencies>
