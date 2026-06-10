@@ -1,0 +1,68 @@
+/* 大屏专属动画 —— 仅作用于 .dash-* 类，不污染全局 */
+
+/* 面板顶部流光扫描 */
+@keyframes dash-scan {
+  0%   { left: -30%; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+.dash-scan {
+  position: absolute;
+  top: 0;
+  left: -30%;
+  width: 30%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+  filter: blur(0.5px);
+  animation: dash-scan 4.5s linear infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 背景网格纹理 */
+.dash-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(30, 144, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 144, 255, 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 漂浮粒子 */
+@keyframes dash-float {
+  0%   { transform: translateY(0) scale(1); opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.8; }
+  100% { transform: translateY(-120px) scale(1.4); opacity: 0; }
+}
+.dash-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #5ad8ff;
+  box-shadow: 0 0 8px 2px rgba(90, 216, 255, 0.6);
+  animation: dash-float linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 面板四角 L 型科技边角 */
+.dash-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: #00d4ff;
+  border-style: solid;
+  border-width: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.dash-corner.tl { top: 4px; left: 4px; border-top-width: 2px; border-left-width: 2px; }
+.dash-corner.tr { top: 4px; right: 4px; border-top-width: 2px; border-right-width: 2px; }
+.dash-corner.bl { bottom: 4px; left: 4px; border-bottom-width: 2px; border-left-width: 2px; }
+.dash-corner.br { bottom: 4px; right: 4px; border-bottom-width: 2px; border-right-width: 2px; }
