@@ -16,8 +16,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -119,9 +118,12 @@ public class AiChatServiceImpl implements IAiChatService {
             }
             fullMessages.add(assistantMsg);
 
-            // 无 tool call → 流式输出最终分析
+            // 无 tool call → 直接输出非流式响应中的内容
             if (toolCalls == null || toolCalls.isEmpty()) {
-                streamFinalResponse(url, fullMessages, tools, onEvent);
+                if (content != null && !content.isEmpty()) {
+                    emitEvent(onEvent, "content", content, null, null, null);
+                }
+                emitEvent(onEvent, "done", null, null, null, null);
                 return;
             }
 
@@ -234,56 +236,6 @@ public class AiChatServiceImpl implements IAiChatService {
         }
     }
 
-    /**
-     * 流式输出最终分析
-     */
-    private void streamFinalResponse(String url, List<Map<String, Object>> messages,
-                                      List<AiToolDefinition> tools, Consumer<String> onEvent) {
-        Map<String, Object> requestBody = createRequestBody(messages, tools, true);
-
-        try {
-            restTemplate.execute(url, HttpMethod.POST, request -> {
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                request.getHeaders().set("Authorization", "Bearer " + apiKey);
-                objectMapper.writeValue(request.getBody(), requestBody);
-            }, response -> {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.getBody()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        if (line.startsWith("data: ")) {
-                            String data = line.substring(6).trim();
-                            if ("[DONE]".equals(data)) break;
-                            try {
-                                @SuppressWarnings("unchecked")
-                                Map<String, Object> chunk = objectMapper.readValue(data, Map.class);
-                                @SuppressWarnings("unchecked")
-                                List<Map<String, Object>> choices = (List<Map<String, Object>>) chunk.get("choices");
-                                if (choices != null && !choices.isEmpty()) {
-                                    Map<String, Object> choice = choices.get(0);
-                                    @SuppressWarnings("unchecked")
-                                    Map<String, Object> delta = (Map<String, Object>) choice.get("delta");
-                                    if (delta != null) {
-                                        Object content = delta.get("content");
-                                        if (content != null && !content.toString().isEmpty()) {
-                                            emitEvent(onEvent, "content", content.toString(), null, null, null);
-                                        }
-                                    }
-                                }
-                            } catch (Exception e) {
-                                // skip unparseable chunk
-                            }
-                        }
-                    }
-                }
-                return null;
-            });
-        } catch (Exception e) {
-            logger.error("Stream request failed", e);
-            emitEvent(onEvent, "error", "流式响应失败: " + e.getMessage(), null, null, null);
-        }
-
-        emitEvent(onEvent, "done", null, null, null, null);
-    }
 
     // ================================================================
     //  响应解析
