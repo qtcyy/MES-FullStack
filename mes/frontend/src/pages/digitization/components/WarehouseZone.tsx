@@ -12,7 +12,6 @@ interface Props {
 }
 
 const LINE_TEX = '/lib/ThreeJs/images/line.png'
-const FONT_URL = '/lib/ThreeJs/FZYaoTi_Regular.json'
 
 const BOARD_LENGTH = 55
 const BOARD_WIDTH = 24
@@ -50,7 +49,6 @@ function ZoneBoundary({ width, depth, posX }: { width: number; depth: number; po
 function ZoneLabel({ name, posX, depth }: { name: string; posX: number; depth: number }) {
   return (
     <Text
-      font={FONT_URL}
       position={[posX, 1.3, depth / 2 - 20]}
       rotation={[-Math.PI / 2, 0, 0]}
       fontSize={20}
