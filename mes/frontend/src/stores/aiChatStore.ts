@@ -19,6 +19,7 @@ export interface Message {
 
 interface AIChatState {
   isOpen: boolean
+  isMaximized: boolean
   messages: Message[]
   isLoading: boolean
   /** 当前思考中的提示文案 */
@@ -28,6 +29,7 @@ interface AIChatState {
   toggle: () => void
   open: () => void
   close: () => void
+  toggleMaximize: () => void
   sendMessage: (content: string) => Promise<void>
   clearMessages: () => void
   clearError: () => void
@@ -37,6 +39,7 @@ let abortController: AbortController | null = null
 
 const useAIChatStore = create<AIChatState>((set, get) => ({
   isOpen: false,
+  isMaximized: false,
   messages: [],
   isLoading: false,
   thinkingText: null,
@@ -45,6 +48,8 @@ const useAIChatStore = create<AIChatState>((set, get) => ({
   toggle: () => set((s) => ({ isOpen: !s.isOpen })),
 
   open: () => set({ isOpen: true }),
+
+  toggleMaximize: () => set((s) => ({ isMaximized: !s.isMaximized })),
 
   close: () => {
     if (abortController) {
