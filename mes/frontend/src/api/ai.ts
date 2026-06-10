@@ -1,28 +1,20 @@
-import type { QuickPrompt } from '@/types/ai'
+import type { QuickPrompt, SseEvent } from '@/types/ai'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
 }
 
-interface DeltaChunk {
-  choices?: Array<{
-    delta?: {
-      content?: string
-    }
-  }>
-}
-
 /**
- * 发送消息到 AI 助手（SSE 流式）
+ * 发送消息到 AI 助手（Agent 模式 SSE 流式）
  *
  * @param messages 当前对话消息列表
- * @param onToken  每收到一个 token 的回调
- * @param signal   AbortController signal，用于取消请求
+ * @param onEvent  每收到一个结构化事件的回调
+ * @param signal   AbortController signal
  */
 export async function streamChat(
   messages: ChatMessage[],
-  onToken: (text: string) => void,
+  onEvent: (event: SseEvent) => void,
   signal: AbortSignal,
 ): Promise<void> {
   const response = await fetch('/api/admin/ai/chat', {
@@ -58,7 +50,6 @@ export async function streamChat(
 
       buffer += decoder.decode(value, { stream: true })
       const lines = buffer.split('\n')
-      // 最后一行可能不完整，保留到下次
       buffer = lines.pop() || ''
 
       for (const line of lines) {
@@ -69,11 +60,10 @@ export async function streamChat(
         if (data === '[DONE]') return
 
         try {
-          const parsed = JSON.parse(data) as DeltaChunk
-          const content = parsed.choices?.[0]?.delta?.content
-          if (content) onToken(content)
+          const event = JSON.parse(data) as SseEvent
+          onEvent(event)
         } catch {
-          // 跳过无法解析的行
+          // skip unparseable lines
         }
       }
     }
@@ -82,49 +72,43 @@ export async function streamChat(
   }
 }
 
-/** 默认快捷提示词（前端常量，后续可从后端获取） */
+/** 默认快捷提示词 — 与 Agent 工具能力对齐 */
 const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
   {
     id: '1',
-    text: '今天有哪些待处理的工单？',
-    displayText: '今日待处理工单',
+    text: '帮我分析一下当前生产工单的整体情况，各状态分布如何？',
+    displayText: '分析工单情况',
     icon: '📋',
   },
   {
     id: '2',
-    text: '当前产线运行状态如何？',
-    displayText: '当前产线运行状态',
-    icon: '📊',
-  },
-  {
-    id: '3',
-    text: '设备OEE数据怎么看？',
-    displayText: '设备OEE数据分析',
+    text: '查看当前设备运行状态，有哪些设备？状态分布怎样？',
+    displayText: '查看设备状态',
     icon: '🏭',
   },
   {
+    id: '3',
+    text: '查一下物料数据，各类物料有多少？给我一个概览',
+    displayText: '统计物料数据',
+    icon: '📦',
+  },
+  {
     id: '4',
-    text: '如何创建工艺路线？',
-    displayText: '创建工艺路线的方法',
-    icon: '🔄',
+    text: '查询 BOM 清单，有哪些物料清单？',
+    displayText: '查看BOM清单',
+    icon: '📊',
   },
   {
     id: '5',
-    text: 'BOM表如何录入和维护？',
-    displayText: 'BOM表录入与维护',
-    icon: '📝',
+    text: '获取生产看板总览，包括工单、设备、物料的汇总数据',
+    displayText: '生产看板总览',
+    icon: '📈',
   },
 ]
 
 /**
  * 获取快捷提示词列表
- *
- * 当前返回前端默认常量，后续可改为 HTTP GET 请求从后端获取，
- * 以支持后台动态配置提示词。
  */
 export function fetchQuickPrompts(): Promise<QuickPrompt[]> {
-  // TODO: 后续替换为后端 API 调用
-  // return fetch('/api/admin/ai/prompts', { credentials: 'include' })
-  //   .then(res => res.json())
   return Promise.resolve(DEFAULT_QUICK_PROMPTS)
 }
