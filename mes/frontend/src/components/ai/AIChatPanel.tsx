@@ -75,39 +75,42 @@ export default function AIChatPanel() {
   }
 
   return (
-    <AnimatePresence>
+    <>
+      {/* 拖拽约束参考层 — 在 AnimatePresence 外部，不参与动画 */}
       {isOpen && (
-        <>
-          {/* 最大化半透明遮罩 */}
-          {isMaximized && (
+        <div
+          ref={constraintsRef}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 999,
+          }}
+        />
+      )}
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* 最大化半透明遮罩 */}
+            {isMaximized && (
+              <motion.div
+                key="backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  background: 'rgba(0,0,0,0.3)',
+                  zIndex: 998,
+                }}
+                onClick={() => toggleMaximize()}
+              />
+            )}
+
             <motion.div
-              key="backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.3)',
-                zIndex: 998,
-              }}
-              onClick={() => toggleMaximize()}
-            />
-          )}
-
-          {/* 拖拽约束参考层 — 全视口透明，pointer-events: none */}
-          <div
-            ref={constraintsRef}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              pointerEvents: 'none',
-              zIndex: 999,
-            }}
-          />
-
-          <motion.div
             key="panel"
             drag={!isMaximized}
             dragConstraints={constraintsRef}
@@ -303,8 +306,9 @@ export default function AIChatPanel() {
               .chat-bubble--assistant strong { font-weight: 600; }
             `}</style>
           </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   )
 }
