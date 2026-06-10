@@ -34,8 +34,6 @@ export default function WarehousePage() {
   useEffect(() => {
     if (editId && editRecord) {
       form.setFieldsValue(editRecord)
-    } else if (!editId) {
-      form.resetFields()
     }
   }, [editId, editRecord, form])
 
@@ -64,10 +62,20 @@ export default function WarehousePage() {
     },
   })
 
+  const [locLoading, setLocLoading] = useState(false)
+
   const handleSelect = async (record: SpWarehouse) => {
     setSelectedWh(record)
-    const locs = await whApi.getLocations(record.id)
-    setLocations(Array.isArray(locs) ? locs : [])
+    setLocLoading(true)
+    setLocations([])
+    try {
+      const locs = await whApi.getLocations(record.id)
+      setLocations(Array.isArray(locs) ? locs : [])
+    } catch {
+      setLocations([])
+    } finally {
+      setLocLoading(false)
+    }
   }
 
   const columns = [
@@ -144,7 +152,7 @@ export default function WarehousePage() {
             toolbar={
               <PermissionGuard perm="warehouse:add">
                 <Button type="primary" icon={<PlusOutlined />}
-                  onClick={() => { setEditId(null); setEditRecord(null); setModalOpen(true) }}>新增库房</Button>
+                  onClick={() => { form.resetFields(); setEditId(null); setEditRecord(null); setModalOpen(true) }}>新增库房</Button>
               </PermissionGuard>
             }
           />
@@ -208,7 +216,7 @@ export default function WarehousePage() {
             <>
               <p>库房: <strong>{selectedWh.name}</strong> ({selectedWh.code})</p>
               <p>规格: {selectedWh.groups || 1}组 x {selectedWh.rows || 1}排 x {selectedWh.layers || 1}层 x {selectedWh.columns || 1}列 = {locations.length} 个库位</p>
-              <Table rowKey="id" size="small" columns={locColumns} dataSource={locations} pagination={{ pageSize: 20 }} />
+              <Table rowKey="id" size="small" columns={locColumns} dataSource={locations} loading={locLoading} pagination={{ pageSize: 20 }} />
             </>
           ) : (
             <p style={{ color: '#999' }}>请点击左侧库房查看库位</p>

@@ -9,6 +9,7 @@ import com.wangziyang.mes.basedata.service.ISpWarehouseService;
 import com.wangziyang.mes.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -59,6 +60,7 @@ public class SpWarehouseController {
 
     @PostMapping("/add-or-update")
     @ResponseBody
+    @Transactional(rollbackFor = Exception.class)
     public Result addOrUpdate(@RequestBody SpWarehouse record) {
         spWarehouseService.saveOrUpdate(record);
         // Regenerate locations when spec changes
