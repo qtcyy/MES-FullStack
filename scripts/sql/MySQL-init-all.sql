@@ -646,7 +646,7 @@ CREATE TABLE `sp_warehouse_location` (
   `update_time` datetime NOT NULL,
   `update_username` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_loc_code` (`code`),
+  UNIQUE KEY `idx_loc_wh_code` (`warehouse_id`, `code`),
   KEY `idx_loc_wh` (`warehouse_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='库位表';
 /*!40101 SET character_set_client = @saved_cs_client */;
