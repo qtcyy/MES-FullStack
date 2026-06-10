@@ -56,6 +56,32 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           wordBreak: 'break-word',
         }}
       >
+        {/* Tool call steps */}
+        {!isUser && message.toolCalls && message.toolCalls.length > 0 && (
+          <div style={{ marginBottom: 8 }}>
+            {message.toolCalls.map((tc, i) => (
+              <div
+                key={i}
+                style={{
+                  fontSize: 12,
+                  color: tc.status === 'error' ? '#ff4d4f' : '#666',
+                  padding: '4px 8px',
+                  background: tc.status === 'running' ? '#e6f7ff' : '#f5f5f5',
+                  borderRadius: 4,
+                  marginTop: 4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                {tc.status === 'running' && <span>⏳ 正在查询：{tc.tool}</span>}
+                {tc.status === 'done' && <span>✅ {tc.summary || tc.tool}</span>}
+                {tc.status === 'error' && <span>❌ {tc.summary || tc.tool}</span>}
+              </div>
+            ))}
+          </div>
+        )}
+
         {message.content ? (
           isUser ? (
             message.content

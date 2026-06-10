@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Input, Button, Space } from 'antd'
-import { CloseOutlined, SendOutlined, DeleteOutlined } from '@ant-design/icons'
+import { CloseOutlined, SendOutlined, DeleteOutlined, LoadingOutlined } from '@ant-design/icons'
 import ChatMessage from './ChatMessage'
 import QuickPrompts from './QuickPrompts'
 import useAIChatStore from '@/stores/aiChatStore'
@@ -13,6 +13,7 @@ export default function AIChatPanel() {
     messages,
     isLoading,
     isOpen,
+    thinkingText,
     close,
     sendMessage,
     clearMessages,
@@ -139,6 +140,25 @@ export default function AIChatPanel() {
         ))}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Thinking indicator */}
+      {thinkingText && (
+        <div
+          style={{
+            padding: '8px 16px',
+            color: '#1677ff',
+            fontSize: 13,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: '#e6f7ff',
+            borderTop: '1px solid #91d5ff',
+          }}
+        >
+          <LoadingOutlined spin />
+          {thinkingText}
+        </div>
+      )}
 
       {/* Input */}
       <div
