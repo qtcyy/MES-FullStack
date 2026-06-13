@@ -1,11 +1,13 @@
 package com.wangziyang.mes.order.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.wangziyang.mes.order.dto.SpDispatchDTO;
+import com.wangziyang.mes.order.entity.SpOrderDispatch;
 
 import java.util.Map;
 
-public interface ISpDispatchService {
+public interface ISpDispatchService extends IService<SpOrderDispatch> {
 
     /**
      * 分页查询待派工工单（statue=0）
