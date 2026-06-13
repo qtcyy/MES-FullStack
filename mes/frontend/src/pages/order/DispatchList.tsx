@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Form, Button, Input, Select, InputNumber, DatePicker, message, Table, Space, Modal } from 'antd'
-import { SearchOutlined, ReloadOutlined, UserSwitchOutlined } from '@ant-design/icons'
+import { SearchOutlined, UserSwitchOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import PageContainer from '@/components/PageContainer'
+import SearchForm from '@/components/SearchForm'
+import PermissionGuard from '@/components/PermissionGuard'
 import { usePagination } from '@/hooks/usePagination'
 import * as dispatchApi from '@/api/order/dispatch'
 import type { DispatchableOrder, DispatchAssignDTO } from '@/types/dispatch'
@@ -23,13 +25,13 @@ export default function DispatchList() {
 
   // Load teams on mount
   useEffect(() => {
-    dispatchApi.getTeams().then(setTeams)
+    dispatchApi.getTeams().then(setTeams).catch((err) => message.error('加载班组列表失败: ' + err.message))
   }, [])
 
   // Load users when team changes
   useEffect(() => {
     if (selectedTeamId) {
-      dispatchApi.getTeamUsers(selectedTeamId).then(setUsers)
+      dispatchApi.getTeamUsers(selectedTeamId).then(setUsers).catch((err) => message.error('加载作业员列表失败: ' + err.message))
     } else {
       setUsers([])
     }
@@ -226,7 +228,7 @@ export default function DispatchList() {
           boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         }}
       >
-        <Form layout="inline" onFinish={handleSearch}>
+        <SearchForm onSearch={handleSearch} onReset={handleReset} loading={isLoading}>
           <Form.Item name="orderCode">
             <Input
               placeholder="输入工单号查询"
@@ -235,17 +237,7 @@ export default function DispatchList() {
               allowClear
             />
           </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" loading={isLoading}>
-              查询
-            </Button>
-          </Form.Item>
-          <Form.Item>
-            <Button icon={<ReloadOutlined />} onClick={handleReset}>
-              重置
-            </Button>
-          </Form.Item>
-        </Form>
+        </SearchForm>
       </div>
 
       {/* Order Table */}
@@ -270,19 +262,21 @@ export default function DispatchList() {
               ? `已选 ${selectedRowKeys.length} 个工单`
               : '勾选工单进行派工操作'}
           </span>
-          <Button
-            type="primary"
-            icon={<UserSwitchOutlined />}
-            onClick={handleDispatch}
-            disabled={selectedRowKeys.length === 0}
-            style={{
-              background: selectedRowKeys.length > 0 ? '#faad14' : undefined,
-              borderColor: selectedRowKeys.length > 0 ? '#faad14' : undefined,
-              fontWeight: 600,
-            }}
-          >
-            人员作业派工
-          </Button>
+          <PermissionGuard perm="order:dispatch">
+            <Button
+              type="primary"
+              icon={<UserSwitchOutlined />}
+              onClick={handleDispatch}
+              disabled={selectedRowKeys.length === 0}
+              style={{
+                background: selectedRowKeys.length > 0 ? '#faad14' : undefined,
+                borderColor: selectedRowKeys.length > 0 ? '#faad14' : undefined,
+                fontWeight: 600,
+              }}
+            >
+              人员作业派工
+            </Button>
+          </PermissionGuard>
         </div>
         <Table
           rowKey="id"
