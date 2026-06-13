@@ -18,9 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/order/dispatch")
@@ -78,7 +79,8 @@ public class SpDispatchController extends BaseController {
     @GetMapping("/teams")
     @ResponseBody
     public Result getTeams() {
-        List<SpTeam> teams = spTeamService.list();
+        List<SpTeam> teams = spTeamService.list(
+                new QueryWrapper<SpTeam>().eq("is_deleted", "0"));
         return Result.success(teams);
     }
 
@@ -92,13 +94,14 @@ public class SpDispatchController extends BaseController {
         List<SpTeamUser> teamUsers = spTeamUserService.list(
                 new QueryWrapper<SpTeamUser>().eq("team_id", teamId));
 
-        List<SysUser> users = new ArrayList<>();
-        for (SpTeamUser tu : teamUsers) {
-            SysUser user = sysUserService.getById(tu.getUserId());
-            if (user != null) {
-                users.add(user);
-            }
+        if (teamUsers.isEmpty()) {
+            return Result.success(Collections.emptyList());
         }
+
+        List<String> userIds = teamUsers.stream()
+                .map(SpTeamUser::getUserId)
+                .collect(Collectors.toList());
+        List<SysUser> users = (List<SysUser>) sysUserService.listByIds(userIds);
         return Result.success(users);
     }
 }
