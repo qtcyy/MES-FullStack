@@ -36,6 +36,7 @@ import ProcessQueryPage from '@/pages/technology/ProcessQueryPage'
 import OperList from '@/pages/technology/OperList'
 // -- order --
 import OrderList from '@/pages/order/OrderList'
+import DispatchList from '@/pages/order/DispatchList'
 // -- digitization --
 import PlanDashboard from '@/pages/digitization/PlanDashboard'
 import Simulation3D from '@/pages/digitization/Simulation3D'
@@ -103,6 +104,7 @@ function App() {
 
                   {/* Order */}
                   <Route path="order/production" element={<OrderList />} />
+                  <Route path="order/dispatch" element={<DispatchList />} />
 
                   {/* Digitization */}
                   <Route path="digitization/plan" element={<PlanDashboard />} />
