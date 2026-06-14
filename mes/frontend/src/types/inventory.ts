@@ -52,6 +52,16 @@ export interface PostItemDTO {
   locationId: string
 }
 
+/** 手动入库 DTO */
+export interface ManualInboundDTO {
+  materialCode: string
+  materialDesc?: string
+  unit?: string
+  warehouseId: string
+  locationId: string
+  quantity: number
+}
+
 /** 入库单状态映射 */
 export const RECEIPT_STATUS_MAP: Record<string, { text: string; color: string }> = {
   pending: { text: '待确认', color: 'blue' },

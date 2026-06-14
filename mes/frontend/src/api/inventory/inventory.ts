@@ -1,7 +1,6 @@
 import client from '../client'
 import type { PageResult, PageParams } from '@/types/api'
-import type { InventoryRecord } from '@/types/inventory'
-import type { ManualInboundDTO } from '@/types/outbound'
+import type { InventoryRecord, ManualInboundDTO } from '@/types/inventory'
 
 /** 分页查询库存明细 */
 export function pageInventory(

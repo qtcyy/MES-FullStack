@@ -25,16 +25,6 @@ export interface OutboundOrderItem {
   postedAt?: string | null
 }
 
-/** 手动入库 DTO */
-export interface ManualInboundDTO {
-  materialCode: string
-  materialDesc?: string
-  unit?: string
-  warehouseId: string
-  locationId: string
-  quantity: number
-}
-
 /** 出库单状态映射 */
 export const OUTBOUND_STATUS_MAP: Record<string, { text: string; color: string }> = {
   pending: { text: '待确认', color: 'blue' },
