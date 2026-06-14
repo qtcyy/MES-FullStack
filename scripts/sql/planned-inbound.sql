@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS sp_inventory (
 -- ============ 2. 种子：电脑配件库（零件库） ============
 INSERT INTO sp_warehouse (id, code, name, type, `groups`, `rows`, `layers`, `columns`, descr, is_deleted, create_time, create_username, update_time, update_username)
 SELECT 'wh-parts-001', 'WH-PARTS', '电脑配件库', '零件库', 1, 2, 2, 2, '台式电脑零件入库专用', '0', NOW(), 'admin', NOW(), 'admin'
-WHERE NOT EXISTS (SELECT 1 FROM sp_warehouse WHERE id = 'wh-parts-001');
+WHERE NOT EXISTS (SELECT 1 FROM sp_warehouse WHERE id = 'wh-parts-001' OR code = 'WH-PARTS');
 
 -- ============ 3. 种子：8 个库位（1-RRLLCC 格式） ============
 INSERT INTO sp_warehouse_location (id, warehouse_id, code, group_no, row_no, layer_no, col_no, is_deleted, create_time, create_username, update_time, update_username)
