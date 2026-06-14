@@ -40,6 +40,8 @@ import DispatchList from '@/pages/order/DispatchList'
 // -- inventory --
 import ReceiptList from '@/pages/inventory/ReceiptList'
 import InventoryList from '@/pages/inventory/InventoryList'
+import OutboundList from '@/pages/inventory/OutboundList'
+import ManualInboundPage from '@/pages/inventory/ManualInboundPage'
 // -- digitization --
 import PlanDashboard from '@/pages/digitization/PlanDashboard'
 import Simulation3D from '@/pages/digitization/Simulation3D'
@@ -112,6 +114,8 @@ function App() {
                   {/* Inventory */}
                   <Route path="inventory/receipt" element={<ReceiptList />} />
                   <Route path="inventory/query" element={<InventoryList />} />
+                  <Route path="inventory/outbound" element={<OutboundList />} />
+                  <Route path="inventory/manual-inbound" element={<ManualInboundPage />} />
 
                   {/* Digitization */}
                   <Route path="digitization/plan" element={<PlanDashboard />} />
