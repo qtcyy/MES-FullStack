@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -104,7 +105,9 @@ public class SpWarehouseReceiptServiceImpl
 
         // 6. 库存台账 upsert
         if (inv != null) {
-            inv.setQuantity(inv.getQuantity().add(item.getQuantity()));
+            BigDecimal existingQty = inv.getQuantity() != null ? inv.getQuantity() : BigDecimal.ZERO;
+            BigDecimal inboundQty = item.getQuantity() != null ? item.getQuantity() : BigDecimal.ZERO;
+            inv.setQuantity(existingQty.add(inboundQty));
             inv.setLastInboundTime(now);
             inventoryMapper.updateById(inv);
         } else {
@@ -129,9 +132,9 @@ public class SpWarehouseReceiptServiceImpl
                     new QueryWrapper<SpWarehouseReceiptItem>()
                             .eq("receipt_id", receipt.getId())
                             .eq("post_status", "posted"));
+            int total = receipt.getTotalItems() != null ? receipt.getTotalItems() : 0;
             receipt.setPostedItems(posted);
-            receipt.setReceiptStatus(
-                    posted >= receipt.getTotalItems() ? "completed" : "partial");
+            receipt.setReceiptStatus(posted >= total ? "completed" : "partial");
             baseMapper.updateById(receipt);
         }
     }
