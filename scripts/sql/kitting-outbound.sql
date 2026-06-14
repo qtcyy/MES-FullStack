@@ -4,7 +4,7 @@
 
 -- ============ 1. 表结构 ============
 CREATE TABLE IF NOT EXISTS sp_outbound_order (
-  id varchar(64) NOT NULL,
+  id varchar(64) NOT NULL COMMENT '主键',
   outbound_code varchar(64) NOT NULL COMMENT '出库单号',
   order_id varchar(64) DEFAULT NULL COMMENT '工单ID',
   order_code varchar(255) DEFAULT NULL COMMENT '工单编号',
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS sp_outbound_order (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='出库单主表';
 
 CREATE TABLE IF NOT EXISTS sp_outbound_order_item (
-  id varchar(64) NOT NULL,
+  id varchar(64) NOT NULL COMMENT '主键',
   outbound_id varchar(64) NOT NULL COMMENT '关联出库单ID',
   material_code varchar(50) NOT NULL COMMENT '物料编码',
   material_desc varchar(200) DEFAULT NULL COMMENT '物料描述',
@@ -71,31 +71,38 @@ WHERE NOT EXISTS (SELECT 1 FROM sp_outbound_order_item WHERE outbound_id = 'ob-2
 -- PART-001 已有库存(用户测试入库)，不在此预置。
 INSERT INTO sp_inventory (id, material_code, material_desc, unit, warehouse_id, warehouse_name, location_id, location_code, quantity, status, last_inbound_time, create_time, create_username, update_time, update_username)
 SELECT 'inv-seed-02','PART-002','DDR5 32GB 内存','条','wh-parts-001','电脑配件库','loc-parts-01','1-010101',100,'available',NOW(),NOW(),'admin',NOW(),'admin'
-WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-002');
+WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-002')
+  AND NOT EXISTS (SELECT 1 FROM sp_inventory WHERE location_id='loc-parts-01');
 
 INSERT INTO sp_inventory (id, material_code, material_desc, unit, warehouse_id, warehouse_name, location_id, location_code, quantity, status, last_inbound_time, create_time, create_username, update_time, update_username)
 SELECT 'inv-seed-03','PART-003','SSD 1TB NVMe','个','wh-parts-001','电脑配件库','loc-parts-03','1-010201',100,'available',NOW(),NOW(),'admin',NOW(),'admin'
-WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-003');
+WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-003')
+  AND NOT EXISTS (SELECT 1 FROM sp_inventory WHERE location_id='loc-parts-03');
 
 INSERT INTO sp_inventory (id, material_code, material_desc, unit, warehouse_id, warehouse_name, location_id, location_code, quantity, status, last_inbound_time, create_time, create_username, update_time, update_username)
 SELECT 'inv-seed-04','PART-004','主板 Z790','个','wh-parts-001','电脑配件库','loc-parts-04','1-010202',100,'available',NOW(),NOW(),'admin',NOW(),'admin'
-WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-004');
+WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-004')
+  AND NOT EXISTS (SELECT 1 FROM sp_inventory WHERE location_id='loc-parts-04');
 
 INSERT INTO sp_inventory (id, material_code, material_desc, unit, warehouse_id, warehouse_name, location_id, location_code, quantity, status, last_inbound_time, create_time, create_username, update_time, update_username)
 SELECT 'inv-seed-05','PART-005','CPU散热器','个','wh-parts-001','电脑配件库','loc-parts-05','1-020101',100,'available',NOW(),NOW(),'admin',NOW(),'admin'
-WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-005');
+WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-005')
+  AND NOT EXISTS (SELECT 1 FROM sp_inventory WHERE location_id='loc-parts-05');
 
 INSERT INTO sp_inventory (id, material_code, material_desc, unit, warehouse_id, warehouse_name, location_id, location_code, quantity, status, last_inbound_time, create_time, create_username, update_time, update_username)
 SELECT 'inv-seed-06','PART-006','机箱外壳 ATX','个','wh-parts-001','电脑配件库','loc-parts-06','1-020102',100,'available',NOW(),NOW(),'admin',NOW(),'admin'
-WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-006');
+WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-006')
+  AND NOT EXISTS (SELECT 1 FROM sp_inventory WHERE location_id='loc-parts-06');
 
 INSERT INTO sp_inventory (id, material_code, material_desc, unit, warehouse_id, warehouse_name, location_id, location_code, quantity, status, last_inbound_time, create_time, create_username, update_time, update_username)
 SELECT 'inv-seed-07','PART-007','电源 750W 金牌','个','wh-parts-001','电脑配件库','loc-parts-07','1-020201',100,'available',NOW(),NOW(),'admin',NOW(),'admin'
-WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-007');
+WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-007')
+  AND NOT EXISTS (SELECT 1 FROM sp_inventory WHERE location_id='loc-parts-07');
 
 INSERT INTO sp_inventory (id, material_code, material_desc, unit, warehouse_id, warehouse_name, location_id, location_code, quantity, status, last_inbound_time, create_time, create_username, update_time, update_username)
 SELECT 'inv-seed-08','PART-008','散热风扇 120mm','个','wh-parts-001','电脑配件库','loc-parts-08','1-020202',100,'available',NOW(),NOW(),'admin',NOW(),'admin'
-WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-008');
+WHERE NOT EXISTS (SELECT 1 FROM sp_inventory WHERE material_code='PART-008')
+  AND NOT EXISTS (SELECT 1 FROM sp_inventory WHERE location_id='loc-parts-08');
 
 -- ============ 5. 菜单：配套出库确认 + 手动入库（父 id=18 库存管理） ============
 INSERT INTO sp_sys_menu (id, code, name, url, parent_id, grade, sort_num, type, permission, icon, descr, create_time, create_username, update_time, update_username)
