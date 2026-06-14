@@ -37,6 +37,9 @@ import OperList from '@/pages/technology/OperList'
 // -- order --
 import OrderList from '@/pages/order/OrderList'
 import DispatchList from '@/pages/order/DispatchList'
+// -- inventory --
+import ReceiptList from '@/pages/inventory/ReceiptList'
+import InventoryList from '@/pages/inventory/InventoryList'
 // -- digitization --
 import PlanDashboard from '@/pages/digitization/PlanDashboard'
 import Simulation3D from '@/pages/digitization/Simulation3D'
@@ -105,6 +108,10 @@ function App() {
                   {/* Order */}
                   <Route path="order/production" element={<OrderList />} />
                   <Route path="order/dispatch" element={<DispatchList />} />
+
+                  {/* Inventory */}
+                  <Route path="inventory/receipt" element={<ReceiptList />} />
+                  <Route path="inventory/query" element={<InventoryList />} />
 
                   {/* Digitization */}
                   <Route path="digitization/plan" element={<PlanDashboard />} />
