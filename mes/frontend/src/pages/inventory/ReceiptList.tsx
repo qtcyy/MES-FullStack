@@ -60,7 +60,6 @@ export default function ReceiptList() {
       setPostOpen(false)
       postForm.resetFields()
       setLocations([])
-      queryClient.invalidateQueries({ queryKey: ['receipt-items', activeReceipt?.id] })
       queryClient.invalidateQueries({ queryKey: ['receipts'] })
     },
     onError: (e: Error) => message.error(e.message || '登账失败'),
@@ -97,11 +96,19 @@ export default function ReceiptList() {
 
   const handlePostOk = () => {
     postForm.validateFields().then((values) => {
-      postMutation.mutate({
-        itemId: activeItem!.id,
-        warehouseId: values.warehouseId,
-        locationId: values.locationId,
-      })
+      const receiptId = activeReceipt?.id
+      postMutation.mutate(
+        {
+          itemId: activeItem!.id,
+          warehouseId: values.warehouseId,
+          locationId: values.locationId,
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['receipt-items', receiptId] })
+          },
+        },
+      )
     })
   }
 
@@ -225,7 +232,10 @@ export default function ReceiptList() {
       <Drawer
         title={`入库单明细 — ${activeReceipt?.receiptCode ?? ''}`}
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => {
+          setDrawerOpen(false)
+          setActiveReceipt(null)
+        }}
         width={900}
         destroyOnClose
       >
