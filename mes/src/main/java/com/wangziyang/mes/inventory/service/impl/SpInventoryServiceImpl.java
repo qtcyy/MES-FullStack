@@ -51,6 +51,14 @@ public class SpInventoryServiceImpl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void manualInbound(ManualInboundDTO dto) {
+        // 0. 入参校验
+        if (dto.getQuantity() == null || dto.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("入库数量必须大于 0");
+        }
+        if (StringUtils.isBlank(dto.getMaterialCode())) {
+            throw new RuntimeException("物料编码不能为空");
+        }
+
         // 1. 库房校验
         SpWarehouse wh = spWarehouseService.getById(dto.getWarehouseId());
         if (wh == null || "1".equals(wh.getDeleted())) {
