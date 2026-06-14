@@ -2,6 +2,7 @@ package com.wangziyang.mes.inventory.controller;
 
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.inventory.dto.ManualInboundDTO;
 import com.wangziyang.mes.inventory.dto.PostItemDTO;
 import com.wangziyang.mes.inventory.request.SpInventoryPageReq;
 import com.wangziyang.mes.inventory.request.SpReceiptPageReq;
@@ -56,5 +57,13 @@ public class SpReceiptController extends BaseController {
     @ResponseBody
     public Result pageInventory(SpInventoryPageReq req) {
         return Result.success(inventoryService.pageInventory(req));
+    }
+
+    @ApiOperation("手动入库")
+    @PostMapping("/manual-inbound")
+    @ResponseBody
+    public Result manualInbound(@RequestBody ManualInboundDTO dto) {
+        inventoryService.manualInbound(dto);
+        return Result.success();
     }
 }
