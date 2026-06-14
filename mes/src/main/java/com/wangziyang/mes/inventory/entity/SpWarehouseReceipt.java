@@ -3,6 +3,9 @@ package com.wangziyang.mes.inventory.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.wangziyang.mes.common.BaseEntity;
 
+/**
+ * 入库单主表
+ */
 @TableName("sp_warehouse_receipt")
 public class SpWarehouseReceipt extends BaseEntity {
 

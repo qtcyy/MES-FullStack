@@ -6,6 +6,9 @@ import com.wangziyang.mes.common.BaseEntity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * 入库单明细
+ */
 @TableName("sp_warehouse_receipt_item")
 public class SpWarehouseReceiptItem extends BaseEntity {
 

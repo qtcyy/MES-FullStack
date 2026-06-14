@@ -6,6 +6,9 @@ import com.wangziyang.mes.common.BaseEntity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * 物料库存（库位级）
+ */
 @TableName("sp_inventory")
 public class SpInventory extends BaseEntity {
 
