@@ -4,6 +4,8 @@ import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
+  OnChangeFn,
+  RowSelectionState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -77,12 +79,24 @@ function DataTable<TData, TValue>({
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [internalRowSelection, setInternalRowSelection] = React.useState({});
+  const [internalRowSelection, setInternalRowSelection] =
+    React.useState<RowSelectionState>({});
 
   // 使用外部控制的 rowSelection 或内部状态
   const rowSelection = externalRowSelection ?? internalRowSelection;
-  const setRowSelection =
-    externalOnRowSelectionChange ?? setInternalRowSelection;
+  // 将 TanStack 的 Updater(值或 (old)=>new)解析为具体值后再分发,
+  // 保持对外 onRowSelectionChange 仅暴露普通对象的公开 API
+  const setRowSelection: OnChangeFn<RowSelectionState> = (updaterOrValue) => {
+    const next =
+      typeof updaterOrValue === "function"
+        ? updaterOrValue(rowSelection)
+        : updaterOrValue;
+    if (externalOnRowSelectionChange) {
+      externalOnRowSelectionChange(next);
+    } else {
+      setInternalRowSelection(next);
+    }
+  };
 
   const isServerPagination = pagination?.mode === "server";
 

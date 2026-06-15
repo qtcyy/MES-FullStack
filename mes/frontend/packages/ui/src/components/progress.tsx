@@ -1,13 +1,14 @@
 "use client"
 
 import * as React from "react"
-import * as ProgressPrimitive from "@radix-ui/react-progress"
+import { Progress as ProgressPrimitive } from "radix-ui"
 
 import { cn } from "@workspace/ui/lib/utils"
 
 type ProgressColor = "primary" | "blue" | "yellow" | "orange" | "red" | "green"
 
-interface ProgressProps extends React.ComponentProps<typeof ProgressPrimitive.Root> {
+interface ProgressProps
+  extends React.ComponentProps<typeof ProgressPrimitive.Root> {
   color?: ProgressColor
   indicatorClassName?: string
 }
