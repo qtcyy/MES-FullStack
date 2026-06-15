@@ -88,11 +88,11 @@ mvn spring-boot:run -DskipTests
 
 ```bash
 cd mes/frontend
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-前端启动于 `http://localhost:3000`，API 请求自动代理到 `localhost:9090`
+前端启动于 `http://localhost:4000`，API 请求自动代理到 `localhost:9090`
 
 ### 5. 登录
 
@@ -205,18 +205,23 @@ MES-FullStack/
     │   ├── mapper/                   # MyBatis XML
     │   ├── templates/                # 旧 Freemarker 模板（保留参考）
     │   └── static/                   # React 构建输出
-    └── frontend/                      # React SPA
-        ├── package.json
-        ├── vite.config.ts            # Vite 配置 + API 代理
-        └── src/
-            ├── api/                  # 后端 API 调用
-            ├── pages/                # 页面组件（按模块）
-            ├── components/           # 共享组件（PageTable, ModalForm 等）
-            ├── stores/               # Zustand 状态
-            ├── layouts/              # AdminLayout
-            ├── hooks/                # 自定义 Hooks
-            ├── types/                # TypeScript 类型
-            └── utils/                # 工具函数
+    └── frontend/                      # pnpm monorepo 根（React SPA）
+        ├── pnpm-workspace.yaml        # 工作区定义（apps/* + packages/*）
+        ├── package.json              # 根工作区脚本（dev/build/lint）
+        ├── packages/                 # 预留共享包
+        └── apps/
+            └── mes1/                  # SPA 应用（包名 mes1）
+                ├── package.json
+                ├── vite.config.ts    # Vite 配置 + API 代理
+                └── src/
+                    ├── api/          # 后端 API 调用
+                    ├── pages/        # 页面组件（按模块）
+                    ├── components/   # 共享组件（PageTable, ModalForm 等）
+                    ├── stores/       # Zustand 状态
+                    ├── layouts/      # AdminLayout
+                    ├── hooks/        # 自定义 Hooks
+                    ├── types/        # TypeScript 类型
+                    └── utils/        # 工具函数
 ```
 
 ## 开发约定
@@ -241,9 +246,9 @@ MES-FullStack/
 
 ### 前端构建失败
 ```bash
-cd mes/frontend && npm install   # 确保依赖安装
-npm run build                     # 重新构建
-npx tsc --noEmit                 # 单独检查 TS 错误
+cd mes/frontend && pnpm install        # 确保依赖安装
+pnpm build                             # 重新构建
+pnpm --filter mes1 exec tsc --noEmit   # 单独检查 TS 错误
 ```
 
 ### 后端启动失败

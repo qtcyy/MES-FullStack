@@ -214,24 +214,25 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>install node and npm</id>
+                        <id>install node and pnpm</id>
                         <phase>generate-resources</phase>
-                        <goals><goal>install-node-and-npm</goal></goals>
+                        <goals><goal>install-node-and-pnpm</goal></goals>
                         <configuration>
                             <nodeVersion>v22.21.0</nodeVersion>
+                            <pnpmVersion>10.14.0</pnpmVersion>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>npm install</id>
+                        <id>pnpm install</id>
                         <phase>generate-resources</phase>
-                        <goals><goal>npm</goal></goals>
+                        <goals><goal>pnpm</goal></goals>
                         <configuration><arguments>install</arguments></configuration>
                     </execution>
                     <execution>
-                        <id>npm run build</id>
+                        <id>pnpm build</id>
                         <phase>generate-resources</phase>
-                        <goals><goal>npm</goal></goals>
-                        <configuration><arguments>run build</arguments></configuration>
+                        <goals><goal>pnpm</goal></goals>
+                        <configuration><arguments>--filter mes1 build</arguments></configuration>
                     </execution>
                 </executions>
             </plugin>

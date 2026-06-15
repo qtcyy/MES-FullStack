@@ -21,20 +21,20 @@ MES (Manufacturing Execution System) — "章鱼师兄", a full-stack monolith f
 # Build everything (frontend + backend)
 cd mes && mvn clean package -DskipTests
 
-# Build frontend only
-cd mes/frontend && npm run build
+# Build frontend only (pnpm monorepo root → builds apps/mes1)
+cd mes/frontend && pnpm build
 
 # Dev: start backend (port 9090)
 cd mes && mvn spring-boot:run
 
-# Dev: start frontend dev server (port 3000, proxies /api → localhost:9090)
-cd mes/frontend && npm run dev
+# Dev: start frontend dev server (port 4000, proxies /api → localhost:9090)
+cd mes/frontend && pnpm dev
 
 # TypeScript check
-cd mes/frontend && npx tsc --noEmit
+cd mes/frontend && pnpm --filter mes1 exec tsc --noEmit
 
 # Lint
-cd mes/frontend && npm run lint
+cd mes/frontend && pnpm lint
 
 # Run tests
 cd mes && mvn test
@@ -84,10 +84,10 @@ Each module follows: `controller` → `service`/`service/impl` → `mapper` + `e
 
 ### Frontend (React SPA)
 
-The React SPA lives in `mes/frontend/`. It replaces the old Freemarker server-rendered templates.
+The React SPA lives in `mes/frontend/` — a pnpm workspace (monorepo). The root holds `pnpm-workspace.yaml` + root `package.json`; the app itself is `mes/frontend/apps/mes1/` (package name `mes1`), with `mes/frontend/packages/` reserved for shared packages. It replaces the old Freemarker server-rendered templates.
 
 ```
-mes/frontend/src/
+mes/frontend/apps/mes1/src/
 ├── api/                    # API call functions per module
 │   ├── client.ts           # axios instance: form-encoding, Result unwrap, 401 handling
 │   ├── auth.ts             # login, logout, captcha, userInfo
