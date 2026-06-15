@@ -7,6 +7,10 @@
     "build": "pnpm --filter mes1 build",
     "lint": "pnpm --filter mes1 lint",
     "preview": "pnpm --filter mes1 preview",
-    "check-types": "pnpm -r check-types"
+    "check-types": "pnpm -r check-types",
+    "dev:new": "pnpm --filter mes-new dev",
+    "build:new": "pnpm --filter mes-new build",
+    "lint:new": "pnpm --filter mes-new lint",
+    "test:new": "pnpm --filter mes-new test"
   }
 }
