@@ -22,26 +22,33 @@ export default function AppTabs() {
       {tabs.map((tab) => {
         const active = tab.path === location.pathname
         return (
-          <button
+          <div
             key={tab.key}
-            onClick={() => navigate(tab.path)}
             className={cn(
-              'group flex items-center gap-2 rounded-md px-3 py-1.5 text-xs transition',
+              'group flex items-center rounded-md text-xs transition',
               active
                 ? 'bg-card font-medium text-foreground shadow-sm ring-1 ring-border'
                 : 'text-muted-foreground hover:bg-muted',
             )}
           >
-            <span>{tab.title}</span>
+            <button
+              type="button"
+              onClick={() => navigate(tab.path)}
+              className="inline-flex items-center gap-2 px-3 py-1.5"
+            >
+              {tab.title}
+            </button>
             {tab.closable && (
-              <span
+              <button
+                type="button"
                 onClick={(e) => onClose(e, tab.key)}
-                className="rounded p-0.5 opacity-50 hover:bg-border hover:opacity-100"
+                className="mr-1 rounded p-0.5 opacity-50 hover:bg-border hover:opacity-100"
+                aria-label={`关闭 ${tab.title}`}
               >
                 <X className="size-3" />
-              </span>
+              </button>
             )}
-          </button>
+          </div>
         )
       })}
     </div>
