@@ -63,6 +63,10 @@ interface DataTableProps<TData, TValue>
   getSubRows?: (row: TData) => TData[] | undefined;
   /** 树形默认是否全部展开(默认 true) */
   defaultExpanded?: boolean;
+  /** 行点击回调(传入原始行数据) */
+  onRowClick?: (row: TData) => void;
+  /** 返回追加到该行 <TableRow> 的 className(用于选中高亮) */
+  rowClassName?: (row: TData) => string;
 }
 
 function DataTable<TData, TValue>({
@@ -79,6 +83,8 @@ function DataTable<TData, TValue>({
   onRowSelectionChange: externalOnRowSelectionChange,
   getSubRows,
   defaultExpanded = true,
+  onRowClick,
+  rowClassName,
   className,
   ...props
 }: DataTableProps<TData, TValue>) {
@@ -203,6 +209,11 @@ function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                  className={cn(
+                    onRowClick && "cursor-pointer",
+                    rowClassName?.(row.original)
+                  )}
                 >
                   {row.getVisibleCells().map((cell, cellIndex) => (
                     <TableCell key={cell.id}>
