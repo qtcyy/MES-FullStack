@@ -6,6 +6,7 @@
     "dev": "pnpm --filter mes1 dev",
     "build": "pnpm --filter mes1 build",
     "lint": "pnpm --filter mes1 lint",
-    "preview": "pnpm --filter mes1 preview"
+    "preview": "pnpm --filter mes1 preview",
+    "check-types": "pnpm -r check-types"
   }
 }
