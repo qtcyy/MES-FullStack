@@ -13,11 +13,22 @@ export const ajaxHeaderInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req.clone({ headers: req.headers.set('X-Requested-With', 'XMLHttpRequest') }))
 }
 
-/** POST/PUT 普通对象体 → application/x-www-form-urlencoded(显式 json 头则跳过) */
+/**
+ * POST/PUT 普通对象体 → application/x-www-form-urlencoded(显式 json 头则跳过)。
+ *
+ * 必须显式设置 Content-Type 头:@ngify 的 detectContentTypeHeader 只识别它自己的
+ * HttpParams,不识别原生 URLSearchParams —— 不设头会被误判为 application/json,
+ * 导致后端按 JSON 处理、绑不到表单参数(方法入参/@RequestParam 全为空)。
+ */
 export const formEncodingInterceptor: HttpInterceptorFn = (req, next) => {
   const contentType = req.headers.get('Content-Type') || ''
   if (shouldFormEncode(req.body, contentType)) {
-    return next(req.clone({ body: buildFormBody(req.body as Record<string, unknown>) }))
+    return next(
+      req.clone({
+        body: buildFormBody(req.body as Record<string, unknown>),
+        headers: req.headers.set('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8'),
+      }),
+    )
   }
   return next(req)
 }
