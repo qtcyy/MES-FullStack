@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ArrowRight, Search, X } from 'lucide-react'
 import {
   Badge,
@@ -42,14 +42,15 @@ export default function DualListTransfer({
   const [rightKw, setRightKw] = useState('')
   const [checked, setChecked] = useState<Record<string, boolean>>({})
 
-  // 弹窗关闭时重置勾选与搜索,避免复开后脏状态残留
-  useEffect(() => {
-    if (!open) {
+  // 关闭时重置勾选与搜索,避免复开后脏状态残留(覆盖 ESC/遮罩/X/关闭按钮所有关闭路径)
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
       setChecked({})
       setLeftKw('')
       setRightKw('')
     }
-  }, [open])
+    onOpenChange(next)
+  }
 
   const leftItems = filterTransferItems(candidates, leftKw)
   const rightItems = filterTransferItems(selected, rightKw)
@@ -66,7 +67,7 @@ export default function DualListTransfer({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -151,7 +152,7 @@ export default function DualListTransfer({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>关闭</Button>
+          <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>关闭</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
