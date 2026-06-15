@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildTree } from '@/utils/tree'
+import { buildTree, flattenTreeForSelect } from '@/utils/tree'
 
 describe('buildTree', () => {
   it('扁平含 parentId 列表构建为嵌套树,parentId 不命中者作根', () => {
@@ -24,5 +24,25 @@ describe('buildTree', () => {
     const tree = buildTree(items)
     expect(tree).toHaveLength(1)
     expect(tree[0]!.children[0]!.id).toBe('2')
+  })
+})
+
+describe('flattenTreeForSelect', () => {
+  const nodes = [
+    { id: '1', name: 'A', children: [{ id: '2', name: 'A-1', children: [{ id: '3', name: 'A-1-1' }] }] },
+    { id: '4', name: 'B' },
+  ]
+
+  it('深度优先扁平化,按层级用全角空格缩进 label', () => {
+    const opts = flattenTreeForSelect(nodes)
+    expect(opts.map((o) => o.value)).toEqual(['1', '2', '3', '4'])
+    expect(opts[0]!.label).toBe('A')
+    expect(opts[1]!.label).toBe('　A-1')
+    expect(opts[2]!.label).toBe('　　A-1-1')
+  })
+
+  it('excludeId 同时排除该节点及其全部子孙(防自环)', () => {
+    const opts = flattenTreeForSelect(nodes, { excludeId: '1' })
+    expect(opts.map((o) => o.value)).toEqual(['4'])
   })
 })

@@ -19,3 +19,31 @@ export function buildTree<T extends { id: string; parentId?: string }>(
   })
   return roots
 }
+
+export interface SelectTreeNode {
+  id: string
+  name: string
+  children?: SelectTreeNode[]
+}
+
+export interface SelectOption {
+  value: string
+  label: string
+}
+
+/** 树 → 带缩进 label 的下拉项;excludeId 排除该节点及其子孙 */
+export function flattenTreeForSelect(
+  nodes: SelectTreeNode[],
+  opts: { excludeId?: string } = {},
+): SelectOption[] {
+  const out: SelectOption[] = []
+  const walk = (list: SelectTreeNode[], depth: number) => {
+    for (const n of list) {
+      if (opts.excludeId && n.id === opts.excludeId) continue
+      out.push({ value: n.id, label: `${'　'.repeat(depth)}${n.name}` })
+      if (n.children?.length) walk(n.children, depth + 1)
+    }
+  }
+  walk(nodes, 0)
+  return out
+}
