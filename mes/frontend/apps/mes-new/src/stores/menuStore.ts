@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { firstValueFrom } from 'rxjs'
 import type { TreeVO, SysMenu } from '@/types/menu'
 import * as menuApi from '@/api/menu'
 import { collectPermissions } from './permissions'
@@ -21,7 +22,6 @@ export const useMenuStore = create<MenuState>()(
       loaded: false,
 
       fetchMenuTree: async () => {
-        const { firstValueFrom } = await import('rxjs')
         const result = await firstValueFrom(menuApi.getMenuTree())
         set({ menuInfo: result.menuInfo, loaded: true })
         useAuthStore.getState().setPermissions(collectPermissions(result.menuInfo))
