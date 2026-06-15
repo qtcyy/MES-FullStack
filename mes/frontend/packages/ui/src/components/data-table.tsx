@@ -4,12 +4,14 @@ import * as React from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
+  type ExpandedState,
   type OnChangeFn,
   type RowSelectionState,
   type SortingState,
   type VisibilityState,
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
@@ -17,6 +19,7 @@ import {
 } from "@tanstack/react-table";
 import {
   ChevronDownIcon,
+  ChevronRightIcon,
   ChevronUpIcon,
   ChevronsUpDownIcon,
 } from "lucide-react";
@@ -56,6 +59,10 @@ interface DataTableProps<TData, TValue>
   enableRowSelection?: boolean;
   rowSelection?: Record<string, boolean>;
   onRowSelectionChange?: (rowSelection: Record<string, boolean>) => void;
+  /** 提供则启用树形展开:返回该行子行数组 */
+  getSubRows?: (row: TData) => TData[] | undefined;
+  /** 树形默认是否全部展开(默认 true) */
+  defaultExpanded?: boolean;
 }
 
 function DataTable<TData, TValue>({
@@ -70,6 +77,8 @@ function DataTable<TData, TValue>({
   enableRowSelection = false,
   rowSelection: externalRowSelection,
   onRowSelectionChange: externalOnRowSelectionChange,
+  getSubRows,
+  defaultExpanded = true,
   className,
   ...props
 }: DataTableProps<TData, TValue>) {
@@ -81,6 +90,9 @@ function DataTable<TData, TValue>({
     React.useState<VisibilityState>({});
   const [internalRowSelection, setInternalRowSelection] =
     React.useState<RowSelectionState>({});
+  const [expanded, setExpanded] = React.useState<ExpandedState>(
+    getSubRows && defaultExpanded ? true : {}
+  );
 
   // 使用外部控制的 rowSelection 或内部状态
   const rowSelection = externalRowSelection ?? internalRowSelection;
@@ -106,6 +118,9 @@ function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
+    getSubRows: getSubRows as ((row: TData, index: number) => TData[] | undefined) | undefined,
+    getExpandedRowModel: getSubRows ? getExpandedRowModel() : undefined,
+    onExpandedChange: setExpanded,
     getPaginationRowModel: isServerPagination
       ? undefined
       : getPaginationRowModel(),
@@ -126,6 +141,7 @@ function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       rowSelection,
+      ...(getSubRows && { expanded }),
       ...(isServerPagination && {
         pagination: {
           pageIndex: pagination.pageIndex,
@@ -188,11 +204,40 @@ function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell, cellIndex) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+                      {getSubRows && cellIndex === 0 ? (
+                        <div
+                          className="flex items-center"
+                          style={{ paddingLeft: `${row.depth * 1.25}rem` }}
+                        >
+                          {row.getCanExpand() ? (
+                            <button
+                              type="button"
+                              onClick={row.getToggleExpandedHandler()}
+                              className="mr-1 inline-flex size-5 items-center justify-center rounded hover:bg-muted"
+                              aria-label="展开或折叠"
+                            >
+                              <ChevronRightIcon
+                                className={cn(
+                                  "size-4 transition-transform",
+                                  row.getIsExpanded() && "rotate-90"
+                                )}
+                              />
+                            </button>
+                          ) : (
+                            <span className="mr-1 inline-block size-5" />
+                          )}
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </div>
+                      ) : (
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )
                       )}
                     </TableCell>
                   ))}
@@ -211,6 +256,7 @@ function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      {(pagination || enableRowSelection) && (
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {isServerPagination ? (
@@ -264,6 +310,7 @@ function DataTable<TData, TValue>({
           </Button>
         </div>
       </div>
+      )}
     </div>
   );
 }
