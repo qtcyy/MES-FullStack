@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { buildTree, flattenTreeForSelect } from '@/utils/tree'
+import {
+  buildTree,
+  flattenTreeForSelect,
+  getCheckState,
+  toggleNode,
+  collectGrantedIds,
+  type CheckTreeNode,
+} from '@/utils/tree'
 
 describe('buildTree', () => {
   it('扁平含 parentId 列表构建为嵌套树,parentId 不命中者作根', () => {
@@ -44,5 +51,40 @@ describe('flattenTreeForSelect', () => {
   it('excludeId 同时排除该节点及其全部子孙(防自环)', () => {
     const opts = flattenTreeForSelect(nodes, { excludeId: '1' })
     expect(opts.map((o) => o.value)).toEqual(['4'])
+  })
+})
+
+describe('勾选级联', () => {
+  const tree: CheckTreeNode[] = [
+    { id: 'p', children: [{ id: 'c1' }, { id: 'c2' }] },
+    { id: 'leaf' },
+  ]
+
+  it('getCheckState:全选子→父 checked;部分→indeterminate;全不选→unchecked', () => {
+    expect(getCheckState(tree[0]!, new Set(['c1', 'c2']))).toBe('checked')
+    expect(getCheckState(tree[0]!, new Set(['c1']))).toBe('indeterminate')
+    expect(getCheckState(tree[0]!, new Set())).toBe('unchecked')
+    expect(getCheckState(tree[1]!, new Set(['leaf']))).toBe('checked')
+  })
+
+  it('toggleNode:勾选父则连带全部子孙;再次切换则全清', () => {
+    const after = toggleNode(tree[0]!, new Set())
+    expect(after.has('p')).toBe(true)
+    expect(after.has('c1')).toBe(true)
+    expect(after.has('c2')).toBe(true)
+    const cleared = toggleNode(tree[0]!, after)
+    expect(cleared.has('p')).toBe(false)
+    expect(cleared.has('c1')).toBe(false)
+  })
+
+  it('collectGrantedIds:含半选祖先(被授权叶子的祖先一并返回)', () => {
+    // 仅勾选 c1 → p 半选;授权集应含 p 与 c1,不含 c2/leaf
+    const granted = collectGrantedIds(tree, new Set(['c1']))
+    expect(new Set(granted)).toEqual(new Set(['p', 'c1']))
+  })
+
+  it('collectGrantedIds:父全选时返回父+全部子孙', () => {
+    const granted = collectGrantedIds(tree, new Set(['c1', 'c2']))
+    expect(new Set(granted)).toEqual(new Set(['p', 'c1', 'c2']))
   })
 })
