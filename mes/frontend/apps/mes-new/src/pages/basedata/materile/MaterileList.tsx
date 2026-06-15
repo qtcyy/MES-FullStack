@@ -40,7 +40,7 @@ export default function MaterileList() {
   const { mutate: softDelete } = useMutation$((record: Materiel) => materileAddOrUpdate({ ...record, deleted: '1' }))
 
   const onSearch = () =>
-    setParams({ current: 1, size: PAGE_SIZE, materiel: draftMateriel || undefined, materielDesc: draftDesc || undefined })
+    setParams({ current: 1, size: PAGE_SIZE, materielLike: draftMateriel || undefined, materielDescLike: draftDesc || undefined })
   const onReset = () => {
     setDraftMateriel('')
     setDraftDesc('')

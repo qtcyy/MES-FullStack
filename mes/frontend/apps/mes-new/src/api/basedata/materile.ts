@@ -4,8 +4,8 @@ import type { PageParams, PageResult } from '@/types/api'
 import type { Materiel } from '@/types/basedata'
 
 export interface MaterilePageParams extends PageParams {
-  materiel?: string
-  materielDesc?: string
+  materielLike?: string
+  materielDescLike?: string
 }
 
 export function materilePage(params: MaterilePageParams) {
