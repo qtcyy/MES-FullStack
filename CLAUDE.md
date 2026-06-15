@@ -84,6 +84,10 @@ Each module follows: `controller` → `service`/`service/impl` → `mapper` + `e
 
 ### Frontend (React SPA)
 
+> **⚠️ 当前活跃前端 = `mes/frontend/apps/mes-new`，不要去看/改 `apps/mes1`。**
+> 最近所有前端开发都围绕 `apps/mes-new` 进行（dev server 实际跑在 `:4100`）。`apps/mes1`（下面文档描述的 Ant Design 版本）已弃用，仅作历史参考，**不要在它里面定位或修改文件**。
+> 注意两者技术栈不同：`mes-new` 使用 shadcn/Radix UI（`@workspace/ui`）+ react-hook-form + zod，而 `mes1` 是 Ant Design 5。改前端前先确认在 `apps/mes-new` 下操作。
+
 The React SPA lives in `mes/frontend/` — a pnpm workspace (monorepo). The root holds `pnpm-workspace.yaml` + root `package.json`; the app itself is `mes/frontend/apps/mes1/` (package name `mes1`), with `mes/frontend/packages/` reserved for shared packages. It replaces the old Freemarker server-rendered templates.
 
 ```
