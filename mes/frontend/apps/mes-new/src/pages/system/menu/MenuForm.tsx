@@ -15,9 +15,9 @@ import {
 } from '@workspace/ui'
 import ModalForm from '@/components/ModalForm'
 import ParentSelect from '@/components/ParentSelect'
-import { useMutation$ } from '@/http/hooks'
+import { useMutation$, useQuery$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
-import { menuAddOrUpdate } from '@/api/system/menu'
+import { menuAddOrUpdate, menuGetById } from '@/api/system/menu'
 import type { SysMenu, TreeVO } from '@/types/menu'
 
 interface MenuFormProps {
@@ -43,6 +43,12 @@ const schema = z.object({
 export default function MenuForm({ open, onOpenChange, record, treeNodes, onSaved }: MenuFormProps) {
   const isEdit = !!record
   const { mutate, loading } = useMutation$((dto: SysMenu) => menuAddOrUpdate(dto))
+  // 菜单树投影(record)缺 sortNum/grade/descr,编辑时按 id 拉完整记录回填
+  const { data: full } = useQuery$(
+    ['sys', 'menu', 'byId', record?.id ?? ''],
+    () => menuGetById(record!.id),
+    { enabled: open && isEdit },
+  )
   const {
     register,
     handleSubmit,
@@ -56,23 +62,24 @@ export default function MenuForm({ open, onOpenChange, record, treeNodes, onSave
 
   useEffect(() => {
     if (open) {
+      const src = full ?? record
       reset({
-        code: record?.code ?? '',
-        name: record?.name ?? '',
-        url: record?.url ?? '',
-        parentId: record?.parentId || '0',
-        type: record?.type ?? 1,
-        sortNum: record?.sortNum ?? 0,
-        permission: record?.permission ?? '',
-        icon: record?.icon ?? '',
-        descr: record?.descr ?? '',
+        code: src?.code ?? '',
+        name: src?.name ?? '',
+        url: src?.url ?? '',
+        parentId: src?.parentId || '0',
+        type: src?.type ?? 1,
+        sortNum: src?.sortNum ?? 0,
+        permission: src?.permission ?? '',
+        icon: src?.icon ?? '',
+        descr: src?.descr ?? '',
       })
     }
-  }, [open, record, reset])
+  }, [open, record, full, reset])
 
   const onSubmit = handleSubmit(async (values) => {
     const dto: SysMenu = {
-      ...(record ?? { id: '', code: '', name: '', url: '', parentId: '0', grade: 0, sortNum: 0, type: 1, permission: '', icon: '', descr: '' }),
+      ...(full ?? record ?? { id: '', code: '', name: '', url: '', parentId: '0', grade: 0, sortNum: 0, type: 1, permission: '', icon: '', descr: '' }),
       code: values.code,
       name: values.name,
       url: values.url ?? '',
