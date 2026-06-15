@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowRight, Search, X } from 'lucide-react'
 import {
   Badge,
@@ -42,14 +42,27 @@ export default function DualListTransfer({
   const [rightKw, setRightKw] = useState('')
   const [checked, setChecked] = useState<Record<string, boolean>>({})
 
+  // 弹窗关闭时重置勾选与搜索,避免复开后脏状态残留
+  useEffect(() => {
+    if (!open) {
+      setChecked({})
+      setLeftKw('')
+      setRightKw('')
+    }
+  }, [open])
+
   const leftItems = filterTransferItems(candidates, leftKw)
   const rightItems = filterTransferItems(selected, rightKw)
   const checkedIds = Object.keys(checked).filter((id) => checked[id])
 
   const handleAdd = async () => {
     if (checkedIds.length === 0) return
-    await onAdd(checkedIds)
-    setChecked({})
+    // 无论 onAdd 成功或抛错都清空勾选,防止脏选残留导致后续发送无效 id
+    try {
+      await onAdd(checkedIds)
+    } finally {
+      setChecked({})
+    }
   }
 
   return (
