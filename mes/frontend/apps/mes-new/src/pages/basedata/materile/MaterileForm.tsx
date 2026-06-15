@@ -107,7 +107,7 @@ export default function MaterileForm({ open, onOpenChange, record, onSaved }: Ma
   })
 
   return (
-    <ModalForm open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑物料' : '新增物料'} onSubmit={onSubmit} submitting={loading}>
+    <ModalForm open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑物料' : '新增物料'} onSubmit={onSubmit} submitting={loading} contentClassName="sm:max-w-2xl">
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label>物料类型</Label>

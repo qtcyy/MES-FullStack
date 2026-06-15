@@ -15,6 +15,8 @@ interface ModalFormProps {
   onSubmit: () => void
   submitting?: boolean
   submitText?: string
+  /** 覆盖弹窗宽度的 className，默认 sm:max-w-md */
+  contentClassName?: string
   children: ReactNode
 }
 
@@ -25,11 +27,12 @@ export default function ModalForm({
   onSubmit,
   submitting,
   submitText = '确定',
+  contentClassName = 'sm:max-w-md',
   children,
 }: ModalFormProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className={contentClassName}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
