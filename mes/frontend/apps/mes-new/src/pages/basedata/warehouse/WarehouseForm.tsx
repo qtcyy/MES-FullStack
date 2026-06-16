@@ -53,7 +53,8 @@ export default function WarehouseForm({ open, onOpenChange, record }: Props) {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await mutate({ ...(record ?? {}), ...values })
+      // 仅提交实体字段 + id + deleted,避免把时间戳/无关字段回传给后端
+      await mutate({ id: record?.id, deleted: record?.deleted ?? '0', ...values })
       toast.success(isEdit ? '修改成功' : '新增成功')
       invalidate('["basedata","warehouse"')
       onOpenChange(false)

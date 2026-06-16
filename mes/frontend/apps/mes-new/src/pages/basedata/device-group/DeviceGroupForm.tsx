@@ -37,7 +37,8 @@ export default function DeviceGroupForm({ open, onOpenChange, record }: Props) {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await mutate({ ...(record ?? {}), ...values })
+      // 仅提交实体字段 + id + deleted,避免把 DTO 专属字段(deviceList 等)/时间戳回传给后端
+      await mutate({ id: record?.id, deleted: record?.deleted ?? '0', ...values })
       toast.success(isEdit ? '修改成功' : '新增成功')
       invalidate('["basedata","device-group"')
       onOpenChange(false)
