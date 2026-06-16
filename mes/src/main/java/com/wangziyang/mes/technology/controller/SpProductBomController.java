@@ -135,6 +135,14 @@ public class SpProductBomController extends BaseController {
             if (StringUtils.isEmpty(record.getStatus())) {
                 record.setStatus("draft");
             }
+        } else {
+            SpProductBom existing = spProductBomService.getById(record.getId());
+            if (existing == null) {
+                return Result.failure("节点不存在");
+            }
+            if ("locked".equals(existing.getStatus())) {
+                return Result.failure("BOM 已锁定，无法修改节点");
+            }
         }
         spProductBomService.saveOrUpdate(record);
         return Result.success(record.getId());

@@ -35,8 +35,8 @@ public class SpProductBomServiceImpl extends ServiceImpl<SpProductBomMapper, SpP
             node.setStatus("locked");
             node.setLockedAt(now);
             node.setLockedBy(username);
-            updateById(node);
         }
+        updateBatchById(allNodes);
     }
 
     @Override
@@ -47,7 +47,14 @@ public class SpProductBomServiceImpl extends ServiceImpl<SpProductBomMapper, SpP
             throw new RuntimeException("Only locked BOM can create new version");
         }
         String oldVer = oldRoot.getVersion();
-        String newVer = "V" + (Integer.parseInt(oldVer.replace("V", "").replace(".0", "")) + 1) + ".0";
+        String newVer;
+        try {
+            String num = oldVer == null ? "1.0" : oldVer.replaceFirst("^[Vv]", "");
+            int major = Integer.parseInt(num.split("\\.")[0]);
+            newVer = "V" + (major + 1) + ".0";
+        } catch (NumberFormatException e) {
+            newVer = "V1.0";
+        }
 
         String newRootId = UUID.randomUUID().toString().replace("-", "");
         SpProductBom newRoot = copyBomNode(oldRoot, null, newRootId, newVer);
