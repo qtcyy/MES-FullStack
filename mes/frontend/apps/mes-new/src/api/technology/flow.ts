@@ -23,3 +23,8 @@ export function flowDelete(id: string) {
 export function flowOpers(flowId: string) {
   return http.get<SpOperVo[]>(`/basedata/flow/process/opers/${encodeURIComponent(flowId)}`)
 }
+
+/** 工艺路线全量(下拉) */
+export function flowList() {
+  return http.get<SpFlow[]>('/basedata/flow/list')
+}
