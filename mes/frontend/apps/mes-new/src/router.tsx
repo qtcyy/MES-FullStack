@@ -15,6 +15,8 @@ import ProcessUnitList from '@/pages/basedata/process-unit/ProcessUnitList'
 import WarehouseList from '@/pages/basedata/warehouse/WarehouseList'
 import OperList from '@/pages/basedata/oper/OperList'
 import FlowList from '@/pages/technology/flow/FlowList'
+import OrderList from '@/pages/order/production/OrderList'
+import DispatchList from '@/pages/order/dispatch/DispatchList'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
 
@@ -41,6 +43,8 @@ export const router = createBrowserRouter([
           { path: 'basedata/warehouse', element: <WarehouseList /> },
           { path: 'basedata/oper', element: <OperList /> },
           { path: 'technology/flow', element: <FlowList /> },
+          { path: 'order/production', element: <OrderList /> },
+          { path: 'order/dispatch', element: <DispatchList /> },
           { path: '403', element: <Forbidden /> },
           { path: '*', element: <NotFound /> },
         ],

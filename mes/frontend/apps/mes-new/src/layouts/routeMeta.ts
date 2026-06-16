@@ -19,6 +19,9 @@ export const ROUTE_META: Record<string, { title: string; icon?: string }> = {
   '/basedata/oper': { title: '工序管理', icon: 'tool' },
   // 工艺
   '/technology/flow': { title: '工艺路线管理', icon: 'branches' },
+  // 计划/订单
+  '/order/production': { title: '生产订单', icon: 'schedule' },
+  '/order/dispatch': { title: '作业派工', icon: 'team' },
 }
 
 /** 在菜单树中按 SPA 路由反查菜单名(用于 ROUTE_META 未登记的路由兜底) */
