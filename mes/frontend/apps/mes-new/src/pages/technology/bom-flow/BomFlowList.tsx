@@ -92,10 +92,17 @@ export default function BomFlowList() {
   )
 
   const canWrite =
-    rootStatus !== 'locked' && (selected?.bomFlow?.status ?? 'draft') !== 'locked'
+    rootStatus !== 'locked' &&
+    (selected?.bomFlow?.status ?? 'draft') !== 'locked' &&
+    selected?.bomNode?.status !== 'locked'
+
+  const bindInitial = useMemo(
+    () => ({ flowId: selected?.bomFlow?.flowId, remark: selected?.bomFlow?.remark }),
+    [selected?.bomFlow?.flowId, selected?.bomFlow?.remark],
+  )
 
   // ===== mutations =====
-  const { mutate: unbind } = useMutation$((bomId: string) => bomFlowUnbind(bomId))
+  const { mutate: unbind, loading: unbindLoading } = useMutation$((bomId: string) => bomFlowUnbind(bomId))
   const { mutate: lock, loading: lockLoading } = useMutation$(() => bomFlowLock(editingRootId!))
 
   // ===== 导航 =====
@@ -218,7 +225,7 @@ export default function BomFlowList() {
         open={bindOpen}
         onOpenChange={setBindOpen}
         bomId={selected?.bomNode.id ?? ''}
-        initial={{ flowId: selected?.bomFlow?.flowId, remark: selected?.bomFlow?.remark }}
+        initial={bindInitial}
         onSaved={onBound}
       />
 
@@ -232,7 +239,7 @@ export default function BomFlowList() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmUnbind}>解绑</AlertDialogAction>
+            <AlertDialogAction onClick={confirmUnbind} disabled={unbindLoading}>解绑</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -428,7 +435,7 @@ export default function BomFlowList() {
                   <DataTable
                     columns={operColumns}
                     data={selected.opers ?? []}
-                    getRowId={(r) => r.relation?.id ?? ''}
+                    getRowId={(r, idx) => r.relation?.id ?? String(idx)}
                   />
                 </div>
               )}
