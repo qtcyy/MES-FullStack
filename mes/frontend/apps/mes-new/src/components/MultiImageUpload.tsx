@@ -5,14 +5,6 @@ import { ImagePlus, Loader2, X } from 'lucide-react'
 import { http } from '@/http/client'
 import { PROCESS_UPLOAD_IMAGE_URL } from '@/api/technology/process-content'
 
-/** 逗号连接的 key 串 ↔ key 数组(过滤空串,避免 ''.split(',') 产生 ['']) */
-export function parseKeys(csv: string | undefined | null): string[] {
-  return (csv ?? '').split(',').map((s) => s.trim()).filter(Boolean)
-}
-export function joinKeys(keys: string[]): string {
-  return keys.filter(Boolean).join(',')
-}
-
 interface MultiImageUploadProps {
   /** 对象 key 列表 */
   keys: string[]

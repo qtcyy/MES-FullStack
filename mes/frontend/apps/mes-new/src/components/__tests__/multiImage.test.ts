@@ -1,6 +1,7 @@
-import { parseKeys, joinKeys } from '../MultiImageUpload'
+import { describe, it, expect } from 'vitest'
+import { parseKeys, joinKeys } from '@/utils/imageKeys'
 
-describe('MultiImageUpload key helpers', () => {
+describe('imageKeys helpers', () => {
   it('parseKeys filters empties (no [""])', () => {
     expect(parseKeys('')).toEqual([])
     expect(parseKeys(undefined)).toEqual([])

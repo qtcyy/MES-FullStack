@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { materielToItem, pickRootSubtree, buildBomNodeTree } from '../productBom'
-import type { BomTreeNode } from '@/types/technology'
+import type { BomTreeNode, SpProductBom } from '@/types/technology'
 import type { Materiel } from '@/types/basedata'
 
 describe('materielToItem', () => {
@@ -25,12 +25,12 @@ describe('pickRootSubtree', () => {
 })
 
 describe('buildBomNodeTree', () => {
-  const mk = (id: string, parentId: string | undefined, sortOrder = 0) =>
+  const mk = (id: string, parentId: string | undefined, sortOrder = 0): { bomNode: SpProductBom } =>
     ({ bomNode: { id, parentId, nodeName: id, sortOrder } })
 
   it('rebuilds tree by parentId and sorts siblings by sortOrder', () => {
     const flat = [mk('c', 'a', 2), mk('a', undefined, 0), mk('b', 'a', 1)]
-    const tree = buildBomNodeTree(flat as any)
+    const tree = buildBomNodeTree(flat)
     expect(tree).toHaveLength(1)
     expect(tree[0].bomNode.id).toBe('a')
     expect(tree[0].children.map((n) => n.bomNode.id)).toEqual(['b', 'c'])
@@ -38,7 +38,7 @@ describe('buildBomNodeTree', () => {
 
   it('treats nodes with missing/unknown parent as roots', () => {
     const flat = [mk('x', 'ghost'), mk('y', undefined)]
-    const tree = buildBomNodeTree(flat as any)
+    const tree = buildBomNodeTree(flat)
     expect(tree.map((n) => n.bomNode.id).sort()).toEqual(['x', 'y'])
   })
 
