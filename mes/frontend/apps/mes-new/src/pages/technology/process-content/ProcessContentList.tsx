@@ -175,7 +175,7 @@ export default function ProcessContentList() {
   // ===== 浏览态 =====
   if (editingRootId === null) {
     return (
-      <PermissionGuard perm="product-bom:list">
+      <PermissionGuard perm="process-content:list">
         <PageContainer
           title="工艺文件编制"
           description="为产品 BOM 节点编制工艺文件:主信息、工序要求、检验、工装设备、技术文档"
@@ -216,7 +216,7 @@ export default function ProcessContentList() {
       : `${selectedBomId}:${detail?.content?.id ?? 'new'}:${detail?.content?.status ?? 'none'}`
 
   return (
-    <PermissionGuard perm="product-bom:list">
+    <PermissionGuard perm="process-content:list">
       <PageContainer title="工艺文件编制">
         <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-3">
           <Button variant="ghost" size="sm" onClick={back}>

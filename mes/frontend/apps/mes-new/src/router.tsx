@@ -47,7 +47,7 @@ export const router = createBrowserRouter([
           { path: 'basedata/oper', element: <OperList /> },
           { path: 'technology/flow', element: <FlowList /> },
           { path: 'technology/product-bom', element: <ProductBomList /> },
-          { path: 'technology/bom-flow', element: <BomFlowList /> },
+          { path: 'technology/process-flow', element: <BomFlowList /> },
           { path: 'technology/process-content', element: <ProcessContentList /> },
           { path: 'order/production', element: <OrderList /> },
           { path: 'order/dispatch', element: <DispatchList /> },

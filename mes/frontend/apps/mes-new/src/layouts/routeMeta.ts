@@ -20,8 +20,8 @@ export const ROUTE_META: Record<string, { title: string; icon?: string }> = {
   // 工艺
   '/technology/flow': { title: '工艺路线管理', icon: 'branches' },
   '/technology/product-bom': { title: '产品BOM管理', icon: 'apartment' },
-  '/technology/bom-flow': { title: '工艺路线绑定', icon: 'branches' },
-  '/technology/process-content': { title: '工艺文件编制', icon: 'file-text' },
+  '/technology/process-flow': { title: '工艺流程管理', icon: 'branches' },
+  '/technology/process-content': { title: '工艺内容编制', icon: 'file-text' },
   // 计划/订单
   '/order/production': { title: '生产订单', icon: 'schedule' },
   '/order/dispatch': { title: '作业派工', icon: 'team' },

@@ -266,7 +266,7 @@ export default function BomFlowList() {
   // ===== 浏览态 =====
   if (editingRootId === null) {
     return (
-      <PermissionGuard perm="product-bom:list">
+      <PermissionGuard perm="process-flow:list">
         <PageContainer
           title="工艺路线绑定"
           description="为产品 BOM 节点绑定工艺路线,并锁定工艺以发布"
@@ -301,7 +301,7 @@ export default function BomFlowList() {
 
   // ===== 绑定态 =====
   return (
-    <PermissionGuard perm="product-bom:list">
+    <PermissionGuard perm="process-flow:list">
       <PageContainer title="工艺路线绑定">
         <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-3">
           <Button variant="ghost" size="sm" onClick={back}>
