@@ -1,7 +1,6 @@
 package com.wangziyang.mes.technology.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
 import com.wangziyang.mes.technology.entity.*;
@@ -155,7 +154,10 @@ public class SpBomFlowController extends BaseController {
         if (node != null && "locked".equals(node.getStatus())) {
             return Result.failure("BOM 已锁定，无法修改");
         }
-        spBomFlowService.update(new UpdateWrapper<SpBomFlow>().eq("id", id).set("remark", remark));
+        SpBomFlow upd = new SpBomFlow();
+        upd.setId(id);
+        upd.setRemark(remark);
+        spBomFlowService.updateById(upd);
         return Result.success(null);
     }
 
