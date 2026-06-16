@@ -103,15 +103,13 @@ export default function DeptList() {
         </div>
       </SearchForm>
 
-      <div className="rounded-lg border border-border bg-card p-2">
-        <DataTable
-          columns={columns}
-          data={treeData}
-          loading={loading}
-          loadingRowCount={6}
-          getSubRows={(row) => row.children}
-        />
-      </div>
+      <DataTable
+        columns={columns}
+        data={treeData}
+        loading={loading}
+        loadingRowCount={6}
+        getSubRows={(row) => row.children}
+      />
 
       <DeptForm
         open={formOpen}

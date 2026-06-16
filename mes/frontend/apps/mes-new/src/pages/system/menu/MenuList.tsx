@@ -98,15 +98,13 @@ export default function MenuList() {
         </Button>
       }
     >
-      <div className="rounded-lg border border-border bg-card p-2">
-        <DataTable
-          columns={columns}
-          data={treeData}
-          loading={loading}
-          loadingRowCount={8}
-          getSubRows={(row) => row.children}
-        />
-      </div>
+      <DataTable
+        columns={columns}
+        data={treeData}
+        loading={loading}
+        loadingRowCount={8}
+        getSubRows={(row) => row.children}
+      />
 
       <MenuForm open={formOpen} onOpenChange={setFormOpen} record={editing} treeNodes={treeData} onSaved={() => {}} />
 

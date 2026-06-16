@@ -99,22 +99,20 @@ export default function DictList() {
         </div>
       </SearchForm>
 
-      <div className="rounded-lg border border-border bg-card p-2">
-        <DataTable
-          columns={columns}
-          data={data?.records ?? []}
-          loading={loading}
-          loadingRowCount={PAGE_SIZE}
-          pagination={{
-            mode: 'server',
-            pageIndex: (data?.current ?? params.current) - 1,
-            pageSize: PAGE_SIZE,
-            totalPages: data?.pages ?? 1,
-            totalRows: data?.total,
-            onPageChange: (idx) => setParams((p) => ({ ...p, current: idx + 1 })),
-          }}
-        />
-      </div>
+      <DataTable
+        columns={columns}
+        data={data?.records ?? []}
+        loading={loading}
+        loadingRowCount={PAGE_SIZE}
+        pagination={{
+          mode: 'server',
+          pageIndex: (data?.current ?? params.current) - 1,
+          pageSize: PAGE_SIZE,
+          totalPages: data?.pages ?? 1,
+          totalRows: data?.total,
+          onPageChange: (idx) => setParams((p) => ({ ...p, current: idx + 1 })),
+        }}
+      />
 
       <DictForm open={formOpen} onOpenChange={setFormOpen} record={editing} onSaved={() => {}} />
 
