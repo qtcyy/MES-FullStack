@@ -89,3 +89,92 @@ export interface SpProductBomItem {
   unit?: string
   sortOrder?: number
 }
+
+// ===== BOM-Flow 绑定(周期 2f, D) =====
+
+/** 工艺路线-工序关系(sp_flow_oper_relation,前端只用部分字段) */
+export interface SpFlowOperRelation {
+  id: string
+  flowId?: string
+  operId?: string
+  oper?: string
+  sortNum?: number
+  /** firstOper / lastOper */
+  operType?: string
+}
+
+/** /bom-flow/opers/{flowId} 与 list 内 opers 项 */
+export interface FlowOperItem {
+  relation: SpFlowOperRelation
+  oper?: SpOper | null
+}
+
+/** BOM-Flow 绑定行(sp_bom_flow) */
+export interface SpBomFlow {
+  id: string
+  bomId: string
+  flowId: string
+  status?: 'draft' | 'locked'
+  remark?: string
+  sortOrder?: number
+}
+
+/** /bom-flow/list/{rootId} 的扁平节点项(未绑定节点仅 bomNode) */
+export interface BomFlowNodeVO {
+  bomNode: SpProductBom
+  bomFlow?: SpBomFlow | null
+  flow?: SpFlow | null
+  opers?: FlowOperItem[]
+}
+
+// ===== 工艺文件(周期 2f, E) =====
+
+/** 工艺文件内容(sp_process_content);图片字段为逗号连接的对象 key 列表 */
+export interface SpProcessContent {
+  id?: string
+  bomId: string
+  flowId?: string
+  mainInfo?: string
+  content?: string
+  contentImages?: string
+  requirements?: string
+  /** '0' | '1' 字符串(切勿发 boolean) */
+  inspectionRequired?: string
+  inspectionImages?: string
+  notes?: string
+  status?: 'draft' | 'completed'
+}
+
+/** 工装设备(sp_process_equipment) */
+export interface SpProcessEquipment {
+  id?: string
+  contentId: string
+  name: string
+  quantity?: number
+  remark?: string
+}
+
+/** 技术文档(sp_process_document);filePath 存对象 key,fileUrl 为后端读时重签的可访问 url */
+export interface SpProcessDocument {
+  id?: string
+  contentId: string
+  name: string
+  filePath: string
+  fileUrl?: string
+}
+
+/** /process-content/get/{bomId} 返回 */
+export interface ProcessContentDetailVO {
+  content: SpProcessContent | null
+  equipment: SpProcessEquipment[]
+  documents: SpProcessDocument[]
+  /** 与 content.contentImages 的非空 key 顺序对齐的展示 url */
+  contentImageUrls: string[]
+  inspectionImageUrls: string[]
+}
+
+/** /process-content/list/{rootId} 节点项 */
+export interface ProcessContentNodeVO {
+  bomNode: SpProductBom
+  content: SpProcessContent | null
+}
