@@ -108,6 +108,7 @@ export default function OrderedTransfer({
                   onDragStart={() => setDragIndex(idx)}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleDrop(idx)}
+                  onDragEnd={() => setDragIndex(null)}
                   className={cn(
                     'flex items-center gap-2 rounded-md border bg-card px-2 py-1.5 transition-colors hover:bg-accent',
                     dragIndex === idx && 'opacity-50',

@@ -9,11 +9,6 @@ export function flowPage(params: PageParams) {
   return http.post<PageResult<SpFlow>>('/basedata/flow/page', params)
 }
 
-/** 按 id 查工艺路线主信息(不含工序链) */
-export function flowGetById(id: string) {
-  return http.get<SpFlow>(`/basedata/flow/get-by-id?id=${encodeURIComponent(id)}`)
-}
-
 /** 级联保存(@RequestBody JSON;后端按顺序推导 sortNum/前后道/首末道/process) */
 export function flowSaveProcess(body: SpFlowDtoReq) {
   return http.post<unknown>('/basedata/flow/process/add-or-update', body, JSON_HEADERS)
