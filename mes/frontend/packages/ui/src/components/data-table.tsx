@@ -35,6 +35,7 @@ import {
   TableRow,
 } from "@workspace/ui/components/table";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+import { Checkbox } from "@workspace/ui/components/checkbox";
 import { cn } from "@workspace/ui/lib/utils";
 
 interface ServerPaginationConfig {
@@ -127,10 +128,39 @@ function DataTable<TData, TValue>({
 
   const isServerPagination = pagination?.mode === "server";
 
+  // enableRowSelection 时自动注入选择列(复选框 + 表头全选);未开启则不改变既有列
+  const tableColumns = React.useMemo<ColumnDef<TData, TValue>[]>(() => {
+    if (!enableRowSelection) return columns;
+    const selectionColumn: ColumnDef<TData, TValue> = {
+      id: "__select__",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="全选本页"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          disabled={!row.getCanSelect()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onClick={(e) => e.stopPropagation()}
+          aria-label="选择此行"
+        />
+      ),
+      enableSorting: false,
+    };
+    return [selectionColumn, ...columns];
+  }, [columns, enableRowSelection]);
+
   const table = useReactTable({
     data,
     getRowId: getRowId,
-    columns,
+    columns: tableColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -207,7 +237,7 @@ function DataTable<TData, TValue>({
             {loading ? (
               Array.from({ length: loadingRowCount }).map((_, rowIndex) => (
                 <TableRow key={`skeleton-${rowIndex}`}>
-                  {columns.map((_, colIndex) => (
+                  {tableColumns.map((_, colIndex) => (
                     <TableCell key={colIndex} className="px-4 py-3">
                       <Skeleton className="h-5 w-full" />
                     </TableCell>
@@ -236,7 +266,7 @@ function DataTable<TData, TValue>({
             ) : (
               <TableRow className="hover:bg-transparent">
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={tableColumns.length}
                   className="h-32 text-center"
                 >
                   <div className="flex flex-col items-center justify-center gap-2 py-6 text-muted-foreground">
