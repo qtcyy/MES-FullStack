@@ -97,7 +97,7 @@ export default function OperList() {
       title="工序管理"
       description="维护工序基础数据及工时 / 制造周期"
       actions={
-        <PermissionGuard perm="oper:add">
+        <PermissionGuard perm="oper:list">
           <Button onClick={() => { setEditing(null); setFormOpen(true) }}>
             <Plus className="size-4" />
             新建工序
