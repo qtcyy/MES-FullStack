@@ -39,7 +39,8 @@ public class MinioUtil {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to init MinIO bucket", e);
+            // MinIO 不可用时不应阻断整个应用启动;首次上传会再次失败并被 controller 捕获
+            System.err.println("[MinioUtil] 初始化 bucket 失败(MinIO 可能未启动): " + e.getMessage());
         }
     }
 
