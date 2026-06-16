@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -115,6 +116,19 @@ public class SpFlowOperRelationController extends BaseController {
     @ResponseBody
     public Result addOrUpdate(@RequestBody SpFlowDto spFlowDto) throws Exception {
         return iSpFlowOperRelationService.addOrUpdate(spFlowDto);
+    }
+
+    /**
+     * 查询流程下有序工序链(按 sortNum 升序),供前端编辑态回填
+     *
+     * @param flowId 流程ID
+     * @return Result 有序工序穿梭对象列表
+     */
+    @ApiOperation("查询流程下有序工序链")
+    @GetMapping("/opers/{flowId}")
+    @ResponseBody
+    public Result opers(@PathVariable String flowId) throws Exception {
+        return Result.success(iSpFlowOperRelationService.currentOperViewServer(flowId));
     }
 
     /**
