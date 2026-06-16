@@ -3,12 +3,11 @@ package com.wangziyang.mes.order.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.wangziyang.mes.basedata.entity.SpMaterile;
 import com.wangziyang.mes.basedata.entity.SpTableManager;
-import com.wangziyang.mes.basedata.request.spMaterileReq;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
 import com.wangziyang.mes.order.entity.SpOrder;
+import com.wangziyang.mes.order.request.SpOrderReq;
 import com.wangziyang.mes.order.service.ISpOrderService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -84,48 +83,38 @@ public class SpOrderController extends BaseController {
      * @return Result 执行结果
      */
     @ApiOperation("生产订单界界面分页查询")
-    @ApiImplicitParams({@ApiImplicitParam(name = "req", value = "请求参数", defaultValue = "请求参数")})
     @PostMapping("/page")
     @ResponseBody
-    public Result page(spMaterileReq req) {
+    public Result page(SpOrderReq req) {
         QueryWrapper queryWrapper = new QueryWrapper();
+        if (StringUtils.isNotEmpty(req.getOrderCodeLike())) {
+            queryWrapper.like("order_code", req.getOrderCodeLike());
+        }
         if (StringUtils.isNotEmpty(req.getMaterielLike())) {
             queryWrapper.like("materiel", req.getMaterielLike());
         }
-        if (StringUtils.isNotEmpty(req.getMaterielDescLike())) {
-            queryWrapper.like("materiel_desc", req.getMaterielDescLike());
-        }
+        queryWrapper.orderByDesc("create_time");
         IPage result = iSpOrderService.page(req, queryWrapper);
         return Result.success(result);
     }
 
-    /**
-     * 生产订单界修改、新增
-     *
-     * @param record 物料实体类
-     * @return 执行结果
-     */
-    @ApiOperation("生产订单界修改、新增")
+    @ApiOperation("生产订单修改、新增")
     @PostMapping("/add-or-update")
     @ResponseBody
-    public Result addOrUpdate(SpMaterile record) {
-        SpOrder spOrder = iSpOrderService.getById(record.getFlowId());
-        iSpOrderService.saveOrUpdate(spOrder);
+    public Result addOrUpdate(SpOrder record) {
+        // 新建订单默认状态=0(已下发/待派工),以进入派工列表
+        if (StringUtils.isEmpty(record.getId()) && record.getStatue() == null) {
+            record.setStatue(0);
+        }
+        iSpOrderService.saveOrUpdate(record);
         return Result.success();
     }
 
 
-    /**
-     * 删除生产订单界
-     *
-     * @param req 请求参数
-     * @return Result 执行结果
-     */
-    @ApiOperation("删除生产订单界")
-    @ApiImplicitParams({@ApiImplicitParam(name = "req", value = "物料实体", defaultValue = "物料实体")})
+    @ApiOperation("删除生产订单")
     @PostMapping("/delete")
     @ResponseBody
-    public Result deleteByTableNameId(SpMaterile req) throws Exception {
+    public Result deleteByTableNameId(SpOrder req) throws Exception {
         iSpOrderService.removeById(req.getId());
         return Result.success();
     }

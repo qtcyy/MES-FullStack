@@ -60,7 +60,7 @@ public class SpOrder extends BaseEntity {
     private String planEndTime;
 
     /**
-     * 1,创建 2 进行中，3订单结束，4订单终结
+     * 订单状态:0 已下发(待派工),1 已派工,2 进行中,3 订单结束,4 订单终结
      */
     private Integer statue;
 
