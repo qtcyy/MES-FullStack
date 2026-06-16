@@ -19,9 +19,11 @@ import {
 } from "@tanstack/react-table";
 import {
   ChevronDownIcon,
+  ChevronLeftIcon,
   ChevronRightIcon,
   ChevronUpIcon,
   ChevronsUpDownIcon,
+  InboxIcon,
 } from "lucide-react";
 
 import { Button } from "@workspace/ui/components/button";
@@ -44,6 +46,21 @@ interface ServerPaginationConfig {
   totalPages: number;
   totalRows?: number;
   onPageChange: (pageIndex: number) => void;
+}
+
+// 计算页码按钮序列:总页数 <= 7 全平铺;否则首页/末页/当前±1,其间以 "ellipsis" 折叠
+function getPageItems(current: number, total: number): (number | "ellipsis")[] {
+  if (total <= 7) {
+    return Array.from({ length: Math.max(total, 1) }, (_, i) => i + 1);
+  }
+  const items: (number | "ellipsis")[] = [1];
+  const left = Math.max(2, current - 1);
+  const right = Math.min(total - 1, current + 1);
+  if (left > 2) items.push("ellipsis");
+  for (let p = left; p <= right; p++) items.push(p);
+  if (right < total - 1) items.push("ellipsis");
+  items.push(total);
+  return items;
 }
 
 interface DataTableProps<TData, TValue>
@@ -173,14 +190,18 @@ function DataTable<TData, TValue>({
           />
         </div>
       )}
-      <div className="rounded-md border">
+      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className="border-b-2 border-border bg-muted px-4 py-3 text-xs font-medium text-muted-foreground"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -198,8 +219,8 @@ function DataTable<TData, TValue>({
               Array.from({ length: loadingRowCount }).map((_, rowIndex) => (
                 <TableRow key={`skeleton-${rowIndex}`}>
                   {columns.map((_, colIndex) => (
-                    <TableCell key={colIndex}>
-                      <Skeleton className="h-6 w-full" />
+                    <TableCell key={colIndex} className="px-4 py-3">
+                      <Skeleton className="h-5 w-full" />
                     </TableCell>
                   ))}
                 </TableRow>
@@ -211,12 +232,13 @@ function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                   onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                   className={cn(
+                    "border-border/60",
                     onRowClick && "cursor-pointer",
                     rowClassName?.(row.original)
                   )}
                 >
                   {row.getVisibleCells().map((cell, cellIndex) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="px-4 py-3">
                       {getSubRows && cellIndex === 0 ? (
                         <div
                           className="flex items-center"
@@ -255,73 +277,113 @@ function DataTable<TData, TValue>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-32 text-center"
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center gap-2 py-6 text-muted-foreground">
+                    <InboxIcon className="size-8 opacity-60" />
+                    <span className="text-sm">暂无数据</span>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+
+        {(pagination || enableRowSelection) && (
+          <div className="flex items-center justify-between gap-2 border-t border-border px-4 py-3">
+            <div className="text-sm text-muted-foreground">
+              {isServerPagination ? (
+                pagination.totalRows != null ? (
+                  <span>
+                    共 {pagination.totalRows} 条 · 每页 {pagination.pageSize} 条
+                  </span>
+                ) : (
+                  <span>
+                    第 {pagination.pageIndex + 1} / {pagination.totalPages} 页
+                  </span>
+                )
+              ) : (
+                <span>
+                  已选 {table.getFilteredSelectedRowModel().rows.length} /{" "}
+                  {table.getFilteredRowModel().rows.length} 行
+                </span>
+              )}
+            </div>
+
+            {isServerPagination ? (
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  aria-label="上一页"
+                  disabled={pagination.pageIndex === 0}
+                  onClick={() => pagination.onPageChange(pagination.pageIndex - 1)}
+                  className="inline-flex size-8 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <ChevronLeftIcon className="size-4" />
+                </button>
+                {getPageItems(
+                  pagination.pageIndex + 1,
+                  pagination.totalPages
+                ).map((item, i) =>
+                  item === "ellipsis" ? (
+                    <span
+                      key={`ellipsis-${i}`}
+                      className="px-1.5 text-sm text-muted-foreground"
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => pagination.onPageChange(item - 1)}
+                      className={cn(
+                        "inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm transition-colors",
+                        item === pagination.pageIndex + 1
+                          ? "bg-primary font-medium text-primary-foreground"
+                          : "border border-border bg-card text-foreground hover:bg-muted"
+                      )}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+                <button
+                  type="button"
+                  aria-label="下一页"
+                  disabled={pagination.pageIndex >= pagination.totalPages - 1}
+                  onClick={() => pagination.onPageChange(pagination.pageIndex + 1)}
+                  className="inline-flex size-8 items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <ChevronRightIcon className="size-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  上一页
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  下一页
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      {(pagination || enableRowSelection) && (
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {isServerPagination ? (
-            <span>
-              第 {pagination.pageIndex + 1} 页 / 共 {pagination.totalPages} 页
-              {pagination.totalRows && ` (${pagination.totalRows} 条记录)`}
-            </span>
-          ) : (
-            <span>
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </span>
-          )}
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (isServerPagination) {
-                pagination.onPageChange(pagination.pageIndex - 1);
-              } else {
-                table.previousPage();
-              }
-            }}
-            disabled={
-              isServerPagination
-                ? pagination.pageIndex === 0
-                : !table.getCanPreviousPage()
-            }
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (isServerPagination) {
-                pagination.onPageChange(pagination.pageIndex + 1);
-              } else {
-                table.nextPage();
-              }
-            }}
-            disabled={
-              isServerPagination
-                ? pagination.pageIndex >= pagination.totalPages - 1
-                : !table.getCanNextPage()
-            }
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-      )}
     </div>
   );
 }
