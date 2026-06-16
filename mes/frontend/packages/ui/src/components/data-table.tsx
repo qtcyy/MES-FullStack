@@ -339,6 +339,7 @@ function DataTable<TData, TValue>({
                     <button
                       key={item}
                       type="button"
+                      aria-current={item === pagination.pageIndex + 1 ? "page" : undefined}
                       onClick={() => pagination.onPageChange(item - 1)}
                       className={cn(
                         "inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm transition-colors",
