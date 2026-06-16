@@ -22,7 +22,10 @@ import type { SpProductBom } from '@/types/technology'
 export type BomNodeMode = 'create-root' | 'add-child' | 'edit'
 
 const schema = z.object({
-  nodeName: z.string().min(1, '请输入节点名称'),
+  // 字段名避开 'nodeName':input 的 name="nodeName" 会污染 <form>.nodeName(DOM clobbering),
+  // 令 React 事件系统读取 form.nodeName.toLowerCase() 崩溃并触发原生提交导致整页刷新。
+  // 这里用 bomNodeName,提交时再映射回后端要的 nodeName。
+  bomNodeName: z.string().min(1, '请输入节点名称'),
   productCode: z.string().optional(),
   remark: z.string().optional(),
   sortOrder: z.coerce.number().optional(),
@@ -31,7 +34,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>
 
 const DEFAULTS: FormValues = {
-  nodeName: '',
+  bomNodeName: '',
   productCode: '',
   remark: '',
   sortOrder: 0,
@@ -85,7 +88,7 @@ export default function BomNodeForm({
       reset(
         mode === 'edit' && initial
           ? {
-              nodeName: initial.nodeName ?? '',
+              bomNodeName: initial.nodeName ?? '',
               productCode: initial.productCode ?? '',
               remark: initial.remark ?? '',
               sortOrder: initial.sortOrder ?? 0,
@@ -100,14 +103,14 @@ export default function BomNodeForm({
       let body: Partial<SpProductBom>
       if (mode === 'create-root') {
         body = {
-          nodeName: values.nodeName,
+          nodeName: values.bomNodeName,
           productCode: values.productCode ?? '',
           remark: values.remark ?? '',
           sortOrder: values.sortOrder ?? 0,
         }
       } else if (mode === 'add-child') {
         body = {
-          nodeName: values.nodeName,
+          nodeName: values.bomNodeName,
           parentId,
           remark: values.remark ?? '',
           sortOrder: values.sortOrder ?? 0,
@@ -115,7 +118,7 @@ export default function BomNodeForm({
       } else {
         body = {
           id: initial!.id,
-          nodeName: values.nodeName,
+          nodeName: values.bomNodeName,
           remark: values.remark ?? '',
           sortOrder: values.sortOrder ?? 0,
         }
@@ -151,7 +154,7 @@ export default function BomNodeForm({
                   onValueChange={(v) => {
                     field.onChange(v)
                     const m = (products ?? []).find((x) => x.materiel === v)
-                    if (m) setValue('nodeName', m.materielDesc ?? '')
+                    if (m) setValue('bomNodeName', m.materielDesc ?? '')
                   }}
                 >
                   <SelectTrigger className="w-full"><SelectValue placeholder="请选择产品" /></SelectTrigger>
@@ -165,8 +168,8 @@ export default function BomNodeForm({
             />
           </FormField>
         )}
-        <FormField label="节点名称" htmlFor="node-name" required error={errors.nodeName?.message}>
-          <Input id="node-name" aria-invalid={!!errors.nodeName} {...register('nodeName')} />
+        <FormField label="节点名称" htmlFor="node-name" required error={errors.bomNodeName?.message}>
+          <Input id="node-name" aria-invalid={!!errors.bomNodeName} {...register('bomNodeName')} />
         </FormField>
         <FormField label="排序" htmlFor="node-sort">
           <Input id="node-sort" type="number" {...register('sortOrder')} />
