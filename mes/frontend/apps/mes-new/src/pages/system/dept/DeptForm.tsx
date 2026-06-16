@@ -4,8 +4,9 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Building2 } from 'lucide-react'
-import { Input, Label, toast } from '@workspace/ui'
+import { Input, toast } from '@workspace/ui'
 import FormDialog from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import ParentSelect from '@/components/ParentSelect'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -71,13 +72,10 @@ export default function DeptForm({ open, onOpenChange, record, treeNodes, onSave
 
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑部门' : '新增部门'} icon={Building2} description="维护组织部门" onSubmit={onSubmit} submitting={loading}>
-      <div className="space-y-1.5">
-        <Label htmlFor="dept-name">部门名称</Label>
-        <Input id="dept-name" {...register('name')} />
-        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>上级部门</Label>
+      <FormField label="部门名称" htmlFor="dept-name" required error={errors.name?.message}>
+        <Input id="dept-name" aria-invalid={!!errors.name} {...register('name')} />
+      </FormField>
+      <FormField label="上级部门" required>
         <Controller
           control={control}
           name="parentId"
@@ -85,12 +83,10 @@ export default function DeptForm({ open, onOpenChange, record, treeNodes, onSave
             <ParentSelect nodes={treeNodes} value={field.value} onChange={field.onChange} excludeId={record?.id} />
           )}
         />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="dept-sort">排序</Label>
-        <Input id="dept-sort" type="number" {...register('sortNum')} />
-        {errors.sortNum && <p className="text-xs text-destructive">{errors.sortNum.message}</p>}
-      </div>
+      </FormField>
+      <FormField label="排序" htmlFor="dept-sort" required error={errors.sortNum?.message}>
+        <Input id="dept-sort" type="number" aria-invalid={!!errors.sortNum} {...register('sortNum')} />
+      </FormField>
     </FormDialog>
   )
 }

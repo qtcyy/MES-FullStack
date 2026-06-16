@@ -3,8 +3,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { User } from 'lucide-react'
-import { Input, Label, toast } from '@workspace/ui'
+import { Input, toast } from '@workspace/ui'
 import FormDialog from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { userAddOrUpdate } from '@/api/system/user'
@@ -72,21 +73,15 @@ export default function UserForm({ open, onOpenChange, record, onSaved }: UserFo
       onSubmit={onSubmit}
       submitting={loading}
     >
-      <div className="space-y-1.5">
-        <Label htmlFor="f-username">登录名</Label>
-        <Input id="f-username" disabled={isEdit} {...register('username')} />
-        {errors.username && <p className="text-xs text-destructive">{errors.username.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="f-name">姓名</Label>
-        <Input id="f-name" {...register('name')} />
-        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="f-password">{isEdit ? '重置密码(留空不改)' : '初始密码'}</Label>
-        <Input id="f-password" type="password" {...register('password')} />
-        {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-      </div>
+      <FormField label="登录名" htmlFor="f-username" required error={errors.username?.message} help={isEdit ? '登录名创建后不可修改' : undefined}>
+        <Input id="f-username" disabled={isEdit} aria-invalid={!!errors.username} {...register('username')} />
+      </FormField>
+      <FormField label="姓名" htmlFor="f-name" required error={errors.name?.message}>
+        <Input id="f-name" aria-invalid={!!errors.name} {...register('name')} />
+      </FormField>
+      <FormField label={isEdit ? '重置密码' : '初始密码'} htmlFor="f-password" required={!isEdit} error={errors.password?.message} help={isEdit ? '留空表示不修改密码' : '新用户的初始登录密码'}>
+        <Input id="f-password" type="password" aria-invalid={!!errors.password} {...register('password')} />
+      </FormField>
     </FormDialog>
   )
 }

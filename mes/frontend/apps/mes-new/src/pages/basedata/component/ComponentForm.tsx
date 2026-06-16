@@ -4,8 +4,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { CircuitBoard } from 'lucide-react'
-import { Input, Label, Textarea, toast } from '@workspace/ui'
+import { Input, Textarea, toast } from '@workspace/ui'
 import FormDialog from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { componentAddOrUpdate } from '@/api/basedata/component'
@@ -60,20 +61,16 @@ export default function ComponentForm({ open, onOpenChange, record, onSaved }: C
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑组件' : '新增组件'} icon={CircuitBoard} description="维护元器件主数据" onSubmit={onSubmit} submitting={loading}>
       {isEdit && (
-        <div className="space-y-1.5">
-          <Label htmlFor="c-code">组件编码</Label>
+        <FormField label="组件编码" htmlFor="c-code">
           <Input id="c-code" value={record?.code ?? ''} disabled />
-        </div>
+        </FormField>
       )}
-      <div className="space-y-1.5">
-        <Label htmlFor="c-name">组件名称</Label>
-        <Input id="c-name" {...register('name')} />
-        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="c-descr">描述</Label>
+      <FormField label="组件名称" htmlFor="c-name" required error={errors.name?.message}>
+        <Input id="c-name" aria-invalid={!!errors.name} {...register('name')} />
+      </FormField>
+      <FormField label="描述" htmlFor="c-descr">
         <Textarea id="c-descr" {...register('descr')} />
-      </div>
+      </FormField>
     </FormDialog>
   )
 }

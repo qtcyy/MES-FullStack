@@ -3,9 +3,10 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Input, Label, Textarea, toast } from '@workspace/ui'
+import { Input, Textarea, toast } from '@workspace/ui'
 import { Boxes } from 'lucide-react'
 import FormDialog from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { deviceGroupAddOrUpdate } from '@/api/basedata/device-group'
@@ -57,20 +58,15 @@ export default function DeviceGroupForm({ open, onOpenChange, record }: Props) {
       onSubmit={onSubmit}
       submitting={loading}
     >
-      <div className="space-y-1.5">
-        <Label htmlFor="dg-code">编组代码</Label>
-        <Input id="dg-code" {...register('code')} />
-        {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="dg-name">编组名称</Label>
-        <Input id="dg-name" {...register('name')} />
-        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="dg-descr">描述</Label>
+      <FormField label="编组代码" htmlFor="dg-code" required error={errors.code?.message}>
+        <Input id="dg-code" aria-invalid={!!errors.code} {...register('code')} />
+      </FormField>
+      <FormField label="编组名称" htmlFor="dg-name" required error={errors.name?.message}>
+        <Input id="dg-name" aria-invalid={!!errors.name} {...register('name')} />
+      </FormField>
+      <FormField label="描述" htmlFor="dg-descr">
         <Textarea id="dg-descr" {...register('descr')} />
-      </div>
+      </FormField>
     </FormDialog>
   )
 }
