@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
@@ -37,14 +37,14 @@ export default function DispatchDialog({ open, onOpenChange, orderIds, onAssigne
   const { mutate, loading } = useMutation$((dto: SpDispatchAssign) => dispatchAssign(dto))
 
   const {
-    register, handleSubmit, control, reset, watch, setValue,
+    register, handleSubmit, control, reset, setValue,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { teamId: '', userId: '', laborHours: 8, planStartTime: '', planEndTime: '', remark: '' },
   })
 
-  const teamId = watch('teamId')
+  const teamId = useWatch({ control, name: 'teamId' })
   const { data: users } = useQuery$(
     ['dispatch', 'team-users', teamId],
     () => dispatchTeamUsers(teamId),
