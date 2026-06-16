@@ -3,8 +3,9 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { BookText } from 'lucide-react'
 import { Input, Label, Textarea, toast } from '@workspace/ui'
-import ModalForm from '@/components/ModalForm'
+import FormDialog from '@/components/FormDialog'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { dictAddOrUpdate } from '@/api/system/dict'
@@ -74,7 +75,7 @@ export default function DictForm({ open, onOpenChange, record, onSaved }: DictFo
   })
 
   return (
-    <ModalForm open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑字典' : '新增字典'} onSubmit={onSubmit} submitting={loading}>
+    <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑字典' : '新增字典'} icon={BookText} description="维护数据字典" onSubmit={onSubmit} submitting={loading}>
       <div className="space-y-1.5">
         <Label htmlFor="d-name">标签名</Label>
         <Input id="d-name" {...register('name')} />
@@ -103,6 +104,6 @@ export default function DictForm({ open, onOpenChange, record, onSaved }: DictFo
         <Label htmlFor="d-descr">描述</Label>
         <Textarea id="d-descr" {...register('descr')} />
       </div>
-    </ModalForm>
+    </FormDialog>
   )
 }

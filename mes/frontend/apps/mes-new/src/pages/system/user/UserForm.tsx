@@ -2,8 +2,9 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { User } from 'lucide-react'
 import { Input, Label, toast } from '@workspace/ui'
-import ModalForm from '@/components/ModalForm'
+import FormDialog from '@/components/FormDialog'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { userAddOrUpdate } from '@/api/system/user'
@@ -62,10 +63,12 @@ export default function UserForm({ open, onOpenChange, record, onSaved }: UserFo
   })
 
   return (
-    <ModalForm
+    <FormDialog
       open={open}
       onOpenChange={onOpenChange}
       title={isEdit ? '编辑用户' : '新增用户'}
+      icon={User}
+      description="维护系统用户账号"
       onSubmit={onSubmit}
       submitting={loading}
     >
@@ -84,6 +87,6 @@ export default function UserForm({ open, onOpenChange, record, onSaved }: UserFo
         <Input id="f-password" type="password" {...register('password')} />
         {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
       </div>
-    </ModalForm>
+    </FormDialog>
   )
 }

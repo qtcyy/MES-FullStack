@@ -13,7 +13,8 @@ import {
   SelectValue,
   toast,
 } from '@workspace/ui'
-import ModalForm from '@/components/ModalForm'
+import { ListTree } from 'lucide-react'
+import FormDialog from '@/components/FormDialog'
 import ParentSelect from '@/components/ParentSelect'
 import { useMutation$, useQuery$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -102,7 +103,7 @@ export default function MenuForm({ open, onOpenChange, record, treeNodes, onSave
   })
 
   return (
-    <ModalForm open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑菜单' : '新增菜单'} onSubmit={onSubmit} submitting={loading}>
+    <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑菜单' : '新增菜单'} icon={ListTree} description="维护菜单与权限项" onSubmit={onSubmit} submitting={loading}>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="m-code">编码</Label>
@@ -168,7 +169,7 @@ export default function MenuForm({ open, onOpenChange, record, treeNodes, onSave
           <Input id="m-icon" {...register('icon')} />
         </div>
       </div>
-    </ModalForm>
+    </FormDialog>
   )
 }
 

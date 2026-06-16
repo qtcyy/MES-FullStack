@@ -3,8 +3,9 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { CircuitBoard } from 'lucide-react'
 import { Input, Label, Textarea, toast } from '@workspace/ui'
-import ModalForm from '@/components/ModalForm'
+import FormDialog from '@/components/FormDialog'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { componentAddOrUpdate } from '@/api/basedata/component'
@@ -57,7 +58,7 @@ export default function ComponentForm({ open, onOpenChange, record, onSaved }: C
   })
 
   return (
-    <ModalForm open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑组件' : '新增组件'} onSubmit={onSubmit} submitting={loading}>
+    <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑组件' : '新增组件'} icon={CircuitBoard} description="维护元器件主数据" onSubmit={onSubmit} submitting={loading}>
       {isEdit && (
         <div className="space-y-1.5">
           <Label htmlFor="c-code">组件编码</Label>
@@ -73,6 +74,6 @@ export default function ComponentForm({ open, onOpenChange, record, onSaved }: C
         <Label htmlFor="c-descr">描述</Label>
         <Textarea id="c-descr" {...register('descr')} />
       </div>
-    </ModalForm>
+    </FormDialog>
   )
 }

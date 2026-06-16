@@ -3,8 +3,9 @@ import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Building2 } from 'lucide-react'
 import { Input, Label, toast } from '@workspace/ui'
-import ModalForm from '@/components/ModalForm'
+import FormDialog from '@/components/FormDialog'
 import ParentSelect from '@/components/ParentSelect'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -69,7 +70,7 @@ export default function DeptForm({ open, onOpenChange, record, treeNodes, onSave
   })
 
   return (
-    <ModalForm open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑部门' : '新增部门'} onSubmit={onSubmit} submitting={loading}>
+    <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑部门' : '新增部门'} icon={Building2} description="维护组织部门" onSubmit={onSubmit} submitting={loading}>
       <div className="space-y-1.5">
         <Label htmlFor="dept-name">部门名称</Label>
         <Input id="dept-name" {...register('name')} />
@@ -90,6 +91,6 @@ export default function DeptForm({ open, onOpenChange, record, treeNodes, onSave
         <Input id="dept-sort" type="number" {...register('sortNum')} />
         {errors.sortNum && <p className="text-xs text-destructive">{errors.sortNum.message}</p>}
       </div>
-    </ModalForm>
+    </FormDialog>
   )
 }

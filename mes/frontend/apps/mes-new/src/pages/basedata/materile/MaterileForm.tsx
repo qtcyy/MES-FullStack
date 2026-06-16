@@ -13,7 +13,8 @@ import {
   SelectValue,
   toast,
 } from '@workspace/ui'
-import ModalForm from '@/components/ModalForm'
+import { Package } from 'lucide-react'
+import FormDialog from '@/components/FormDialog'
 import ImageUpload from '@/components/ImageUpload'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -107,7 +108,7 @@ export default function MaterileForm({ open, onOpenChange, record, onSaved }: Ma
   })
 
   return (
-    <ModalForm open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑物料' : '新增物料'} onSubmit={onSubmit} submitting={loading} contentClassName="sm:max-w-2xl">
+    <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑物料' : '新增物料'} icon={Package} description="维护物料主数据与图片" onSubmit={onSubmit} submitting={loading} contentClassName="sm:max-w-2xl">
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label>物料类型</Label>
@@ -202,6 +203,6 @@ export default function MaterileForm({ open, onOpenChange, record, onSaved }: Ma
           render={({ field }) => <ImageUpload value={field.value} onChange={field.onChange} />}
         />
       </div>
-    </ModalForm>
+    </FormDialog>
   )
 }

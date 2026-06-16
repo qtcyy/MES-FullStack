@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { ShieldCheck } from 'lucide-react'
 import { Input, Label, Textarea, toast } from '@workspace/ui'
-import ModalForm from '@/components/ModalForm'
+import FormDialog from '@/components/FormDialog'
 import TreeView, { type TreeViewNode } from '@/components/TreeView'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -83,7 +84,7 @@ export default function RoleForm({ open, onOpenChange, record, onSaved }: RoleFo
   })
 
   return (
-    <ModalForm open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑角色' : '新增角色'} onSubmit={onSubmit} submitting={loading}>
+    <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑角色' : '新增角色'} icon={ShieldCheck} description="维护角色与权限" onSubmit={onSubmit} submitting={loading}>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="r-name">角色名</Label>
@@ -106,6 +107,6 @@ export default function RoleForm({ open, onOpenChange, record, onSaved }: RoleFo
           <TreeView nodes={menuNodes} checkedIds={checkedIds} onCheckedChange={setCheckedIds} />
         </div>
       </div>
-    </ModalForm>
+    </FormDialog>
   )
 }
