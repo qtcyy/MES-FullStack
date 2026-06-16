@@ -78,6 +78,8 @@ interface DataTableProps<TData, TValue>
   onRowClick?: (row: TData) => void;
   /** 返回追加到该行 <TableRow> 的 className(用于选中高亮) */
   rowClassName?: (row: TData) => string;
+  /** 行稳定 id(用于跨页/按业务 id 选择)。默认 TanStack 用行下标 */
+  getRowId?: (row: TData) => string;
 }
 
 function DataTable<TData, TValue>({
@@ -94,6 +96,7 @@ function DataTable<TData, TValue>({
   onRowSelectionChange: externalOnRowSelectionChange,
   onRowClick,
   rowClassName,
+  getRowId,
   className,
   ...props
 }: DataTableProps<TData, TValue>) {
@@ -126,6 +129,7 @@ function DataTable<TData, TValue>({
 
   const table = useReactTable({
     data,
+    getRowId: getRowId,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
