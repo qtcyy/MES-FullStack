@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { filterTransferItems, excludeSelected } from '../transfer'
+import { filterTransferItems, excludeSelected, moveItem } from '../transfer'
 
 describe('filterTransferItems', () => {
   const items = [
@@ -28,5 +28,24 @@ describe('excludeSelected', () => {
   })
   it('空已选返回全部', () => {
     expect(excludeSelected(all, [])).toHaveLength(3)
+  })
+})
+
+describe('moveItem', () => {
+  const list = ['a', 'b', 'c', 'd']
+  it('向后移动', () => {
+    expect(moveItem(list, 0, 2)).toEqual(['b', 'c', 'a', 'd'])
+  })
+  it('向前移动', () => {
+    expect(moveItem(list, 3, 1)).toEqual(['a', 'd', 'b', 'c'])
+  })
+  it('同位返回原序副本(新数组实例)', () => {
+    const r = moveItem(list, 1, 1)
+    expect(r).toEqual(list)
+    expect(r).not.toBe(list)
+  })
+  it('越界返回原序副本', () => {
+    expect(moveItem(list, -1, 2)).toEqual(list)
+    expect(moveItem(list, 0, 9)).toEqual(list)
   })
 })
