@@ -29,9 +29,17 @@ export const useAppStore = create<AppState>()(
       activeKey: HOME_TAB.key,
 
       addTab: (tab) => {
-        const { tabs, activeKey } = get()
-        if (tabs.find((t) => t.key === tab.key)) {
-          if (activeKey !== tab.key) set({ activeKey: tab.key })
+        const { tabs } = get()
+        const existing = tabs.find((t) => t.key === tab.key)
+        if (existing) {
+          // 已存在:激活;若标题/图标有更新(如兜底标题→菜单真实名)则刷新该标签
+          const changed = existing.title !== tab.title || existing.icon !== tab.icon
+          set({
+            activeKey: tab.key,
+            ...(changed
+              ? { tabs: tabs.map((t) => (t.key === tab.key ? { ...t, title: tab.title, icon: tab.icon } : t)) }
+              : {}),
+          })
           return
         }
         let next = [...tabs, tab]
