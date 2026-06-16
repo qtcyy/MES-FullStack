@@ -42,24 +42,23 @@ export default function FormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={`gap-0 overflow-hidden p-0 ${contentClassName}`}>
-        <DialogHeader className="space-y-0 bg-gradient-to-r from-primary/5 to-transparent px-6 py-4 text-left">
+        <DialogHeader className="space-y-0 px-6 py-4 text-left">
           <div className="flex items-center gap-3">
-            <span className="h-10 w-1 shrink-0 rounded-full bg-primary" />
             {Icon && (
-              <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="size-5" />
               </span>
             )}
             <div className="min-w-0">
-              <DialogTitle className="truncate">{title}</DialogTitle>
-              {description && <DialogDescription className="truncate">{description}</DialogDescription>}
+              <DialogTitle className="truncate text-base font-semibold">{title}</DialogTitle>
+              {description && <DialogDescription className="truncate text-xs">{description}</DialogDescription>}
             </div>
           </div>
         </DialogHeader>
         <Separator />
         <form onSubmit={(e) => { e.preventDefault(); onSubmit() }}>
           <ScrollArea className="max-h-[70vh]">
-            <div className="space-y-4 px-6 py-5">{children}</div>
+            <div className="space-y-5 px-6 py-5">{children}</div>
           </ScrollArea>
           <Separator />
           <DialogFooter className="px-6 py-4">
@@ -74,13 +73,17 @@ export default function FormDialog({
   )
 }
 
-/** 表单分区:小标题 + 细分隔线 */
-export function FormSection({ title, children }: { title: string; children: ReactNode }) {
+/** 表单分区:小图标 + 标题 + 细线 + 可选标签(B2 轻分区) */
+export function FormSection({
+  title, icon: Icon, tag, children,
+}: { title: string; icon?: LucideIcon; tag?: string; children: ReactNode }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</span>
+        {Icon && <Icon className="size-3.5 shrink-0 text-primary" />}
+        <span className="text-xs font-semibold text-foreground/80">{title}</span>
         <Separator className="flex-1" />
+        {tag && <span className="shrink-0 text-[11px] text-muted-foreground">{tag}</span>}
       </div>
       {children}
     </div>
