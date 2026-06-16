@@ -33,4 +33,19 @@ public class SpBomFlowServiceImpl extends ServiceImpl<SpBomFlowMapper, SpBomFlow
             }
         }
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String replaceBinding(String bomId, String flowId, String remark) {
+        QueryWrapper<SpBomFlow> delQw = new QueryWrapper<>();
+        delQw.eq("bom_id", bomId);
+        remove(delQw);
+        SpBomFlow bf = new SpBomFlow();
+        bf.setBomId(bomId);
+        bf.setFlowId(flowId);
+        bf.setStatus("draft");
+        bf.setRemark(remark);
+        save(bf); // 不手设 id,交由 @TableId 雪花生成
+        return bf.getId();
+    }
 }

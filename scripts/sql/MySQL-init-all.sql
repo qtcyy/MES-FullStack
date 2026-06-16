@@ -51,7 +51,7 @@ CREATE TABLE `sp_bom_flow` (
   `update_time` datetime DEFAULT NULL,
   `update_username` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_bom_id` (`bom_id`),
+  UNIQUE KEY `uk_bom_flow_bom` (`bom_id`),
   KEY `idx_flow_id` (`flow_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

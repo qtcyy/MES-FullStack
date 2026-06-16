@@ -1,6 +1,7 @@
 package com.wangziyang.mes.technology.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
 import com.wangziyang.mes.technology.entity.*;
@@ -41,7 +42,7 @@ public class SpBomFlowController extends BaseController {
 
             QueryWrapper<SpBomFlow> bfQw = new QueryWrapper<>();
             bfQw.eq("bom_id", node.getId());
-            SpBomFlow bomFlow = spBomFlowService.getOne(bfQw);
+            SpBomFlow bomFlow = spBomFlowService.getOne(bfQw, false);
 
             if (bomFlow != null) {
                 nodeMap.put("bomFlow", bomFlow);
@@ -79,38 +80,45 @@ public class SpBomFlowController extends BaseController {
         String bomId = (String) params.get("bomId");
         String flowId = (String) params.get("flowId");
         String remark = (String) params.get("remark");
-
-        // Check if not locked
+        if (bomId == null || bomId.trim().isEmpty() || flowId == null || flowId.trim().isEmpty()) {
+            return Result.failure("BOM 节点与工艺路线不能为空");
+        }
         SpProductBom bomNode = spProductBomService.getById(bomId);
-        if (bomNode != null && "locked".equals(bomNode.getStatus())) {
+        if (bomNode == null) {
+            return Result.failure("BOM 节点不存在");
+        }
+        if ("locked".equals(bomNode.getStatus())) {
             return Result.failure("BOM 已锁定，无法编辑工艺流程");
         }
-
-        // Remove existing binding
-        QueryWrapper<SpBomFlow> delQw = new QueryWrapper<>();
-        delQw.eq("bom_id", bomId);
-        spBomFlowService.remove(delQw);
-
-        // Create new binding
-        SpBomFlow bf = new SpBomFlow();
-        bf.setId(UUID.randomUUID().toString().replace("-", ""));
-        bf.setBomId(bomId);
-        bf.setFlowId(flowId);
-        bf.setStatus("draft");
-        bf.setRemark(remark);
-        spBomFlowService.save(bf);
-
-        return Result.success(bf.getId());
+        if (iSpFlowService.getById(flowId) == null) {
+            return Result.failure("工艺路线不存在");
+        }
+        SpBomFlow existing = spBomFlowService.getOne(
+                new QueryWrapper<SpBomFlow>().eq("bom_id", bomId), false);
+        if (existing != null && "locked".equals(existing.getStatus())) {
+            return Result.failure("工艺流程已锁定，无法修改");
+        }
+        String id = spBomFlowService.replaceBinding(bomId, flowId, remark);
+        return Result.success(id);
     }
 
     @PostMapping("/unbind")
     @ResponseBody
     public Result unbind(@RequestBody Map<String, String> params) {
         String bomId = params.get("bomId");
+        if (bomId == null || bomId.trim().isEmpty()) {
+            return Result.failure("BOM 节点不能为空");
+        }
         QueryWrapper<SpBomFlow> qw = new QueryWrapper<>();
         qw.eq("bom_id", bomId);
-        SpBomFlow bf = spBomFlowService.getOne(qw);
-        if (bf != null && "locked".equals(bf.getStatus())) {
+        SpBomFlow bf = spBomFlowService.getOne(qw, false);
+        if (bf == null) {
+            return Result.failure("绑定不存在或已解绑");
+        }
+        SpProductBom node = spProductBomService.getById(bomId);
+        boolean locked = "locked".equals(bf.getStatus())
+                || (node != null && "locked".equals(node.getStatus()));
+        if (locked) {
             return Result.failure("工艺流程已锁定，无法解绑");
         }
         spBomFlowService.remove(qw);
@@ -133,14 +141,21 @@ public class SpBomFlowController extends BaseController {
     public Result updateRemark(@RequestBody Map<String, String> params) {
         String id = params.get("id");
         String remark = params.get("remark");
-        SpBomFlow bf = spBomFlowService.getById(id);
-        if (bf != null) {
-            if ("locked".equals(bf.getStatus())) {
-                return Result.failure("工艺流程已锁定");
-            }
-            bf.setRemark(remark);
-            spBomFlowService.updateById(bf);
+        if (id == null || id.trim().isEmpty()) {
+            return Result.failure("id 不能为空");
         }
+        SpBomFlow bf = spBomFlowService.getById(id);
+        if (bf == null) {
+            return Result.failure("绑定不存在");
+        }
+        if ("locked".equals(bf.getStatus())) {
+            return Result.failure("工艺流程已锁定");
+        }
+        SpProductBom node = spProductBomService.getById(bf.getBomId());
+        if (node != null && "locked".equals(node.getStatus())) {
+            return Result.failure("BOM 已锁定，无法修改");
+        }
+        spBomFlowService.update(new UpdateWrapper<SpBomFlow>().eq("id", id).set("remark", remark));
         return Result.success(null);
     }
 
