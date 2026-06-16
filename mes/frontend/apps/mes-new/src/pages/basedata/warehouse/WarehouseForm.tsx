@@ -3,9 +3,10 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Input, Label, Textarea, toast } from '@workspace/ui'
-import { Warehouse as WarehouseIcon } from 'lucide-react'
+import { Input, Textarea, toast } from '@workspace/ui'
+import { Warehouse as WarehouseIcon, Info, LayoutGrid } from 'lucide-react'
 import FormDialog, { FormSection } from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { warehouseAddOrUpdate } from '@/api/basedata/warehouse'
@@ -73,51 +74,36 @@ export default function WarehouseForm({ open, onOpenChange, record }: Props) {
       onSubmit={onSubmit}
       submitting={loading}
     >
-      <FormSection title="基本信息">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="wh-code">库房编码</Label>
-            <Input id="wh-code" {...register('code')} />
-            {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="wh-name">库房名称</Label>
-            <Input id="wh-name" {...register('name')} />
-            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-          </div>
+      <FormSection title="基本信息" icon={Info} tag="必填">
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="库房编码" htmlFor="wh-code" required error={errors.code?.message}>
+            <Input id="wh-code" aria-invalid={!!errors.code} {...register('code')} />
+          </FormField>
+          <FormField label="库房名称" htmlFor="wh-name" required error={errors.name?.message}>
+            <Input id="wh-name" aria-invalid={!!errors.name} {...register('name')} />
+          </FormField>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="wh-type">库房类型</Label>
+        <FormField label="库房类型" htmlFor="wh-type">
           <Input id="wh-type" placeholder="如:零件库 / 产品库" {...register('type')} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="wh-descr">描述</Label>
+        </FormField>
+        <FormField label="描述" htmlFor="wh-descr">
           <Textarea id="wh-descr" {...register('descr')} />
-        </div>
+        </FormField>
       </FormSection>
-
-      <FormSection title="库位规格">
+      <FormSection title="库位规格" icon={LayoutGrid} tag="必填">
         <div className="grid grid-cols-4 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="wh-groups">组</Label>
-            <Input id="wh-groups" type="number" min={1} {...register('groups')} />
-            {errors.groups && <p className="text-xs text-destructive">{errors.groups.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="wh-rows">排</Label>
-            <Input id="wh-rows" type="number" min={1} {...register('rows')} />
-            {errors.rows && <p className="text-xs text-destructive">{errors.rows.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="wh-layers">层</Label>
-            <Input id="wh-layers" type="number" min={1} {...register('layers')} />
-            {errors.layers && <p className="text-xs text-destructive">{errors.layers.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="wh-columns">列</Label>
-            <Input id="wh-columns" type="number" min={1} {...register('columns')} />
-            {errors.columns && <p className="text-xs text-destructive">{errors.columns.message}</p>}
-          </div>
+          <FormField label="组" htmlFor="wh-groups" required error={errors.groups?.message}>
+            <Input id="wh-groups" type="number" min={1} aria-invalid={!!errors.groups} {...register('groups')} />
+          </FormField>
+          <FormField label="排" htmlFor="wh-rows" required error={errors.rows?.message}>
+            <Input id="wh-rows" type="number" min={1} aria-invalid={!!errors.rows} {...register('rows')} />
+          </FormField>
+          <FormField label="层" htmlFor="wh-layers" required error={errors.layers?.message}>
+            <Input id="wh-layers" type="number" min={1} aria-invalid={!!errors.layers} {...register('layers')} />
+          </FormField>
+          <FormField label="列" htmlFor="wh-columns" required error={errors.columns?.message}>
+            <Input id="wh-columns" type="number" min={1} aria-invalid={!!errors.columns} {...register('columns')} />
+          </FormField>
         </div>
         <p className="text-xs text-muted-foreground">保存后后端按「组 × 排 × 层 × 列」自动生成库位。</p>
       </FormSection>

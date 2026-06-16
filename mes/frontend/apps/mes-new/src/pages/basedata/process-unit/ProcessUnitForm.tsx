@@ -4,8 +4,9 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Input, Label, Switch, Textarea, toast } from '@workspace/ui'
-import { Factory } from 'lucide-react'
+import { Factory, Info } from 'lucide-react'
 import FormDialog, { FormSection } from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { processUnitAddOrUpdate } from '@/api/basedata/process-unit'
@@ -73,23 +74,18 @@ export default function ProcessUnitForm({ open, onOpenChange, record }: Props) {
       onSubmit={onSubmit}
       submitting={loading}
     >
-      <FormSection title="基本信息">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="pu-code">单元代码</Label>
-            <Input id="pu-code" {...register('code')} />
-            {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="pu-name">单元名称</Label>
-            <Input id="pu-name" {...register('name')} />
-            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-          </div>
+      <FormSection title="基本信息" icon={Info}>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="单元代码" htmlFor="pu-code" required error={errors.code?.message}>
+            <Input id="pu-code" aria-invalid={!!errors.code} {...register('code')} />
+          </FormField>
+          <FormField label="单元名称" htmlFor="pu-name" required error={errors.name?.message}>
+            <Input id="pu-name" aria-invalid={!!errors.name} {...register('name')} />
+          </FormField>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="pu-type">单元类型</Label>
+        <FormField label="单元类型" htmlFor="pu-type">
           <Input id="pu-type" placeholder="如:人员作业单元 / 设备作业单元" {...register('type')} />
-        </div>
+        </FormField>
         <div className="flex items-center justify-between rounded-md border px-3 py-2">
           <Label htmlFor="pu-lw">是否有线边库</Label>
           <Controller
@@ -98,10 +94,9 @@ export default function ProcessUnitForm({ open, onOpenChange, record }: Props) {
             render={({ field }) => <Switch id="pu-lw" checked={field.value} onCheckedChange={field.onChange} />}
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="pu-descr">描述</Label>
+        <FormField label="描述" htmlFor="pu-descr">
           <Textarea id="pu-descr" {...register('descr')} />
-        </div>
+        </FormField>
       </FormSection>
     </FormDialog>
   )

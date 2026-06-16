@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -13,8 +12,9 @@ import {
   SelectValue,
   toast,
 } from '@workspace/ui'
-import { Package } from 'lucide-react'
-import FormDialog from '@/components/FormDialog'
+import { Package, Info, Boxes, Image as ImageIcon } from 'lucide-react'
+import FormDialog, { FormSection } from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import ImageUpload from '@/components/ImageUpload'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -109,100 +109,89 @@ export default function MaterileForm({ open, onOpenChange, record, onSaved }: Ma
 
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑物料' : '新增物料'} icon={Package} description="维护物料主数据与图片" onSubmit={onSubmit} submitting={loading} contentClassName="sm:max-w-2xl">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label>物料类型</Label>
-          <Controller
-            control={control}
-            name="matType"
-            render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={(v) => {
-                  field.onChange(v)
-                  const d = TYPE_DEFAULTS[v]
-                  if (d) {
-                    setValue('source', d.source)
-                    setValue('leadTime', d.leadTime)
-                  }
-                }}
-              >
-                <SelectTrigger className="w-full"><SelectValue placeholder="请选择类型" /></SelectTrigger>
-                <SelectContent>
-                  {MAT_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.matType && <p className="text-xs text-destructive">{errors.matType.message}</p>}
+      <FormSection title="基本信息" icon={Info} tag="必填">
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="物料类型" required error={errors.matType?.message}>
+            <Controller
+              control={control}
+              name="matType"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(v) => {
+                    field.onChange(v)
+                    const d = TYPE_DEFAULTS[v]
+                    if (d) {
+                      setValue('source', d.source)
+                      setValue('leadTime', d.leadTime)
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full"><SelectValue placeholder="请选择类型" /></SelectTrigger>
+                  <SelectContent>
+                    {MAT_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
+          {isEdit && (
+            <FormField label="物料编码" htmlFor="m-materiel">
+              <Input id="m-materiel" value={record?.materiel ?? ''} disabled />
+            </FormField>
+          )}
         </div>
-        {isEdit && (
-          <div className="space-y-1.5">
-            <Label htmlFor="m-materiel">物料编码</Label>
-            <Input id="m-materiel" value={record?.materiel ?? ''} disabled />
-          </div>
-        )}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="m-desc">物料描述</Label>
-        <Input id="m-desc" {...register('materielDesc')} />
-        {errors.materielDesc && <p className="text-xs text-destructive">{errors.materielDesc.message}</p>}
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="m-model">型号</Label>
-          <Input id="m-model" {...register('model')} />
+        <FormField label="物料描述" htmlFor="m-desc" required error={errors.materielDesc?.message}>
+          <Input id="m-desc" aria-invalid={!!errors.materielDesc} {...register('materielDesc')} />
+        </FormField>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="型号" htmlFor="m-model">
+            <Input id="m-model" {...register('model')} />
+          </FormField>
+          <FormField label="单位" htmlFor="m-unit">
+            <Input id="m-unit" {...register('unit')} />
+          </FormField>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="m-unit">单位</Label>
-          <Input id="m-unit" {...register('unit')} />
+      </FormSection>
+      <FormSection title="采购与库存" icon={Boxes} tag="选填">
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="物料来源">
+            <Controller
+              control={control}
+              name="source"
+              render={({ field }) => (
+                <Select value={field.value || undefined} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full"><SelectValue placeholder="请选择来源" /></SelectTrigger>
+                  <SelectContent>
+                    {SOURCES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
+          <FormField label="规格" htmlFor="m-size">
+            <Input id="m-size" {...register('size')} />
+          </FormField>
         </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label>物料来源</Label>
-          <Controller
-            control={control}
-            name="source"
-            render={({ field }) => (
-              <Select value={field.value || undefined} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full"><SelectValue placeholder="请选择来源" /></SelectTrigger>
-                <SelectContent>
-                  {SOURCES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            )}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="提前期(天)" htmlFor="m-lead" required error={errors.leadTime?.message}>
+            <Input id="m-lead" type="number" aria-invalid={!!errors.leadTime} {...register('leadTime')} />
+          </FormField>
+          <FormField label="安全库存" htmlFor="m-stock" required error={errors.safetyStock?.message}>
+            <Input id="m-stock" type="number" aria-invalid={!!errors.safetyStock} {...register('safetyStock')} />
+          </FormField>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="m-size">规格</Label>
-          <Input id="m-size" {...register('size')} />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="m-lead">提前期(天)</Label>
-          <Input id="m-lead" type="number" {...register('leadTime')} />
-          {errors.leadTime && <p className="text-xs text-destructive">{errors.leadTime.message}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="m-stock">安全库存</Label>
-          <Input id="m-stock" type="number" {...register('safetyStock')} />
-          {errors.safetyStock && <p className="text-xs text-destructive">{errors.safetyStock.message}</p>}
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="m-group">产品组</Label>
-        <Input id="m-group" {...register('productGroup')} />
-      </div>
-      <div className="space-y-1.5">
-        <Label>物料图片</Label>
+        <FormField label="产品组" htmlFor="m-group">
+          <Input id="m-group" {...register('productGroup')} />
+        </FormField>
+      </FormSection>
+      <FormSection title="物料图片" icon={ImageIcon}>
         <Controller
           control={control}
           name="imageUrl"
           render={({ field }) => <ImageUpload value={field.value} onChange={field.onChange} />}
         />
-      </div>
+      </FormSection>
     </FormDialog>
   )
 }

@@ -3,9 +3,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ShieldCheck } from 'lucide-react'
-import { Input, Label, Textarea, toast } from '@workspace/ui'
-import FormDialog from '@/components/FormDialog'
+import { ShieldCheck, Info, ListChecks } from 'lucide-react'
+import { Input, Textarea, toast } from '@workspace/ui'
+import FormDialog, { FormSection } from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import TreeView, { type TreeViewNode } from '@/components/TreeView'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -85,28 +86,24 @@ export default function RoleForm({ open, onOpenChange, record, onSaved }: RoleFo
 
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑角色' : '新增角色'} icon={ShieldCheck} description="维护角色与权限" onSubmit={onSubmit} submitting={loading}>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="r-name">角色名</Label>
-          <Input id="r-name" {...register('name')} />
-          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+      <FormSection title="基本信息" icon={Info} tag="必填">
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="角色名" htmlFor="r-name" required error={errors.name?.message}>
+            <Input id="r-name" aria-invalid={!!errors.name} {...register('name')} />
+          </FormField>
+          <FormField label="角色编码" htmlFor="r-code" required error={errors.code?.message}>
+            <Input id="r-code" aria-invalid={!!errors.code} {...register('code')} />
+          </FormField>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="r-code">角色编码</Label>
-          <Input id="r-code" {...register('code')} />
-          {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="r-descr">描述</Label>
-        <Textarea id="r-descr" {...register('descr')} />
-      </div>
-      <div className="space-y-1.5">
-        <Label>菜单权限</Label>
+        <FormField label="描述" htmlFor="r-descr">
+          <Textarea id="r-descr" {...register('descr')} />
+        </FormField>
+      </FormSection>
+      <FormSection title="菜单权限" icon={ListChecks}>
         <div className="max-h-64 overflow-auto rounded-md border border-border p-2">
           <TreeView nodes={menuNodes} checkedIds={checkedIds} onCheckedChange={setCheckedIds} />
         </div>
-      </div>
+      </FormSection>
     </FormDialog>
   )
 }

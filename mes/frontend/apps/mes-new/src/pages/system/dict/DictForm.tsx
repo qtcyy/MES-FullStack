@@ -3,9 +3,10 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { BookText } from 'lucide-react'
-import { Input, Label, Textarea, toast } from '@workspace/ui'
-import FormDialog from '@/components/FormDialog'
+import { BookText, Info, Tags } from 'lucide-react'
+import { Input, Textarea, toast } from '@workspace/ui'
+import FormDialog, { FormSection } from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import { useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { dictAddOrUpdate } from '@/api/system/dict'
@@ -76,34 +77,32 @@ export default function DictForm({ open, onOpenChange, record, onSaved }: DictFo
 
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑字典' : '新增字典'} icon={BookText} description="维护数据字典" onSubmit={onSubmit} submitting={loading}>
-      <div className="space-y-1.5">
-        <Label htmlFor="d-name">标签名</Label>
-        <Input id="d-name" {...register('name')} />
-        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="d-value">数据值</Label>
-        <Input id="d-value" {...register('value')} />
-        {errors.value && <p className="text-xs text-destructive">{errors.value.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="d-type">类型</Label>
-        <Input id="d-type" {...register('type')} />
-        {errors.type && <p className="text-xs text-destructive">{errors.type.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="d-sort">排序</Label>
-        <Input id="d-sort" type="number" {...register('sortNum')} />
-        {errors.sortNum && <p className="text-xs text-destructive">{errors.sortNum.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="d-parent">上级 ID(可选)</Label>
-        <Input id="d-parent" {...register('parentId')} />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="d-descr">描述</Label>
-        <Textarea id="d-descr" {...register('descr')} />
-      </div>
+      <FormSection title="基本信息" icon={Info} tag="必填">
+        <FormField label="标签名" htmlFor="d-name" required error={errors.name?.message}>
+          <Input id="d-name" aria-invalid={!!errors.name} {...register('name')} />
+        </FormField>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="数据值" htmlFor="d-value" required error={errors.value?.message}>
+            <Input id="d-value" aria-invalid={!!errors.value} {...register('value')} />
+          </FormField>
+          <FormField label="类型" htmlFor="d-type" required error={errors.type?.message}>
+            <Input id="d-type" aria-invalid={!!errors.type} {...register('type')} />
+          </FormField>
+        </div>
+      </FormSection>
+      <FormSection title="归类与描述" icon={Tags} tag="选填">
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="排序" htmlFor="d-sort" required error={errors.sortNum?.message}>
+            <Input id="d-sort" type="number" aria-invalid={!!errors.sortNum} {...register('sortNum')} />
+          </FormField>
+          <FormField label="上级 ID" htmlFor="d-parent">
+            <Input id="d-parent" {...register('parentId')} />
+          </FormField>
+        </div>
+        <FormField label="描述" htmlFor="d-descr">
+          <Textarea id="d-descr" {...register('descr')} />
+        </FormField>
+      </FormSection>
     </FormDialog>
   )
 }

@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -13,8 +12,9 @@ import {
   SelectValue,
   toast,
 } from '@workspace/ui'
-import { ListTree } from 'lucide-react'
-import FormDialog from '@/components/FormDialog'
+import { ListTree, Info, KeyRound } from 'lucide-react'
+import FormDialog, { FormSection } from '@/components/FormDialog'
+import FormField from '@/components/FormField'
 import ParentSelect from '@/components/ParentSelect'
 import { useMutation$, useQuery$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -104,71 +104,65 @@ export default function MenuForm({ open, onOpenChange, record, treeNodes, onSave
 
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} title={isEdit ? '编辑菜单' : '新增菜单'} icon={ListTree} description="维护菜单与权限项" onSubmit={onSubmit} submitting={loading}>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="m-code">编码</Label>
-          <Input id="m-code" {...register('code')} />
-          {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
+      <FormSection title="基本信息" icon={Info} tag="必填">
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="编码" htmlFor="m-code" required error={errors.code?.message}>
+            <Input id="m-code" aria-invalid={!!errors.code} {...register('code')} />
+          </FormField>
+          <FormField label="名称" htmlFor="m-name" required error={errors.name?.message}>
+            <Input id="m-name" aria-invalid={!!errors.name} {...register('name')} />
+          </FormField>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="m-name">名称</Label>
-          <Input id="m-name" {...register('name')} />
-          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label>上级菜单</Label>
-        <Controller
-          control={control}
-          name="parentId"
-          render={({ field }) => (
-            <ParentSelect
-              nodes={treeNodes.map((n) => toSelectNode(n))}
-              value={field.value}
-              onChange={field.onChange}
-              excludeId={record?.id}
-              rootLabel="顶级菜单"
-            />
-          )}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label>类型</Label>
+        <FormField label="上级菜单" required>
           <Controller
             control={control}
-            name="type"
+            name="parentId"
             render={({ field }) => (
-              <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
-                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">目录</SelectItem>
-                  <SelectItem value="1">菜单</SelectItem>
-                  <SelectItem value="2">按钮</SelectItem>
-                </SelectContent>
-              </Select>
+              <ParentSelect
+                nodes={treeNodes.map((n) => toSelectNode(n))}
+                value={field.value}
+                onChange={field.onChange}
+                excludeId={record?.id}
+                rootLabel="顶级菜单"
+              />
             )}
           />
+        </FormField>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="类型" required>
+            <Controller
+              control={control}
+              name="type"
+              render={({ field }) => (
+                <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">目录</SelectItem>
+                    <SelectItem value="1">菜单</SelectItem>
+                    <SelectItem value="2">按钮</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
+          <FormField label="排序" htmlFor="m-sort" required error={errors.sortNum?.message}>
+            <Input id="m-sort" type="number" aria-invalid={!!errors.sortNum} {...register('sortNum')} />
+          </FormField>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="m-sort">排序</Label>
-          <Input id="m-sort" type="number" {...register('sortNum')} />
+      </FormSection>
+      <FormSection title="展示与权限" icon={KeyRound} tag="选填">
+        <FormField label="路由 URL" htmlFor="m-url">
+          <Input id="m-url" {...register('url')} />
+        </FormField>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="权限标识" htmlFor="m-perm">
+            <Input id="m-perm" {...register('permission')} />
+          </FormField>
+          <FormField label="图标(lucide 名)" htmlFor="m-icon">
+            <Input id="m-icon" {...register('icon')} />
+          </FormField>
         </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="m-url">路由 URL</Label>
-        <Input id="m-url" {...register('url')} />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="m-perm">权限标识</Label>
-          <Input id="m-perm" {...register('permission')} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="m-icon">图标(lucide 名)</Label>
-          <Input id="m-icon" {...register('icon')} />
-        </div>
-      </div>
+      </FormSection>
     </FormDialog>
   )
 }
