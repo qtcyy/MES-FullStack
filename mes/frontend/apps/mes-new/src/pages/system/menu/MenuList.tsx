@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
   Badge,
   Button,
-  DataTable,
+  TreeDataTable,
   toast,
 } from '@workspace/ui'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
@@ -98,7 +98,7 @@ export default function MenuList() {
         </Button>
       }
     >
-      <DataTable
+      <TreeDataTable
         columns={columns}
         data={treeData}
         loading={loading}

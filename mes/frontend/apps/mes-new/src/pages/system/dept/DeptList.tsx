@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
-  DataTable,
+  TreeDataTable,
   Input,
   Label,
   toast,
@@ -103,7 +103,7 @@ export default function DeptList() {
         </div>
       </SearchForm>
 
-      <DataTable
+      <TreeDataTable
         columns={columns}
         data={treeData}
         loading={loading}
