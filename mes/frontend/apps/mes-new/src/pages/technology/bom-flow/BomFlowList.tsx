@@ -435,7 +435,7 @@ export default function BomFlowList() {
                   <DataTable
                     columns={operColumns}
                     data={selected.opers ?? []}
-                    getRowId={(r, idx) => r.relation?.id ?? String(idx)}
+                    getRowId={(r) => r.relation?.id ?? r.relation?.oper ?? ''}
                   />
                 </div>
               )}

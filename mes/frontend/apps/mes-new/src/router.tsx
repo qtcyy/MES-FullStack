@@ -17,6 +17,7 @@ import OperList from '@/pages/basedata/oper/OperList'
 import FlowList from '@/pages/technology/flow/FlowList'
 import ProductBomList from '@/pages/technology/product-bom/ProductBomList'
 import BomFlowList from '@/pages/technology/bom-flow/BomFlowList'
+import ProcessContentList from '@/pages/technology/process-content/ProcessContentList'
 import OrderList from '@/pages/order/production/OrderList'
 import DispatchList from '@/pages/order/dispatch/DispatchList'
 import NotFound from '@/pages/error/NotFound'
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
           { path: 'technology/flow', element: <FlowList /> },
           { path: 'technology/product-bom', element: <ProductBomList /> },
           { path: 'technology/bom-flow', element: <BomFlowList /> },
+          { path: 'technology/process-content', element: <ProcessContentList /> },
           { path: 'order/production', element: <OrderList /> },
           { path: 'order/dispatch', element: <DispatchList /> },
           { path: '403', element: <Forbidden /> },
