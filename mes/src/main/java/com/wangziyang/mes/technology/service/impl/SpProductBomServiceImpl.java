@@ -46,15 +46,13 @@ public class SpProductBomServiceImpl extends ServiceImpl<SpProductBomMapper, SpP
         if (oldRoot == null || !"locked".equals(oldRoot.getStatus())) {
             throw new RuntimeException("Only locked BOM can create new version");
         }
+        // createNewVersion 仅递增主版本号、次版本号归零;无法解析时统一回退 V1.0
         String oldVer = oldRoot.getVersion();
-        String newVer;
-        try {
-            String num = oldVer == null ? "1.0" : oldVer.replaceFirst("^[Vv]", "");
-            int major = Integer.parseInt(num.split("\\.")[0]);
-            newVer = "V" + (major + 1) + ".0";
-        } catch (NumberFormatException e) {
-            newVer = "V1.0";
-        }
+        java.util.regex.Matcher verMatcher =
+                java.util.regex.Pattern.compile("(\\d+)").matcher(oldVer == null ? "" : oldVer);
+        String newVer = verMatcher.find()
+                ? "V" + (Integer.parseInt(verMatcher.group(1)) + 1) + ".0"
+                : "V1.0";
 
         String newRootId = UUID.randomUUID().toString().replace("-", "");
         SpProductBom newRoot = copyBomNode(oldRoot, null, newRootId, newVer);
