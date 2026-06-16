@@ -48,7 +48,7 @@ interface BomNodeFormProps {
   onOpenChange: (open: boolean) => void
   mode: BomNodeMode
   parentId?: string
-  initial?: SpProductBom
+  initial?: Pick<SpProductBom, 'id' | 'nodeName' | 'productCode' | 'remark' | 'sortOrder'>
   onSaved: (newId: string) => void
 }
 

@@ -80,12 +80,14 @@ export default function ProductBomList() {
   const [nodeFormOpen, setNodeFormOpen] = useState(false)
   const [nodeFormMode, setNodeFormMode] = useState<BomNodeMode>('create-root')
   const [nodeFormParentId, setNodeFormParentId] = useState<string | undefined>(undefined)
-  const [nodeFormInitial, setNodeFormInitial] = useState<SpProductBom | undefined>(undefined)
+  const [nodeFormInitial, setNodeFormInitial] = useState<
+    Pick<SpProductBom, 'id' | 'nodeName' | 'productCode' | 'remark' | 'sortOrder'> | undefined
+  >(undefined)
 
   const [itemFormOpen, setItemFormOpen] = useState(false)
   const [itemFormInitial, setItemFormInitial] = useState<SpProductBomItem | undefined>(undefined)
 
-  const [deletingNode, setDeletingNode] = useState<BomTreeNode | null>(null)
+  const [deletingNode, setDeletingNode] = useState<{ id: string; nodeName: string } | null>(null)
   const [deletingItem, setDeletingItem] = useState<SpProductBomItem | null>(null)
   const [locking, setLocking] = useState(false)
 
@@ -114,7 +116,7 @@ export default function ProductBomList() {
     { enabled: !!selectedNodeId },
   )
 
-  const locked = rootTree?.status === 'locked'
+  const canWrite = !!rootTree && rootTree.status !== 'locked'
 
   // ===== mutations =====
   const { mutate: deleteNode } = useMutation$((id: string) => productBomDelete(id))
@@ -163,7 +165,7 @@ export default function ProductBomList() {
     if (!selectedNode) return
     setNodeFormMode('edit')
     setNodeFormParentId(undefined)
-    setNodeFormInitial(selectedNode as unknown as SpProductBom)
+    setNodeFormInitial(selectedNode)
     setNodeFormOpen(true)
   }
 
@@ -196,9 +198,7 @@ export default function ProductBomList() {
       toast.success('已删除节点')
       invalidate(INVALIDATE_TREE)
       invalidate(INVALIDATE_PAGE)
-      if (selectedNodeId === deletingNode.id) {
-        setSelectedNodeId(selectedRootId)
-      }
+      setSelectedNodeId(selectedRootId)
     } catch {
       /* toast by interceptor */
     } finally {
@@ -282,8 +282,6 @@ export default function ProductBomList() {
                   setDeletingNode({
                     id: row.original.id,
                     nodeName: row.original.nodeName,
-                    children: [],
-                    itemCount: 0,
                   })
                 }
               >
@@ -399,7 +397,7 @@ export default function ProductBomList() {
               variant="ghost"
               size="icon-sm"
               title="编辑"
-              disabled={locked}
+              disabled={!canWrite}
               onClick={() => openEditItem(row.original)}
             >
               <Pencil className="size-4" />
@@ -408,7 +406,7 @@ export default function ProductBomList() {
               variant="ghost"
               size="icon-sm"
               title="删除"
-              disabled={locked}
+              disabled={!canWrite}
               onClick={() => setDeletingItem(row.original)}
             >
               <Trash2 className="size-4 text-destructive" />
@@ -417,7 +415,7 @@ export default function ProductBomList() {
         ),
       },
     ],
-    [locked],
+    [canWrite],
   )
 
   // ===== 浏览态视图切换按钮组 =====
@@ -600,13 +598,13 @@ export default function ProductBomList() {
             <Badge variant="outline">版本 {rootTree.version}</Badge>
           )}
           <div className="ml-auto flex gap-2">
-            {!locked && (
+            {rootTree?.status === 'draft' && (
               <Button variant="outline" size="sm" onClick={() => setLocking(true)}>
                 <Lock className="size-4" />
                 锁定整树
               </Button>
             )}
-            {locked && (
+            {rootTree?.status === 'locked' && (
               <Button variant="outline" size="sm" onClick={handleNewVersion}>
                 <GitBranch className="size-4" />
                 创建新版本
@@ -638,7 +636,7 @@ export default function ProductBomList() {
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={locked}
+                      disabled={!canWrite}
                       onClick={openAddChild}
                     >
                       <Plus className="size-4" />
@@ -647,7 +645,7 @@ export default function ProductBomList() {
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={locked}
+                      disabled={!canWrite}
                       onClick={openEditNode}
                     >
                       <Pencil className="size-4" />
@@ -657,8 +655,11 @@ export default function ProductBomList() {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={locked}
-                        onClick={() => selectedNode && setDeletingNode(selectedNode)}
+                        disabled={!canWrite}
+                        onClick={() =>
+                          selectedNode &&
+                          setDeletingNode({ id: selectedNode.id, nodeName: selectedNode.nodeName })
+                        }
                       >
                         <Trash2 className="size-4 text-destructive" />
                         删除节点
@@ -706,7 +707,7 @@ export default function ProductBomList() {
                   <div className="text-sm font-medium">物料行</div>
                   <Button
                     size="sm"
-                    disabled={locked || !selectedNodeId}
+                    disabled={!canWrite || !selectedNodeId}
                     onClick={openAddItem}
                   >
                     <Plus className="size-4" />

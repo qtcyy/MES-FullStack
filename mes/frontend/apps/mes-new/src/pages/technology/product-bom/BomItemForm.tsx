@@ -15,7 +15,8 @@ import { Package } from 'lucide-react'
 import FormDialog, { FormSection } from '@/components/FormDialog'
 import FormField from '@/components/FormField'
 import { useQuery$, useMutation$ } from '@/http/hooks'
-import { productBomProducts, productBomItemSave } from '@/api/technology/product-bom'
+import { productBomItemSave } from '@/api/technology/product-bom'
+import { materilePage } from '@/api/basedata/materile'
 import { materielToItem } from '@/utils/productBom'
 import type { SpProductBomItem } from '@/types/technology'
 
@@ -62,9 +63,9 @@ export default function BomItemForm({
   onSaved,
 }: BomItemFormProps) {
   const isEdit = !!initial
-  const { data: products } = useQuery$(
-    ['productBom', 'products'],
-    () => productBomProducts(),
+  const { data: materialsData } = useQuery$(
+    ['materile', 'all'],
+    () => materilePage({ current: 1, size: 500 }),
     { enabled: open },
   )
   const { mutate, loading } = useMutation$((b: Partial<SpProductBomItem>) => productBomItemSave(b))
@@ -155,7 +156,7 @@ export default function BomItemForm({
                   value={field.value || undefined}
                   onValueChange={(v) => {
                     field.onChange(v)
-                    const m = (products ?? []).find((x) => x.materiel === v)
+                    const m = (materialsData?.records ?? []).find((x) => x.materiel === v)
                     if (m) {
                       const mapped = materielToItem(m)
                       setValue('materialDesc', mapped.materialDesc ?? '')
@@ -165,7 +166,7 @@ export default function BomItemForm({
                 >
                   <SelectTrigger className="w-full"><SelectValue placeholder="请选择物料" /></SelectTrigger>
                   <SelectContent>
-                    {(products ?? []).map((m) => (
+                    {(materialsData?.records ?? []).map((m) => (
                       <SelectItem key={m.materiel} value={m.materiel}>{m.materiel} {m.materielDesc}</SelectItem>
                     ))}
                   </SelectContent>
