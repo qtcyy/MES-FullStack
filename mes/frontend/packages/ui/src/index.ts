@@ -116,6 +116,10 @@ export {
   DataTableColumnHeader,
   type DataTableProps,
 } from "./components/data-table";
+export {
+  TreeDataTable,
+  type TreeDataTableProps,
+} from "./components/tree-data-table";
 export { ThemeToggle, themeToggleVariants } from "./components/ui/theme-toggle";
 export {
   NavigationMenu,
