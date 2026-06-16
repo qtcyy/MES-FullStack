@@ -61,9 +61,8 @@ interface TreeDataTableProps<TData, TValue>
 
 ### 3.2 状态与可见性
 
-- `const [collapsedIds, setCollapsedIds] = React.useState<Set<string>>(...)`
-  - `defaultCollapsed` 为 `false`（默认）→ 初始空集合（全展开）。
-  - `defaultCollapsed` 为 `true` → 初始为全部"可展开行 id"。
+- `const [collapsedIds, setCollapsedIds] = React.useState<Set<string>>(() => new Set())`（默认空集 = 全展开）。
+  - `defaultCollapsed` 为 `true` → 在拿到**首批非空行**时一次性初始化为全部"可展开行 id"。两个消费者均异步取数（首帧 `rows` 为空，惰性初值此刻算不出 id），故用 `useRef` 守卫在渲染期做一次性初始化（React 官方"渲染期按数据初始化"模式，幂等、不成环、不覆盖用户后续手动展开/折叠）；默认 `false` 时该分支不触发。
 - TanStack 配置：`getCoreRowModel` + `getExpandedRowModel` + `getSubRows` + `getRowId`，`state: { expanded: true }` 恒真（保证行模型输出**全部**行、保持父在前子在后的扁平顺序、提供 `row.depth` 与 `row.getParentRows()`），`onExpandedChange` 为 no-op（我们不走 TanStack 的展开切换）。
 - 每行计算：
   - `isOpen = !collapsedIds.has(row.id)`（驱动 chevron 旋转）
@@ -89,11 +88,9 @@ interface TreeDataTableProps<TData, TValue>
 ```tsx
 <tr
   key={row.id}
-  aria-hidden={!visible || undefined}
-  className={cn(
-    "transition-colors",
-    visible ? "hover:bg-muted/50" : "pointer-events-none"
-  )}
+  // 不可见行整体 inert:同时移出键盘 Tab 序、阻断点击、从无障碍树移除
+  inert={!visible || undefined}
+  className={cn("transition-colors", visible && "hover:bg-muted/50")}
 >
   {row.getVisibleCells().map((cell, cellIndex) => (
     <TableCell key={cell.id} className="border-0 p-0 align-middle">
@@ -134,9 +131,9 @@ interface TreeDataTableProps<TData, TValue>
       aria-label={isOpen ? "折叠" : "展开"}
       aria-expanded={isOpen}
       onClick={() => toggle(row.id)}
-      className="mr-1 inline-flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      className="mr-1 inline-flex size-5 shrink-0 items-center justify-center self-center rounded text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
     >
-      <ChevronRightIcon className={cn("size-4 transition-transform duration-200", isOpen && "rotate-90")} />
+      <ChevronRightIcon className={cn("size-4 transition-transform duration-200 motion-reduce:transition-none", isOpen && "rotate-90")} />
     </button>
   ) : (
     <span className="mr-1 inline-block size-5 shrink-0" />
@@ -150,9 +147,9 @@ interface TreeDataTableProps<TData, TValue>
 > 缩进引导线：每个祖先层级渲染一条 `w-5`（1.25rem，与旧缩进单位一致）左侧细竖线 `border-l border-border/40`，`self-stretch` 使竖线撑满行高，相邻行竖线连成层级竖轨，使树层级一眼可辨；深度 0 无竖线。菜单树仅 3 级（目录/菜单/按钮），不会拥挤。
 
 ### 3.4 无障碍
-- chevron 按钮带 `aria-expanded` + 动态 `aria-label`（折叠/展开）。
-- 不可见行 `aria-hidden` + `pointer-events-none`，避免读屏announce与误点。
-- 所有过渡受 `motion-reduce:transition-none` 约束。
+- chevron 按钮带 `aria-expanded` + 动态 `aria-label`（折叠/展开），并带与全站一致的 `focus-visible` 焦点环。
+- 不可见（被折叠）行整体置 `inert`：一举移出键盘 Tab 序、阻断点击、并从无障碍树移除，避免键盘聚焦到高度塌缩为 0 的隐藏控件（仅靠 `aria-hidden`+`pointer-events-none` 挡不住键盘焦点）。
+- 所有过渡（高度、透明度、chevron 旋转）均受 `motion-reduce:transition-none` 约束。
 
 ## 4. 改动文件清单
 

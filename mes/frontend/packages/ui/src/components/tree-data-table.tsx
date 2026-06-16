@@ -81,9 +81,17 @@ function TreeDataTable<TData, TValue>({
     [rows]
   );
 
-  const [collapsedIds, setCollapsedIds] = React.useState<Set<string>>(() =>
-    defaultCollapsed ? new Set(expandableIds) : new Set()
+  const [collapsedIds, setCollapsedIds] = React.useState<Set<string>>(
+    () => new Set()
   );
+
+  // defaultCollapsed 初始全折叠:数据异步到达,惰性初值在首帧(rows 为空)无法生效。
+  // 故在拿到首批非空行时用 ref 守卫做一次性初始化(React 官方"渲染期按数据初始化"模式,幂等不成环)。
+  const initializedRef = React.useRef(false);
+  if (!initializedRef.current && rows.length > 0) {
+    initializedRef.current = true;
+    if (defaultCollapsed) setCollapsedIds(new Set(expandableIds));
+  }
 
   const toggle = React.useCallback((id: string) => {
     setCollapsedIds((prev) => {
@@ -169,10 +177,12 @@ function TreeDataTable<TData, TValue>({
                 return (
                   <tr
                     key={row.id}
-                    aria-hidden={!visible || undefined}
+                    // 不可见(被折叠)行整体 inert:同时移出键盘 Tab 序、阻断点击、从无障碍树移除,
+                    // 避免键盘聚焦到高度塌缩为 0 的隐藏控件(aria-hidden + pointer-events-none 挡不住键盘焦点)
+                    inert={!visible || undefined}
                     className={cn(
                       "transition-colors",
-                      visible ? "hover:bg-muted/50" : "pointer-events-none"
+                      visible && "hover:bg-muted/50"
                     )}
                   >
                     {row.getVisibleCells().map((cell, cellIndex) => (
@@ -208,11 +218,11 @@ function TreeDataTable<TData, TValue>({
                                     aria-label={isOpen ? "折叠" : "展开"}
                                     aria-expanded={isOpen}
                                     onClick={() => toggle(row.id)}
-                                    className="mr-1 inline-flex size-5 shrink-0 items-center justify-center self-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                    className="mr-1 inline-flex size-5 shrink-0 items-center justify-center self-center rounded text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
                                   >
                                     <ChevronRightIcon
                                       className={cn(
-                                        "size-4 transition-transform duration-200",
+                                        "size-4 transition-transform duration-200 motion-reduce:transition-none",
                                         isOpen && "rotate-90"
                                       )}
                                     />
