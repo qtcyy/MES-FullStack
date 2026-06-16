@@ -13,6 +13,8 @@ import MaterileList from '@/pages/basedata/materile/MaterileList'
 import DeviceGroupList from '@/pages/basedata/device-group/DeviceGroupList'
 import ProcessUnitList from '@/pages/basedata/process-unit/ProcessUnitList'
 import WarehouseList from '@/pages/basedata/warehouse/WarehouseList'
+import OperList from '@/pages/basedata/oper/OperList'
+import FlowList from '@/pages/technology/flow/FlowList'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
 
@@ -37,6 +39,8 @@ export const router = createBrowserRouter([
           { path: 'basedata/device-group', element: <DeviceGroupList /> },
           { path: 'basedata/process-unit', element: <ProcessUnitList /> },
           { path: 'basedata/warehouse', element: <WarehouseList /> },
+          { path: 'basedata/oper', element: <OperList /> },
+          { path: 'technology/flow', element: <FlowList /> },
           { path: '403', element: <Forbidden /> },
           { path: '*', element: <NotFound /> },
         ],
