@@ -182,14 +182,31 @@ function TreeDataTable<TData, TValue>({
                     inert={!visible || undefined}
                     className={cn(
                       "transition-colors",
-                      visible && "hover:bg-muted/50"
+                      // 分隔线落在 <tr> 上:整行一条、天然与 hover 背景对齐;折叠行不画线,避免 0 高行残留 1px 堆叠
+                      visible && "border-b border-border/60 hover:bg-muted/50"
                     )}
                   >
                     {row.getVisibleCells().map((cell, cellIndex) => (
                       <TableCell
                         key={cell.id}
-                        className="border-0 p-0 align-middle"
+                        className={cn(
+                          "border-0 p-0 align-middle",
+                          cellIndex === 0 && "relative"
+                        )}
                       >
+                        {/* 缩进引导线:绝对铺满整格(行高),与内容解耦 → 竖线连续且与 hover/分隔线对齐 */}
+                        {cellIndex === 0 && row.depth > 0 && (
+                          <div
+                            aria-hidden
+                            className="pointer-events-none absolute inset-y-0 left-4 flex"
+                          >
+                            {Array.from({ length: row.depth }).map((_, i) => (
+                              <span key={i} className="flex w-5 justify-center">
+                                <span className="h-full w-px bg-border/40" />
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         {/* 高度动画层 */}
                         <div
                           className={cn(
@@ -201,24 +218,19 @@ function TreeDataTable<TData, TValue>({
                             {cellIndex === 0 ? (
                               <div
                                 className={cn(
-                                  "flex items-stretch border-b border-border/60 pl-4 transition-opacity duration-200 motion-reduce:transition-none",
+                                  "flex items-center py-3 pr-4 transition-opacity duration-200 motion-reduce:transition-none",
                                   visible ? "opacity-100" : "opacity-0"
                                 )}
+                                // 缩进用 paddingLeft(基准 1rem + 每级 1.25rem),与绝对引导线对齐
+                                style={{ paddingLeft: `${1 + row.depth * 1.25}rem` }}
                               >
-                                {Array.from({ length: row.depth }).map((_, i) => (
-                                  <span
-                                    key={i}
-                                    aria-hidden
-                                    className="w-5 shrink-0 self-stretch border-l border-border/40"
-                                  />
-                                ))}
                                 {row.getCanExpand() ? (
                                   <button
                                     type="button"
                                     aria-label={isOpen ? "折叠" : "展开"}
                                     aria-expanded={isOpen}
                                     onClick={() => toggle(row.id)}
-                                    className="mr-1 inline-flex size-5 shrink-0 items-center justify-center self-center rounded text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                                    className="mr-1 inline-flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
                                   >
                                     <ChevronRightIcon
                                       className={cn(
@@ -228,9 +240,9 @@ function TreeDataTable<TData, TValue>({
                                     />
                                   </button>
                                 ) : (
-                                  <span className="mr-1 inline-block size-5 shrink-0 self-center" />
+                                  <span className="mr-1 inline-block size-5 shrink-0" />
                                 )}
-                                <div className="flex min-w-0 flex-1 items-center py-3 pr-4">
+                                <div className="min-w-0 flex-1">
                                   {flexRender(
                                     cell.column.columnDef.cell,
                                     cell.getContext()
@@ -240,7 +252,7 @@ function TreeDataTable<TData, TValue>({
                             ) : (
                               <div
                                 className={cn(
-                                  "border-b border-border/60 px-4 py-3 transition-opacity duration-200 motion-reduce:transition-none",
+                                  "px-4 py-3 transition-opacity duration-200 motion-reduce:transition-none",
                                   visible ? "opacity-100" : "opacity-0"
                                 )}
                               >

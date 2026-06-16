@@ -90,24 +90,39 @@ interface TreeDataTableProps<TData, TValue>
   key={row.id}
   // 不可见行整体 inert:同时移出键盘 Tab 序、阻断点击、从无障碍树移除
   inert={!visible || undefined}
-  className={cn("transition-colors", visible && "hover:bg-muted/50")}
+  className={cn(
+    "transition-colors",
+    // 分隔线落在 <tr>:整行一条、天然与 hover 背景对齐;折叠行不画线避免 0 高行残留 1px 堆叠
+    visible && "border-b border-border/60 hover:bg-muted/50"
+  )}
 >
   {row.getVisibleCells().map((cell, cellIndex) => (
-    <TableCell key={cell.id} className="border-0 p-0 align-middle">
-      {/* 高度动画层：grid 0fr↔1fr */}
+    <TableCell
+      key={cell.id}
+      className={cn("border-0 p-0 align-middle", cellIndex === 0 && "relative")}
+    >
+      {/* 缩进引导线:绝对铺满整格(行高),与内容解耦 → 竖线连续且与 hover/分隔线对齐 */}
+      {cellIndex === 0 && row.depth > 0 && (
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-4 flex">
+          {Array.from({ length: row.depth }).map((_, i) => (
+            <span key={i} className="flex w-5 justify-center">
+              <span className="h-full w-px bg-border/40" />
+            </span>
+          ))}
+        </div>
+      )}
+      {/* 高度动画层:grid 0fr↔1fr */}
       <div className={cn(
         "grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none",
         visible ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
       )}>
         <div className="overflow-hidden">
-          {/* 内容层：padding + 分隔线 + 透明度淡入淡出，随高度一起收起 */}
+          {/* 内容层:padding + 透明度淡入淡出,随高度一起收起。cell0 用 paddingLeft 缩进 + chevron */}
           <div className={cn(
-            "border-b border-border/60 px-4 py-3 transition-opacity duration-200 motion-reduce:transition-none",
+            "px-4 py-3 transition-opacity duration-200 motion-reduce:transition-none",
             visible ? "opacity-100" : "opacity-0"
           )}>
-            {cellIndex === 0
-              ? /* 树形单元：缩进引导线 + chevron/占位 + 内容 */
-              : flexRender(cell.column.columnDef.cell, cell.getContext())}
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </div>
         </div>
       </div>
@@ -116,35 +131,31 @@ interface TreeDataTableProps<TData, TValue>
 </tr>
 ```
 
-> 关键点：单元格 `p-0 border-0`，把内边距与底部分隔线移入**动画内容层**，使收起时高度、内边距、分隔线一起平滑归零——多行折叠后塌缩为 ~0 高度，不残留 1px 描边线堆叠。hover 背景在 `<tr>` 上，透过无背景的内容层显示，覆盖整行。
+> **对齐关键点（修复 hover/分隔线错位）**：各列内容高度天然不同（操作列图标按钮 > 文字行），若把分隔线放进单元格内层会因 `align-middle` 居中而错位、且 hover 背景超出分隔线。故：
+> 1. **分隔线落在 `<tr>` 上**（整行一条、与 hover 背景同元素，天然对齐）；折叠行不画线，避免 0 高行残留描边堆叠。
+> 2. 单元格 `p-0`、内容 `align-middle` 居中（恢复正常表格观感）；内边距在动画内容层内，收起时随高度归零。
+> 3. **缩进引导线改为绝对定位**（`inset-y-0` 铺满整格＝行高，与内容解耦），保证竖线连续且与 hover/分隔线严丝合缝；竖线在 `w-5`（1.25rem，与缩进单位一致）块内居中，恰好对齐父级 chevron 中心；深度 0 无竖线。
 
-**cell0 树形单元**（缩进引导线 + chevron）：
+**cell0 树形单元**（内容层内，缩进引导线见上方绝对层）：
 
 ```tsx
-<div className="flex items-stretch">
-  {Array.from({ length: row.depth }).map((_, i) => (
-    <span key={i} aria-hidden className="w-5 shrink-0 self-stretch border-l border-border/40" />
-  ))}
+<div className="flex items-center py-3 pr-4 ..." style={{ paddingLeft: `${1 + row.depth * 1.25}rem` }}>
   {row.getCanExpand() ? (
     <button
       type="button"
       aria-label={isOpen ? "折叠" : "展开"}
       aria-expanded={isOpen}
       onClick={() => toggle(row.id)}
-      className="mr-1 inline-flex size-5 shrink-0 items-center justify-center self-center rounded text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+      className="mr-1 inline-flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
     >
       <ChevronRightIcon className={cn("size-4 transition-transform duration-200 motion-reduce:transition-none", isOpen && "rotate-90")} />
     </button>
   ) : (
     <span className="mr-1 inline-block size-5 shrink-0" />
   )}
-  <div className="min-w-0 flex-1 self-center">
-    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-  </div>
+  <div className="min-w-0 flex-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
 </div>
 ```
-
-> 缩进引导线：每个祖先层级渲染一条 `w-5`（1.25rem，与旧缩进单位一致）左侧细竖线 `border-l border-border/40`，`self-stretch` 使竖线撑满行高，相邻行竖线连成层级竖轨，使树层级一眼可辨；深度 0 无竖线。菜单树仅 3 级（目录/菜单/按钮），不会拥挤。
 
 ### 3.4 无障碍
 - chevron 按钮带 `aria-expanded` + 动态 `aria-label`（折叠/展开），并带与全站一致的 `focus-visible` 焦点环。
