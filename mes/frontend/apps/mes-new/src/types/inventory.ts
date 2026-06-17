@@ -83,11 +83,11 @@ export interface SpInventory {
 /** 分页参数 */
 export interface ReceiptPageParams extends PageParams {
   receiptCode?: string
-  receiptStatus?: string
+  receiptStatus?: ReceiptStatus
 }
 export interface OutboundPageParams extends PageParams {
   outboundCode?: string
-  outboundStatus?: string
+  outboundStatus?: OutboundStatus
 }
 export interface InventoryPageParams extends PageParams {
   materialCode?: string

@@ -16,13 +16,16 @@ describe('receiptStatusMeta', () => {
 })
 
 describe('outboundStatusMeta', () => {
+  it('pending → 待确认', () => { expect(outboundStatusMeta('pending').label).toBe('待确认') })
   it('partial → 部分出库', () => { expect(outboundStatusMeta('partial').label).toBe('部分出库') })
   it('completed → 已完成', () => { expect(outboundStatusMeta('completed').label).toBe('已完成') })
+  it('空值 → —', () => { expect(outboundStatusMeta(undefined).label).toBe('—') })
 })
 
 describe('postStatusMeta', () => {
   it('pending → 待登账', () => { expect(postStatusMeta('pending').label).toBe('待登账') })
   it('posted → 已登账', () => { expect(postStatusMeta('posted').label).toBe('已登账') })
+  it('空值 → —', () => { expect(postStatusMeta(undefined).label).toBe('—') })
 })
 
 describe('progressText', () => {

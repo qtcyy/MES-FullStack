@@ -4,7 +4,7 @@ import type { SpInventory, InventoryPageParams, ManualInboundDTO } from '@/types
 
 const JSON_HEADERS = { headers: { 'Content-Type': 'application/json' } }
 
-/** 库存明细查询(form 编码) —— 端点为 /inventory/page,非 /inventory/inventory/page */
+/** 库存台账分页查询(form 编码;端点为 /inventory/page) */
 export function pageInventory(params: InventoryPageParams) {
   return http.post<PageResult<SpInventory>>('/inventory/page', params)
 }
