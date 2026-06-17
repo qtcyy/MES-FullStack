@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
   Skeleton, Tabs, TabsContent, TabsList, TabsTrigger, toast,
@@ -25,7 +25,19 @@ const LEGEND: { cls: string; text: string }[] = [
 
 export default function GanttPage() {
   const { data, loading, refetch } = useQuery$(['gantt', 'tasks'], () => fetchGanttTasks({}))
-  const tasks = useMemo(() => data ?? [], [data])
+  // 改期乐观更新: 拖拽提交后先用本地新计划时间渲染,待 refetch 落库后清除,避免条体回弹/不跟手
+  const [optimistic, setOptimistic] = useState<Record<string, { planStartTime: string; planEndTime: string }>>({})
+  const tasks = useMemo(() => {
+    const base = data ?? []
+    if (Object.keys(optimistic).length === 0) return base
+    return base.map((t) => (optimistic[t.id] ? { ...t, ...optimistic[t.id] } : t))
+  }, [data, optimistic])
+  // 新数据到达即清除乐观覆盖(此时服务端已是新计划时间,视觉无缝衔接)
+  useEffect(() => {
+    setOptimistic((prev) => (Object.keys(prev).length ? {} : prev))
+  }, [data])
+  // 仅首屏(尚无数据)显示骨架; refetch 时保留旧图表,避免整页刷新跳顶、滚动位置丢失
+  const initialLoading = loading && !data
   // 挂载时快照一次"当前时间";用 lazy state initializer 而非 useMemo 包裹 Date.now(),
   // 满足 React 纯函数规则(useMemo 体内不得调用 Date.now 等不纯函数)。
   const [nowMs] = useState(() => Date.now())
@@ -47,11 +59,19 @@ export default function GanttPage() {
   const busy = reM.loading || stM.loading || fiM.loading || prM.loading || acM.loading
 
   const handleReschedule = async (t: GanttTask, planStartTime: string, planEndTime: string) => {
+    // 先乐观渲染新位置,提交成功后由 refetch 落库并清除覆盖;失败则回滚
+    setOptimistic((prev) => ({ ...prev, [t.id]: { planStartTime, planEndTime } }))
     try {
       await reM.mutate({ id: t.id, planStartTime, planEndTime })
       toast.success('已改期')
       refetch()
-    } catch { /* 拦截器已 toast */ }
+    } catch {
+      setOptimistic((prev) => {
+        const next = { ...prev }
+        delete next[t.id]
+        return next
+      })
+    }
   }
   const handleStart = async (id: string, actualStartTime: string) => {
     try { await stM.mutate({ id, actualStartTime: actualStartTime || undefined }); toast.success('已记录开工'); refetch() } catch { /* 拦截器已 toast */ }
@@ -153,7 +173,7 @@ export default function GanttPage() {
           <TabsTrigger value="order">订单视角</TabsTrigger>
         </TabsList>
         <TabsContent value="resource" className="pt-3">
-          {loading ? (
+          {initialLoading ? (
             <Skeleton className="h-72 w-full" />
           ) : (
             <GanttChart
@@ -166,7 +186,7 @@ export default function GanttPage() {
           )}
         </TabsContent>
         <TabsContent value="order" className="pt-3">
-          {loading ? (
+          {initialLoading ? (
             <Skeleton className="h-72 w-full" />
           ) : (
             <GanttChart
