@@ -12,8 +12,9 @@ import FormDialog from '@/components/FormDialog'
 import FormField from '@/components/FormField'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
-import { warehousePage, warehouseLocations } from '@/api/basedata/warehouse'
+import { warehousePage } from '@/api/basedata/warehouse'
 import { postReceiptItem } from '@/api/inventory/receipt'
+import LocationSelect from '../LocationSelect'
 import type { SpWarehouseReceiptItem } from '@/types/inventory'
 
 interface Props {
@@ -35,13 +36,6 @@ export default function ReceiptPostDialog({ item, open, onOpenChange }: Props) {
     { enabled: open },
   )
   const warehouses = (whPage?.records ?? []).filter((w) => w.type === '零件库')
-
-  // 选定库房后级联库位
-  const { data: locations } = useQuery$(
-    ['basedata', 'warehouse', 'locations', warehouseId],
-    () => warehouseLocations(warehouseId),
-    { enabled: open && !!warehouseId },
-  )
 
   const { mutate, loading } = useMutation$(
     (dto: { itemId: string; warehouseId: string; locationId: string }) => postReceiptItem(dto),
@@ -88,15 +82,14 @@ export default function ReceiptPostDialog({ item, open, onOpenChange }: Props) {
           </SelectContent>
         </Select>
       </FormField>
-      <FormField label="库位" required help="一个库位只能存放一种物料">
-        <Select value={locationId || undefined} onValueChange={setLocationId} disabled={!warehouseId}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={warehouseId ? '请选择库位' : '请先选择库房'} />
-          </SelectTrigger>
-          <SelectContent>
-            {(locations ?? []).map((l) => <SelectItem key={l.id} value={l.id}>{l.code}</SelectItem>)}
-          </SelectContent>
-        </Select>
+      <FormField label="库位" required help="一库位一物料;已占其他物料的库位不可选">
+        <LocationSelect
+          warehouseId={warehouseId}
+          materialCode={item?.materialCode ?? ''}
+          value={locationId}
+          onChange={setLocationId}
+          disabled={!warehouseId}
+        />
       </FormField>
     </FormDialog>
   )

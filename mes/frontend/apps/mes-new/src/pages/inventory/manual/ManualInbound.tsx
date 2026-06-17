@@ -8,8 +8,9 @@ import { FormSection } from '@/components/FormDialog'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { materilePage } from '@/api/basedata/materile'
-import { warehousePage, warehouseLocations } from '@/api/basedata/warehouse'
+import { warehousePage } from '@/api/basedata/warehouse'
 import { manualInbound } from '@/api/inventory/stock'
+import LocationSelect from '../LocationSelect'
 import type { ManualInboundDTO } from '@/types/inventory'
 
 const FETCH_SIZE = 200
@@ -28,12 +29,6 @@ export default function ManualInbound() {
     ['basedata', 'warehouse', 'page', { current: 1, size: FETCH_SIZE }],
     () => warehousePage({ current: 1, size: FETCH_SIZE }),
   )
-  const { data: locations } = useQuery$(
-    ['basedata', 'warehouse', 'locations', warehouseId],
-    () => warehouseLocations(warehouseId),
-    { enabled: !!warehouseId },
-  )
-
   const materials = matPage?.records ?? []
   const warehouses = (whPage?.records ?? []).filter((w) => w.type === '零件库')
 
@@ -71,7 +66,7 @@ export default function ManualInbound() {
         <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); onSubmit() }}>
           <FormSection title="入库信息" tag="必填">
             <FormField label="物料" required>
-              <Select value={materialCode || undefined} onValueChange={setMaterialCode}>
+              <Select value={materialCode || undefined} onValueChange={(v) => { setMaterialCode(v); setLocationId('') }}>
                 <SelectTrigger className="w-full"><SelectValue placeholder="请选择物料" /></SelectTrigger>
                 <SelectContent>
                   {materials.map((m) => <SelectItem key={m.id} value={m.materiel}>{m.materiel} · {m.materielDesc}</SelectItem>)}
@@ -87,15 +82,14 @@ export default function ManualInbound() {
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField label="库位" required help="一库位一物料">
-                <Select value={locationId || undefined} onValueChange={setLocationId} disabled={!warehouseId}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={warehouseId ? '请选择库位' : '请先选择库房'} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(locations ?? []).map((l) => <SelectItem key={l.id} value={l.id}>{l.code}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+              <FormField label="库位" required help="已占其他物料的库位不可选">
+                <LocationSelect
+                  warehouseId={warehouseId}
+                  materialCode={materialCode}
+                  value={locationId}
+                  onChange={setLocationId}
+                  disabled={!warehouseId}
+                />
               </FormField>
             </div>
             <FormField label="数量" htmlFor="mi-qty" required>
