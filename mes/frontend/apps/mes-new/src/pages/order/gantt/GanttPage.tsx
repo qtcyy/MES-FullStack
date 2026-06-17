@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react'
 import {
   Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-  Skeleton, Tabs, TabsContent, TabsList, TabsTrigger,
+  Skeleton, Tabs, TabsContent, TabsList, TabsTrigger, toast,
 } from '@workspace/ui'
 import PageContainer from '@/components/PageContainer'
-import { useQuery$ } from '@/http/hooks'
-import { fetchGanttTasks } from '@/api/order/gantt'
-import type { GanttTask } from '@/types/order'
+import { useMutation$, useQuery$ } from '@/http/hooks'
+import {
+  fetchGanttTasks, rescheduleTask, startTask, finishTask, updateTaskProgress, adjustTaskActual,
+} from '@/api/order/gantt'
+import type {
+  GanttTask, GanttRescheduleReq, GanttStartReq, GanttFinishReq, GanttProgressReq, GanttActualReq,
+} from '@/types/order'
 import { computeRange, groupByOrder, groupByResource } from './ganttUtils'
 import GanttChart from './GanttChart'
 import TaskDetailSheet from './TaskDetailSheet'
@@ -29,8 +33,42 @@ export default function GanttPage() {
   const [orderCode, setOrderCode] = useState('')
   const [teamId, setTeamId] = useState('all')
   const [tab, setTab] = useState('resource')
-  const [active, setActive] = useState<GanttTask | null>(null)
+  const [activeId, setActiveId] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+
+  // active 按 id 从最新 tasks 派生,refetch 后自动反映新状态
+  const active = useMemo(() => tasks.find((t) => t.id === activeId) ?? null, [tasks, activeId])
+
+  const reM = useMutation$((b: GanttRescheduleReq) => rescheduleTask(b))
+  const stM = useMutation$((b: GanttStartReq) => startTask(b))
+  const fiM = useMutation$((b: GanttFinishReq) => finishTask(b))
+  const prM = useMutation$((b: GanttProgressReq) => updateTaskProgress(b))
+  const acM = useMutation$((b: GanttActualReq) => adjustTaskActual(b))
+  const busy = reM.loading || stM.loading || fiM.loading || prM.loading || acM.loading
+
+  const handleReschedule = async (t: GanttTask, planStartTime: string, planEndTime: string) => {
+    try {
+      await reM.mutate({ id: t.id, planStartTime, planEndTime })
+      toast.success('已改期')
+      refetch()
+    } catch { /* 拦截器已 toast */ }
+  }
+  const handleStart = async (id: string, actualStartTime: string) => {
+    try { await stM.mutate({ id, actualStartTime: actualStartTime || undefined }); toast.success('已记录开工'); refetch() } catch { /* 拦截器已 toast */ }
+  }
+  const handleFinish = async (id: string, actualEndTime: string) => {
+    try { await fiM.mutate({ id, actualEndTime: actualEndTime || undefined }); toast.success('已记录完工'); refetch() } catch { /* 拦截器已 toast */ }
+  }
+  const handleProgress = async (id: string, progress: number) => {
+    try { await prM.mutate({ id, progress }); toast.success('进度已更新'); refetch() } catch { /* 拦截器已 toast */ }
+  }
+  const handleAdjustActual = async (id: string, actualStartTime: string, actualEndTime: string) => {
+    try {
+      await acM.mutate({ id, actualStartTime: actualStartTime || undefined, actualEndTime: actualEndTime || undefined })
+      toast.success('实际时间已修正')
+      refetch()
+    } catch { /* 拦截器已 toast */ }
+  }
 
   const teamOptions = useMemo(() => {
     const m = new Map<string, string>()
@@ -53,14 +91,21 @@ export default function GanttPage() {
   const orderGroups = useMemo(() => groupByOrder(filtered), [filtered])
 
   const onTaskClick = (t: GanttTask) => {
-    setActive(t)
+    setActiveId(t.id)
     setSheetOpen(true)
+  }
+
+  const chartHandlers = {
+    onTaskClick,
+    onReschedule: handleReschedule,
+    onQuickStart: (t: GanttTask) => handleStart(t.id, ''),
+    onQuickFinish: (t: GanttTask) => handleFinish(t.id, ''),
   }
 
   return (
     <PageContainer
       title="生产甘特图"
-      description="按资源/订单两个视角查看工序派工的计划与实际进度"
+      description="拖动计划条改期,点击任务回填执行(开工/完工/进度)"
       actions={
         <Button variant="outline" size="sm" onClick={refetch}>
           刷新
@@ -116,7 +161,7 @@ export default function GanttPage() {
               rangeStartMs={range.startMs}
               rangeEndMs={range.endMs}
               nowMs={nowMs}
-              onTaskClick={onTaskClick}
+              {...chartHandlers}
             />
           )}
         </TabsContent>
@@ -129,13 +174,23 @@ export default function GanttPage() {
               rangeStartMs={range.startMs}
               rangeEndMs={range.endMs}
               nowMs={nowMs}
-              onTaskClick={onTaskClick}
+              {...chartHandlers}
             />
           )}
         </TabsContent>
       </Tabs>
 
-      <TaskDetailSheet task={active} nowMs={nowMs} open={sheetOpen} onOpenChange={setSheetOpen} />
+      <TaskDetailSheet
+        task={active}
+        nowMs={nowMs}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        busy={busy}
+        onStart={handleStart}
+        onFinish={handleFinish}
+        onProgress={handleProgress}
+        onAdjustActual={handleAdjustActual}
+      />
     </PageContainer>
   )
 }

@@ -153,3 +153,50 @@ export function groupByOrder(tasks: GanttTask[]): GanttGroup[] {
   }
   return groups
 }
+
+export type DragMode = 'move' | 'resize-start' | 'resize-end'
+
+/** 像素位移 → 天数(四舍五入) */
+export function pxToDays(deltaPx: number, dayWidth: number): number {
+  return Math.round(deltaPx / dayWidth)
+}
+
+/** 把 'yyyy-MM-dd[ 后缀]' 的日期部分平移 deltaDays 天,保留原后缀;非法/空原样返回 */
+function shiftDateStr(s: string | undefined, deltaDays: number): string | undefined {
+  if (!s) return s
+  const m = /^(\d{4})-(\d{2})-(\d{2})(.*)$/.exec(s.trim())
+  if (!m) return s
+  const dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  dt.setDate(dt.getDate() + deltaDays)
+  const y = dt.getFullYear()
+  const mo = String(dt.getMonth() + 1).padStart(2, '0')
+  const d = String(dt.getDate()).padStart(2, '0')
+  return `${y}-${mo}-${d}${m[4]}`
+}
+
+/** 拖拽计算新计划起止;move=两端同移,resize-*=单端移并 clamp(起≤止,保留至少 1 天) */
+export function shiftPlanByDays(
+  task: GanttTask,
+  deltaDays: number,
+  mode: DragMode,
+): { planStartTime?: string; planEndTime?: string } {
+  const ps = task.planStartTime
+  const pe = task.planEndTime
+  if (mode === 'move') {
+    return { planStartTime: shiftDateStr(ps, deltaDays), planEndTime: shiftDateStr(pe, deltaDays) }
+  }
+  const psDay = parseDay(ps)
+  const peDay = parseDay(pe)
+  if (psDay == null || peDay == null) {
+    return { planStartTime: ps, planEndTime: pe }
+  }
+  if (mode === 'resize-start') {
+    const maxDelta = Math.round((peDay - psDay) / DAY_MS) // 起最多前进到止当天
+    const d = Math.min(deltaDays, maxDelta)
+    return { planStartTime: shiftDateStr(ps, d), planEndTime: pe }
+  }
+  // resize-end
+  const minDelta = Math.round((psDay - peDay) / DAY_MS) // 止最多后退到起当天
+  const d = Math.max(deltaDays, minDelta)
+  return { planStartTime: ps, planEndTime: shiftDateStr(pe, d) }
+}

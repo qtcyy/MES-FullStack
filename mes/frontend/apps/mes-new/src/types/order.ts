@@ -75,3 +75,10 @@ export interface GanttQueryParams {
   orderCode?: string
   teamId?: string
 }
+
+/** 甘特图写操作入参 */
+export interface GanttRescheduleReq { id: string; planStartTime: string; planEndTime: string }
+export interface GanttStartReq { id: string; actualStartTime?: string }
+export interface GanttFinishReq { id: string; actualEndTime?: string }
+export interface GanttProgressReq { id: string; progress: number }
+export interface GanttActualReq { id: string; actualStartTime?: string; actualEndTime?: string }

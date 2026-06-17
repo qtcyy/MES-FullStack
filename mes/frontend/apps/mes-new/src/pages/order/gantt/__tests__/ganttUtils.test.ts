@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   parseDay, getDisplayStatus, computeRange, daysBetween, timeToX,
   groupByResource, groupByOrder, enumerateDays, taskBars, DAY_MS,
+  pxToDays, shiftPlanByDays,
 } from '../ganttUtils'
 import type { GanttTask } from '@/types/order'
 
@@ -135,5 +136,43 @@ describe('taskBars', () => {
     const b = taskBars(task({ planStartTime: '2026-06-15', planEndTime: '2026-06-10' }), RS, 44, NOW)
     expect(b.plan).toEqual({ left: 264, width: 44 })
     expect(b.plan!.width).toBeGreaterThan(0)
+  })
+})
+
+describe('pxToDays', () => {
+  it('四舍五入到天', () => {
+    expect(pxToDays(0, 44)).toBe(0)
+    expect(pxToDays(44, 44)).toBe(1)
+    expect(pxToDays(21, 44)).toBe(0)   // <半天 → 0
+    expect(pxToDays(23, 44)).toBe(1)   // >半天 → 1
+    expect(pxToDays(-44, 44)).toBe(-1)
+  })
+})
+
+describe('shiftPlanByDays', () => {
+  const base = (over: Partial<GanttTask> = {}) =>
+    task({ planStartTime: '2026-06-10', planEndTime: '2026-06-12', ...over })
+
+  it('move 平移两端,保持工期', () => {
+    expect(shiftPlanByDays(base(), 2, 'move')).toEqual({ planStartTime: '2026-06-12', planEndTime: '2026-06-14' })
+  })
+  it('move 保留时分秒后缀', () => {
+    const r = shiftPlanByDays(base({ planStartTime: '2026-06-10 08:30:00', planEndTime: '2026-06-12 17:00:00' }), 1, 'move')
+    expect(r).toEqual({ planStartTime: '2026-06-11 08:30:00', planEndTime: '2026-06-13 17:00:00' })
+  })
+  it('move 负 delta', () => {
+    expect(shiftPlanByDays(base(), -1, 'move')).toEqual({ planStartTime: '2026-06-09', planEndTime: '2026-06-11' })
+  })
+  it('resize-start 只动开始', () => {
+    expect(shiftPlanByDays(base(), 1, 'resize-start')).toEqual({ planStartTime: '2026-06-11', planEndTime: '2026-06-12' })
+  })
+  it('resize-start clamp 不越过结束(最多到同一天)', () => {
+    expect(shiftPlanByDays(base(), 5, 'resize-start')).toEqual({ planStartTime: '2026-06-12', planEndTime: '2026-06-12' })
+  })
+  it('resize-end 只动结束', () => {
+    expect(shiftPlanByDays(base(), 2, 'resize-end')).toEqual({ planStartTime: '2026-06-10', planEndTime: '2026-06-14' })
+  })
+  it('resize-end clamp 不早于开始', () => {
+    expect(shiftPlanByDays(base(), -5, 'resize-end')).toEqual({ planStartTime: '2026-06-10', planEndTime: '2026-06-10' })
   })
 })

@@ -1,15 +1,17 @@
-import { Fragment, useMemo } from 'react'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@workspace/ui'
+import { Fragment, useMemo, useState } from 'react'
+import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from '@workspace/ui'
 import type { GanttTask } from '@/types/order'
 import {
   enumerateDays, floorDay, getDisplayStatus, taskBars, timeToX,
-  type DisplayStatus, type GanttGroup,
+  pxToDays, shiftPlanByDays,
+  type DisplayStatus, type DragMode, type GanttGroup,
 } from './ganttUtils'
 
 const LABEL_W = 176
 const DAY_W = 44
 const ROW_H = 34
 const GROUP_H = 30
+const HANDLE_W = 6 // 两端缩放句柄宽
 
 const STATUS_BAR: Record<DisplayStatus, string> = {
   notStarted: 'bg-slate-400',
@@ -29,19 +31,66 @@ function fmtDay(ms: number): string {
   return `${d.getMonth() + 1}/${d.getDate()}`
 }
 
+interface DragState {
+  taskId: string
+  mode: DragMode
+  startX: number
+  task: GanttTask
+}
+
 interface Props {
   groups: GanttGroup[]
   rangeStartMs: number
   rangeEndMs: number
   nowMs: number
   onTaskClick: (t: GanttTask) => void
+  onReschedule?: (t: GanttTask, planStartTime: string, planEndTime: string) => void
+  onQuickStart?: (t: GanttTask) => void
+  onQuickFinish?: (t: GanttTask) => void
 }
 
-export default function GanttChart({ groups, rangeStartMs, rangeEndMs, nowMs, onTaskClick }: Props) {
+export default function GanttChart({
+  groups, rangeStartMs, rangeEndMs, nowMs,
+  onTaskClick, onReschedule, onQuickStart, onQuickFinish,
+}: Props) {
   const days = useMemo(() => enumerateDays(rangeStartMs, rangeEndMs), [rangeStartMs, rangeEndMs])
   const trackWidth = days.length * DAY_W
   const todayLeft = timeToX(floorDay(nowMs), rangeStartMs, DAY_W)
   const showToday = floorDay(nowMs) >= floorDay(rangeStartMs) && floorDay(nowMs) <= floorDay(rangeEndMs)
+
+  const [drag, setDrag] = useState<DragState | null>(null)
+  const [previewDays, setPreviewDays] = useState(0)
+
+  function beginDrag(e: React.PointerEvent<HTMLDivElement>, t: GanttTask) {
+    if (!onReschedule) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const offset = e.clientX - rect.left
+    const mode: DragMode =
+      offset < HANDLE_W ? 'resize-start' : offset > rect.width - HANDLE_W ? 'resize-end' : 'move'
+    e.preventDefault()
+    e.stopPropagation()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    setDrag({ taskId: t.id, mode, startX: e.clientX, task: t })
+    setPreviewDays(0)
+  }
+  function moveDrag(e: React.PointerEvent<HTMLDivElement>) {
+    if (!drag) return
+    setPreviewDays(pxToDays(e.clientX - drag.startX, DAY_W))
+  }
+  function endDrag(e: React.PointerEvent<HTMLDivElement>) {
+    if (!drag) return
+    const d = pxToDays(e.clientX - drag.startX, DAY_W)
+    if (d !== 0 && onReschedule) {
+      const r = shiftPlanByDays(drag.task, d, drag.mode)
+      onReschedule(drag.task, r.planStartTime ?? '', r.planEndTime ?? '')
+    } else if (d === 0) {
+      // 未发生平移 = 视为点击: 打开详情 Sheet。
+      // 这是 status1(已派工、尚无实际条)任务唯一可达 Sheet 的入口。
+      onTaskClick(drag.task)
+    }
+    setDrag(null)
+    setPreviewDays(0)
+  }
 
   // 每 DAY_W 像素画一条 1px 日列分隔线。注意本项目 --border 是原始色值(#d8dee7 / oklch(...)),
   // 不可用 hsl(var(--border)) 包裹(那会得到无效色而整条渐变被丢弃),直接用 var(--border)。
@@ -116,15 +165,61 @@ export default function GanttChart({ groups, rangeStartMs, rangeEndMs, nowMs, on
                   <div className="relative" style={{ ...gridStyle, height: ROW_H }}>
                     {showToday && <div className="absolute top-0 z-10 h-full w-px bg-red-500/40" style={{ left: todayLeft }} />}
                     {row.tasks.map((t) => {
-                      const bars = taskBars(t, rangeStartMs, DAY_W, nowMs)
+                      const isDragging = drag?.taskId === t.id
+                      const effTask: GanttTask = isDragging
+                        ? { ...t, ...shiftPlanByDays(t, previewDays, drag!.mode) }
+                        : t
+                      const bars = taskBars(effTask, rangeStartMs, DAY_W, nowMs)
                       const st = getDisplayStatus(t, nowMs)
+                      const canDrag = !!onReschedule && st !== 'completed'
                       return (
                         <Fragment key={t.id}>
                           {bars.plan && (
-                            <div
-                              className="absolute rounded bg-slate-300/80 dark:bg-slate-600/70"
-                              style={{ left: bars.plan.left + 2, width: Math.max(bars.plan.width - 4, 2), top: 4, height: 7 }}
-                            />
+                            <HoverCard openDelay={120} closeDelay={60}>
+                              <HoverCardTrigger asChild>
+                                <div
+                                  className={`absolute ${canDrag ? 'cursor-grab active:cursor-grabbing' : ''} ${isDragging ? 'z-20' : ''}`}
+                                  style={{ left: bars.plan.left + 2, width: Math.max(bars.plan.width - 4, 6), top: 1, height: 12 }}
+                                  onPointerDown={canDrag ? (e) => beginDrag(e, t) : undefined}
+                                  onPointerMove={canDrag ? moveDrag : undefined}
+                                  onPointerUp={canDrag ? endDrag : undefined}
+                                  title={canDrag ? '拖动整体平移 · 拖两端缩放 · 单击查看详情' : undefined}
+                                >
+                                  <div className="absolute inset-x-0 rounded bg-slate-300/80 dark:bg-slate-600/70" style={{ top: 3, height: 7 }} />
+                                  {canDrag && (
+                                    <>
+                                      <div className="absolute left-0 top-0 h-full cursor-ew-resize" style={{ width: HANDLE_W }} />
+                                      <div className="absolute right-0 top-0 h-full cursor-ew-resize" style={{ width: HANDLE_W }} />
+                                    </>
+                                  )}
+                                </div>
+                              </HoverCardTrigger>
+                              <HoverCardContent className="w-64 text-xs" side="top">
+                                <div className="mb-1 text-sm font-semibold">
+                                  {t.orderCode} · {t.operName}
+                                </div>
+                                <div className="space-y-0.5 text-muted-foreground">
+                                  <div>班组：{t.teamName} / {t.userName}</div>
+                                  <div>计划：{t.planStartTime || '—'} ~ {t.planEndTime || '—'}</div>
+                                  <div>实际：{t.actualStartTime || '—'} ~ {t.actualEndTime || '进行中'}</div>
+                                  <div>进度：{t.progress ?? 0}% · {STATUS_TEXT[st]}</div>
+                                </div>
+                                {t.dispatchStatus === 1 && onQuickStart && (
+                                  <div className="mt-2 flex gap-2 border-t pt-2">
+                                    <Button size="sm" variant="secondary" className="h-7 px-2 text-xs" onClick={() => onQuickStart(t)}>
+                                      记录开工
+                                    </Button>
+                                  </div>
+                                )}
+                                <button
+                                  type="button"
+                                  className="mt-1 text-primary hover:underline"
+                                  onClick={() => onTaskClick(t)}
+                                >
+                                  点击查看详情 →
+                                </button>
+                              </HoverCardContent>
+                            </HoverCard>
                           )}
                           {bars.actual && (
                             <HoverCard openDelay={120} closeDelay={60}>
@@ -151,6 +246,20 @@ export default function GanttChart({ groups, rangeStartMs, rangeEndMs, nowMs, on
                                   <div>实际：{t.actualStartTime || '—'} ~ {t.actualEndTime || '进行中'}</div>
                                   <div>进度：{t.progress ?? 0}% · {STATUS_TEXT[st]}</div>
                                 </div>
+                                {(onQuickStart || onQuickFinish) && (t.dispatchStatus === 1 || t.dispatchStatus === 2) && (
+                                  <div className="mt-2 flex gap-2 border-t pt-2">
+                                    {t.dispatchStatus === 1 && onQuickStart && (
+                                      <Button size="sm" variant="secondary" className="h-7 px-2 text-xs" onClick={() => onQuickStart(t)}>
+                                        记录开工
+                                      </Button>
+                                    )}
+                                    {t.dispatchStatus === 2 && onQuickFinish && (
+                                      <Button size="sm" variant="secondary" className="h-7 px-2 text-xs" onClick={() => onQuickFinish(t)}>
+                                        记录完工
+                                      </Button>
+                                    )}
+                                  </div>
+                                )}
                                 <div className="mt-1 text-primary">点击查看详情 →</div>
                               </HoverCardContent>
                             </HoverCard>
