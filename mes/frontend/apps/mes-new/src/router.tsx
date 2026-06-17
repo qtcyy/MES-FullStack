@@ -21,6 +21,7 @@ import ProcessContentList from '@/pages/technology/process-content/ProcessConten
 import OrderList from '@/pages/order/production/OrderList'
 import DispatchList from '@/pages/order/dispatch/DispatchList'
 import GanttPage from '@/pages/order/gantt/GanttPage'
+import ReceiptList from '@/pages/inventory/receipt/ReceiptList'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
 
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
           { path: 'order/production', element: <OrderList /> },
           { path: 'order/dispatch', element: <DispatchList /> },
           { path: 'order/gantt', element: <GanttPage /> },
+          { path: 'inventory/receipt', element: <ReceiptList /> },
           { path: '403', element: <Forbidden /> },
           { path: '*', element: <NotFound /> },
         ],
