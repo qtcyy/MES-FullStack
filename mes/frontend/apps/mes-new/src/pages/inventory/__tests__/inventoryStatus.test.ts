@@ -5,6 +5,8 @@ import {
   postStatusMeta,
   progressText,
   progressPercent,
+  locationAvailability,
+  locationOptionLabel,
 } from '../inventoryStatus'
 
 describe('receiptStatusMeta', () => {
@@ -37,4 +39,17 @@ describe('progressPercent', () => {
   it('3/8 → 38', () => { expect(progressPercent(3, 8)).toBe(38) })
   it('total 0 → 0(不除零)', () => { expect(progressPercent(0, 0)).toBe(0) })
   it('全部完成 → 100', () => { expect(progressPercent(8, 8)).toBe(100) })
+})
+
+describe('locationAvailability', () => {
+  it('无占用 → empty', () => { expect(locationAvailability(undefined, 'PART-001')).toBe('empty') })
+  it('空串占用 → empty', () => { expect(locationAvailability('', 'PART-001')).toBe('empty') })
+  it('同物料 → same', () => { expect(locationAvailability('PART-001', 'PART-001')).toBe('same') })
+  it('他物料 → other', () => { expect(locationAvailability('PART-007', 'PART-001')).toBe('other') })
+})
+
+describe('locationOptionLabel', () => {
+  it('空闲', () => { expect(locationOptionLabel('1-0101', undefined, 'PART-001')).toBe('1-0101 · 空闲') })
+  it('可累加', () => { expect(locationOptionLabel('1-0101', 'PART-001', 'PART-001')).toBe('1-0101 · 已存本物料·可累加') })
+  it('已占他物料', () => { expect(locationOptionLabel('1-0102', 'PART-007', 'PART-001')).toBe('1-0102 · 已占 PART-007') })
 })

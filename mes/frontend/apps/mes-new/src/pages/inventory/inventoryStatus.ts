@@ -48,3 +48,20 @@ export function progressPercent(posted?: number, total?: number): number {
   if (t <= 0) return 0
   return Math.round(((posted ?? 0) / t) * 100)
 }
+
+export type LocationAvailability = 'empty' | 'same' | 'other'
+
+/** 库位对目标物料的可用性:无占用→empty;同物料→same;他物料→other */
+export function locationAvailability(occupiedBy: string | undefined, target: string): LocationAvailability {
+  if (!occupiedBy) return 'empty'
+  return occupiedBy === target ? 'same' : 'other'
+}
+
+/** 库位下拉选项文案 */
+export function locationOptionLabel(code: string, occupiedBy: string | undefined, target: string): string {
+  switch (locationAvailability(occupiedBy, target)) {
+    case 'empty': return `${code} · 空闲`
+    case 'same': return `${code} · 已存本物料·可累加`
+    case 'other': return `${code} · 已占 ${occupiedBy}`
+  }
+}
