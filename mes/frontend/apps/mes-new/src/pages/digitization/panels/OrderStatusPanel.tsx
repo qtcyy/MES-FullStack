@@ -6,7 +6,11 @@ import type { NameValue } from '@/types/digitization'
 export default function OrderStatusPanel({ data }: { data: NameValue[] }) {
   return (
     <PanelFrame title="订单状态分布" badge="real">
-      <EChart option={buildPieOption(data)} className="h-full w-full min-h-[150px]" />
+      {data.length ? (
+        <EChart option={buildPieOption(data)} className="h-full w-full min-h-[150px]" />
+      ) : (
+        <div className="ds-empty">暂无数据</div>
+      )}
     </PanelFrame>
   )
 }
