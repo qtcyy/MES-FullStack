@@ -135,3 +135,14 @@
   font-size: 16px;
   color: #6ea3d8;
 }
+
+/* 窄于设计基准(1280px)时:两列 + 允许纵向滚动,避免被裁切 */
+@media (max-width: 1280px) {
+  .mes-dashboard {
+    height: auto;
+    overflow-y: auto;
+  }
+  .mes-dashboard .ds-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

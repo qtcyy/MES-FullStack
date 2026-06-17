@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import PrivateRoute from '@/components/PrivateRoute'
 import AdminLayout from '@/layouts/AdminLayout'
 import LoginPage from '@/pages/login/LoginPage'
@@ -25,9 +26,11 @@ import ReceiptList from '@/pages/inventory/receipt/ReceiptList'
 import OutboundList from '@/pages/inventory/outbound/OutboundList'
 import InventoryQuery from '@/pages/inventory/query/InventoryQuery'
 import ManualInbound from '@/pages/inventory/manual/ManualInbound'
-import PlanDashboard from '@/pages/digitization/PlanDashboard'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
+
+// eslint-disable-next-line react-refresh/only-export-components -- 路由配置模块:lazy() 使本文件被识别为含组件,但其仅导出 router 配置,无 Fast Refresh 边界需求
+const PlanDashboard = lazy(() => import('@/pages/digitization/PlanDashboard'))
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -66,7 +69,14 @@ export const router = createBrowserRouter([
           { path: '*', element: <NotFound /> },
         ],
       },
-      { path: 'digitization/plan', element: <PlanDashboard /> },
+      {
+        path: 'digitization/plan',
+        element: (
+          <Suspense fallback={<div style={{ minHeight: '100vh', background: '#050b16' }} />}>
+            <PlanDashboard />
+          </Suspense>
+        ),
+      },
     ],
   },
 ])
