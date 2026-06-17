@@ -43,3 +43,35 @@ export interface SpDispatchAssign {
 
 export interface SpTeamOption { id: string; code: string; name: string }
 export interface TeamUserOption { id: string; name: string; username?: string }
+
+/** 甘特图派工任务(订单×工序×班组×作业员) */
+export interface GanttTask {
+  id: string
+  orderId: string
+  orderCode: string
+  materiel: string
+  materielDesc?: string
+  qty: number
+  orderType: string
+  orderStatue: number
+  operId: string
+  operName: string
+  teamId: string
+  teamName: string
+  userId: string
+  userName: string
+  planStartTime?: string
+  planEndTime?: string
+  actualStartTime?: string
+  actualEndTime?: string
+  dispatchStatus: number
+  progress?: number
+}
+
+/** 甘特图查询过滤(全部可选) */
+export interface GanttQueryParams {
+  startTime?: string
+  endTime?: string
+  orderCode?: string
+  teamId?: string
+}
