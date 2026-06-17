@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangziyang.mes.digitization.mapper.DashboardMapper">
+
+    <select id="selectMonthlyTrend" resultType="com.wangziyang.mes.digitization.dto.MonthlyTrendVO">
+        SELECT DATE_FORMAT(create_time, '%Y-%m')                AS month,
+               COUNT(*)                                          AS orderCount,
+               COALESCE(SUM(qty), 0)                             AS totalQty,
+               SUM(CASE WHEN statue IN (3, 4) THEN 1 ELSE 0 END) AS completedCount
+        FROM sp_order
+        WHERE create_time IS NOT NULL
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m')
+    </select>
+</mapper>
