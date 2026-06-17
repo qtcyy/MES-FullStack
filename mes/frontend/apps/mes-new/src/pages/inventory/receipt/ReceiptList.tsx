@@ -21,8 +21,8 @@ export default function ReceiptList() {
 
   const { data, loading } = useQuery$(['inventory', 'receipt', 'page', params], () => pageReceipts(params))
 
-  const onSearch = () => setParams({ current: 1, size: PAGE_SIZE, receiptCode: draftCode || undefined })
-  const onReset = () => { setDraftCode(''); setParams({ current: 1, size: PAGE_SIZE }) }
+  const onSearch = () => { setSelected(null); setParams({ current: 1, size: PAGE_SIZE, receiptCode: draftCode || undefined }) }
+  const onReset = () => { setDraftCode(''); setSelected(null); setParams({ current: 1, size: PAGE_SIZE }) }
 
   const columns = useMemo<ColumnDef<SpWarehouseReceipt>[]>(() => [
     { accessorKey: 'receiptCode', header: '入库单号' },
@@ -67,7 +67,7 @@ export default function ReceiptList() {
               pageSize: PAGE_SIZE,
               totalPages: data?.pages ?? 1,
               totalRows: data?.total,
-              onPageChange: (idx) => setParams((p) => ({ ...p, current: idx + 1 })),
+              onPageChange: (idx) => { setSelected(null); setParams((p) => ({ ...p, current: idx + 1 })) },
             }}
           />
         }
