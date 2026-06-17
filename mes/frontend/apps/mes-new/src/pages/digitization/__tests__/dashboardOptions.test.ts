@@ -39,6 +39,10 @@ describe('pickPalette', () => {
 describe('trend transforms', () => {
   it('trendMonthLabel: 2026-06 → 6月', () => { expect(trendMonthLabel('2026-06')).toBe('6月') })
   it('trendMonthLabel: 2026-01 → 1月', () => { expect(trendMonthLabel('2026-01')).toBe('1月') })
+  it('trendMonthLabel: 非法输入回显', () => {
+    expect(trendMonthLabel('2026-06-17')).toBe('6月')
+    expect(trendMonthLabel('bad')).toBe('bad')
+  })
   it('trendMonths', () => { expect(trendMonths(trend)).toEqual(['5月', '6月']) })
   it('trendOrderCounts', () => { expect(trendOrderCounts(trend)).toEqual([10, 12]) })
   it('trendCompletedCounts', () => { expect(trendCompletedCounts(trend)).toEqual([6, 9]) })
@@ -55,11 +59,20 @@ describe('option builders', () => {
     const opt = buildPieOption(items) as { series: { data: unknown[] }[] }
     expect(opt.series[0].data).toHaveLength(2)
   })
+  it('buildPieOption: data[0] 映射 name/value', () => {
+    const opt = buildPieOption(items) as { series: { data: { name: string; value: number }[] }[] }
+    expect(opt.series[0].data[0].name).toBe('创建')
+    expect(opt.series[0].data[0].value).toBe(3)
+  })
   it('buildBarOption: xAxis data 长度=输入', () => {
     const opt = buildBarOption(items) as { xAxis: { data: unknown[] } }
     expect(opt.xAxis.data).toHaveLength(2)
   })
-  it('buildOrderTrendOption: 双 series + x轴12项映射', () => {
+  it('buildBarOption: xAxis.data[0] 映射 name', () => {
+    const opt = buildBarOption(items) as { xAxis: { data: string[] } }
+    expect(opt.xAxis.data[0]).toBe('创建')
+  })
+  it('buildOrderTrendOption: 双 series + x轴长度=输入', () => {
     const opt = buildOrderTrendOption(trend) as { series: unknown[]; xAxis: { data: unknown[] } }
     expect(opt.series).toHaveLength(2)
     expect(opt.xAxis.data).toHaveLength(2)

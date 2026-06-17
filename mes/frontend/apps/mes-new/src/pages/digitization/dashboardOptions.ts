@@ -19,9 +19,10 @@ export function formatCount(n: number): string {
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
-/** 'yyyy-MM' → 'M月' */
+/** 'yyyy-MM' → 'M月';非法输入回显原值 */
 export function trendMonthLabel(month: string): string {
-  return `${Number(month.slice(5))}月`
+  const m = Number(month.slice(5, 7))
+  return m >= 1 && m <= 12 ? `${m}月` : month
 }
 
 export function trendMonths(trend: MonthlyTrendPoint[]): string[] {
