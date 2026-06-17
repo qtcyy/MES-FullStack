@@ -82,7 +82,7 @@ CSS Grid：顶部 KPI `repeat(4,1fr)`；主体 `grid-template-columns: 1fr 1.5fr
   "msg": "操作成功",
   "data": {
     "kpi": { "orderCount": 128, "deviceCount": 36, "materielCount": 256, "flowCount": 18 },
-    "orderStatus":  [ {"name":"创建","value":12}, {"name":"进行中","value":42}, {"name":"订单结束","value":60}, {"name":"订单终结","value":14} ],
+    "orderStatus":  [ {"name":"已下发","value":12}, {"name":"已派工","value":20}, {"name":"进行中","value":42}, {"name":"订单结束","value":40}, {"name":"订单终结","value":14} ],
     "deviceStatus": [ {"name":"空闲","value":8},  {"name":"运行中","value":24}, {"name":"维修中","value":3},  {"name":"报废","value":1} ],
     "orderType":    [ {"name":"批量","value":90}, {"name":"验证","value":24}, {"name":"返工","value":14} ],
     "monthlyTrend": [ {"month":"2025-07","orderCount":10,"totalQty":1200,"completedCount":8}, … 共 12 项 … ]
@@ -102,14 +102,14 @@ CSS Grid：顶部 KPI `repeat(4,1fr)`；主体 `grid-template-columns: 1fr 1.5fr
 | `kpi.deviceCount` | `spDeviceMapper.selectCount(null)` | ToolExecutor.java:597 |
 | `kpi.materielCount` | `spMaterileMapper.selectCount(null)` | ToolExecutor.java:612 |
 | `kpi.flowCount` | `spFlowMapper.selectCount(null)` | ToolExecutor.java:620 |
-| `orderStatus` | `spOrderMapper.selectList(null)` → 按 `statue` 内存分组；映射 1→创建 2→进行中 3→订单结束 4→订单终结 | SpOrder.java:65；ToolExecutor.java:576-586 |
+| `orderStatus` | `spOrderMapper.selectList(null)` → 按 `statue` 内存分组；按 **SpOrder.statue 实体权威语义** 映射 0→已下发 1→已派工 2→进行中 3→订单结束 4→订单终结（**不沿用 ToolExecutor 的 1→创建,后者映射有误且漏 0**，审查时已更正） | SpOrder.java:62-65（实体注释为准） |
 | `deviceStatus` | `spDeviceMapper.selectList(null)` → 按 `status` 内存分组；映射 0→空闲 1→运行中 2→维修中 3→报废 | SpDevice.java:22；MySQL-init-all.sql:103 |
 | `orderType` | `spOrderMapper.selectList(null)` → 按 `orderType` 内存分组；映射 P→批量 A→验证 F→返工 | SpOrder.java:35；OrderForm.tsx:85-90；MySQL-init-all.sql:258 |
 | `monthlyTrend` | **新增** `DashboardMapper.selectMonthlyTrend()`：`GROUP BY DATE_FORMAT(create_time,'%Y-%m')`，service 补齐"近 12 个月"——**截至服务器当前月的连续 12 个自然月**（含当前月，缺失月份补 0、按月升序） | SpOrder 有 create_time(datetime)/qty/statue；SpOrderMapper.xml 为空，需新增 |
 
 **实现取舍：**
 - 计数与分布走 `selectList` 内存分组（对齐 ToolExecutor 已验证逻辑，Mockito 易测：stub `selectList` 返回若干实体，断言分组结果）。本项目数据量小，可接受。
-- `monthlyTrend` 走专用 SQL（跨 12 月聚合，SQL 比内存清晰），用 `DashboardMapper`（digitization 模块内新增，`@Select` 注解，`resultType=MonthlyTrendVO`），**不触碰 order 模块的 mapper**，保持纯新增。
+- `monthlyTrend` 走专用 SQL（跨 12 月聚合，SQL 比内存清晰），用 `DashboardMapper`（digitization 模块内新增，**XML 实现** `resources/mapper/digitization/DashboardMapper.xml`，`resultType=MonthlyTrendVO`；遵循项目"自定义查询走 XML"惯例，非注解），**不触碰 order 模块的 mapper**，保持纯新增。
 - `completedCount` 定义：`statue IN (3,4)`（订单结束/终结）计为完成。
 
 ### 3.4 新增后端文件
@@ -123,13 +123,14 @@ mes/src/main/java/com/wangziyang/mes/digitization/
 │   ├── IDashboardService.java                # overview()
 │   └── impl/DashboardServiceImpl.java        # 注入各 mapper,聚合 + code→label 映射 + 12 月补齐
 ├── mapper/
-│   └── DashboardMapper.java                  # @Select selectMonthlyTrend() → List<MonthlyTrendVO>
+│   └── DashboardMapper.java                  # selectMonthlyTrend() → List<MonthlyTrendVO>（不继承 BaseMapper）
 └── dto/
     ├── DashboardOverviewVO.java
     ├── DashboardKpiVO.java
     ├── NameValueVO.java
     └── MonthlyTrendVO.java
 ```
+（另含 `resources/mapper/digitization/DashboardMapper.xml` 提供 `selectMonthlyTrend` 的聚合 SQL。）
 
 - `DashboardController` 继承 `BaseController`（沿用项目范式），`@RequestMapping("/digitization/dashboard")` + `@GetMapping("/overview")` + `@ResponseBody` + 返回 `Result.success(...)`。范例：SpOrderController / SpDeviceController。
 - `@MapperScan` 已覆盖 `**.mapper*`（入口 `SparchetypeApplication`），`DashboardMapper` 自动注册。

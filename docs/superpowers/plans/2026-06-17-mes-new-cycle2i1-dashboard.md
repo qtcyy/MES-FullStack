@@ -6,9 +6,16 @@
 
 **Architecture:** 后端在 `digitization` 模块纯新增 `DashboardController`(REST) + `DashboardServiceImpl`(聚合,复用各模块 mapper) + `DashboardMapper`(月度趋势 SQL) + DTO,零生产代码改动;前端新增 `echarts` 依赖、`EChart` 容器、纯函数 option 构造器(vitest)、深空蓝主题大屏页面,路由挂在 `PrivateRoute` 下、`AdminLayout` 平级以实现全屏无侧边栏。
 
-**Tech Stack:** 后端 Java 8 / Spring Boot 2.1.7 / MyBatis-Plus 3.1.2 / JUnit4 + Mockito 2.23.4;前端 React 19 / TS / Vite / @ngify/http + 自研 useQuery$ / ECharts 5 / vitest(node)。
+**Tech Stack:** 后端 Java 8 / Spring Boot 2.1.7 / MyBatis-Plus 3.1.2 / JUnit4 + Mockito 2.23.4;前端 React 19 / TS / Vite / @ngify/http + 自研 useQuery$ / ECharts 6 / vitest(node)。
 
 设计依据:`docs/superpowers/specs/2026-06-17-mes-new-cycle2i1-dashboard-design.md`
+
+> **审查落地修正记录(2026-06-17,实现+多 agent 审查后回填):**
+> 1. **订单状态码映射改用实体权威语义**:本计划 Task 3/4 的代码块原写 `1→创建`(沿用 ToolExecutor),代码审查发现该口径有误且漏 statue=0。实现已更正为 `SpOrder.statue` 权威语义 **0→已下发 / 1→已派工 / 2→进行中 / 3→订单结束 / 4→订单终结**,`ORDER_STATUS_LABELS` 与对应单测同步(commit 7305da0)。**以实现为准**。
+> 2. **echarts 实际为 ^6.1.0**(非 Task 6 写的 ^5.x);v6 仍导出 `EChartsCoreOption`/`ECharts` 类型,EChart.tsx 原样通过,按需 import 路径不变。
+> 3. **后端单测实际 7 例**(非 Task 4/5 写的 8;计划笔误,场景无遗漏),全绿。
+> 4. **UI 性能收口**(commit 06e56b5):时钟抽为独立 `Clock` 组件(消除每秒整屏重渲染)、大屏路由 `React.lazy`+`Suspense`(echarts 拆独立 chunk)、空数组兜底提为模块常量、<1280px 两列媒体查询。
+> 5. **真实面板空态**(commit 64474d1):数据为空时显示"暂无数据"占位(落实设计 §6)。
 
 ---
 
