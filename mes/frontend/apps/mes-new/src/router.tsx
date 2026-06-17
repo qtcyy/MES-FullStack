@@ -25,6 +25,7 @@ import ReceiptList from '@/pages/inventory/receipt/ReceiptList'
 import OutboundList from '@/pages/inventory/outbound/OutboundList'
 import InventoryQuery from '@/pages/inventory/query/InventoryQuery'
 import ManualInbound from '@/pages/inventory/manual/ManualInbound'
+import PlanDashboard from '@/pages/digitization/PlanDashboard'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
 
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
           { path: '*', element: <NotFound /> },
         ],
       },
+      { path: 'digitization/plan', element: <PlanDashboard /> },
     ],
   },
 ])
