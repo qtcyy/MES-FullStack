@@ -1,7 +1,12 @@
 package com.wangziyang.mes.order.mapper;
 
-import com.wangziyang.mes.order.entity.SpOrderDispatch;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.wangziyang.mes.order.dto.GanttQueryReq;
+import com.wangziyang.mes.order.dto.GanttTaskVO;
+import com.wangziyang.mes.order.entity.SpOrderDispatch;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +18,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SpOrderDispatchMapper extends BaseMapper<SpOrderDispatch> {
 
+    List<GanttTaskVO> selectGanttTasks(@Param("req") GanttQueryReq req);
 }

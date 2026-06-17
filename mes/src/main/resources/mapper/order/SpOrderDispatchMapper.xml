@@ -2,4 +2,53 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wangziyang.mes.order.mapper.SpOrderDispatchMapper">
 
+    <resultMap id="ganttTaskMap" type="com.wangziyang.mes.order.dto.GanttTaskVO">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_code" property="orderCode"/>
+        <result column="materiel" property="materiel"/>
+        <result column="materiel_desc" property="materielDesc"/>
+        <result column="qty" property="qty"/>
+        <result column="order_type" property="orderType"/>
+        <result column="order_statue" property="orderStatue"/>
+        <result column="oper_id" property="operId"/>
+        <result column="oper_name" property="operName"/>
+        <result column="team_id" property="teamId"/>
+        <result column="team_name" property="teamName"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="plan_start_time" property="planStartTime"/>
+        <result column="plan_end_time" property="planEndTime"/>
+        <result column="actual_start_time" property="actualStartTime"/>
+        <result column="actual_end_time" property="actualEndTime"/>
+        <result column="dispatch_status" property="dispatchStatus"/>
+        <result column="progress" property="progress"/>
+    </resultMap>
+
+    <select id="selectGanttTasks" resultMap="ganttTaskMap">
+        SELECT d.id, d.order_id, o.order_code, o.materiel, o.materiel_desc, o.qty, o.order_type,
+               o.statue AS order_statue, d.oper_id, p.oper_desc AS oper_name,
+               d.team_id, t.name AS team_name, d.user_id, u.name AS user_name,
+               d.plan_start_time, d.plan_end_time, d.actual_start_time, d.actual_end_time,
+               d.dispatch_status, d.progress
+        FROM sp_order_dispatch d
+        LEFT JOIN sp_order o ON o.id = d.order_id
+        LEFT JOIN sp_oper p ON p.id = d.oper_id
+        LEFT JOIN sp_team t ON t.id = d.team_id
+        LEFT JOIN sp_sys_user u ON u.id = d.user_id
+        WHERE d.oper_id IS NOT NULL
+        <if test="req.orderCode != null and req.orderCode != ''">
+            AND o.order_code LIKE CONCAT('%', #{req.orderCode}, '%')
+        </if>
+        <if test="req.teamId != null and req.teamId != ''">
+            AND d.team_id = #{req.teamId}
+        </if>
+        <if test="req.startTime != null and req.startTime != ''">
+            AND d.plan_end_time &gt;= #{req.startTime}
+        </if>
+        <if test="req.endTime != null and req.endTime != ''">
+            AND d.plan_start_time &lt;= #{req.endTime}
+        </if>
+        ORDER BY d.plan_start_time, d.id
+    </select>
 </mapper>

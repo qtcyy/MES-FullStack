@@ -18,11 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * <p>
  * 前端控制器
@@ -117,36 +112,5 @@ public class SpOrderController extends BaseController {
     public Result deleteByTableNameId(SpOrder req) throws Exception {
         iSpOrderService.removeById(req.getId());
         return Result.success();
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/gantt/list", method = RequestMethod.POST, produces = "application/json")
-    public Result getListGantt(Map<String, Object> params) throws Exception {
-        //刚特图总数据
-        List<Map<String, Object>> result = new ArrayList<>();
-        //具体的订单信息
-        for (int i = 0; i < 20; i++) {
-            Map<String, Object> map = new HashMap<>(8);
-            Map<String, Object> value = new HashMap<>(8);
-            List<Map<String, Object>> values = new ArrayList<>();
-            if (i % 2 == 0) {
-                map.put("id", "id" + (i + 1));
-                map.put("name", "除湿器一线：工单号" + (i + 1));
-                map.put("desc", "计划数量：");
-                value.put("from", "/Date(" + System.currentTimeMillis() + ")/");
-                value.put("to", "/Date(" + (System.currentTimeMillis() + 2000000000) + ")/");
-                value.put("label", "黑科除湿器");
-                value.put("desc", "完工进度100%");
-                value.put("customClass", "ganttGreen");
-                value.put("dataObj", "1");
-                values.add(value);
-            } else {
-                map.put("desc", "完工数量：0");
-            }
-            map.put("cssClass", "redLabel");
-            map.put("values", values);
-            result.add(map);
-        }
-        return Result.success(result);
     }
 }

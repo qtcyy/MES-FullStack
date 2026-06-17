@@ -68,6 +68,12 @@ public class SpOrderDispatch extends BaseEntity {
      */
     private String remark;
 
+    /** 工序ID(关联sp_oper);订单级派工时为空 */
+    private String operId;
+
+    /** 完工进度 0-100 */
+    private Integer progress;
+
     public String getOrderId() {
         return orderId;
     }
@@ -146,6 +152,22 @@ public class SpOrderDispatch extends BaseEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getOperId() {
+        return operId;
+    }
+
+    public void setOperId(String operId) {
+        this.operId = operId;
+    }
+
+    public Integer getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Integer progress) {
+        this.progress = progress;
     }
 
     @Override
