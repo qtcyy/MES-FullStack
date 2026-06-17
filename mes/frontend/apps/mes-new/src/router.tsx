@@ -24,6 +24,7 @@ import GanttPage from '@/pages/order/gantt/GanttPage'
 import ReceiptList from '@/pages/inventory/receipt/ReceiptList'
 import OutboundList from '@/pages/inventory/outbound/OutboundList'
 import InventoryQuery from '@/pages/inventory/query/InventoryQuery'
+import ManualInbound from '@/pages/inventory/manual/ManualInbound'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
 
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
           { path: 'inventory/receipt', element: <ReceiptList /> },
           { path: 'inventory/outbound', element: <OutboundList /> },
           { path: 'inventory/query', element: <InventoryQuery /> },
+          { path: 'inventory/manual-inbound', element: <ManualInbound /> },
           { path: '403', element: <Forbidden /> },
           { path: '*', element: <NotFound /> },
         ],
