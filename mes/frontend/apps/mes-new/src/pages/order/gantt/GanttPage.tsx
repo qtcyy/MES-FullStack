@@ -1,0 +1,141 @@
+import { useMemo, useState } from 'react'
+import {
+  Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Skeleton, Tabs, TabsContent, TabsList, TabsTrigger,
+} from '@workspace/ui'
+import PageContainer from '@/components/PageContainer'
+import { useQuery$ } from '@/http/hooks'
+import { fetchGanttTasks } from '@/api/order/gantt'
+import type { GanttTask } from '@/types/order'
+import { computeRange, groupByOrder, groupByResource } from './ganttUtils'
+import GanttChart from './GanttChart'
+import TaskDetailSheet from './TaskDetailSheet'
+
+const LEGEND: { cls: string; text: string }[] = [
+  { cls: 'bg-slate-300 dark:bg-slate-600', text: '计划' },
+  { cls: 'bg-slate-400', text: '未开工' },
+  { cls: 'bg-amber-500', text: '进行中' },
+  { cls: 'bg-green-500', text: '已完工' },
+  { cls: 'bg-red-500', text: '逾期' },
+]
+
+export default function GanttPage() {
+  const { data, loading, refetch } = useQuery$(['gantt', 'tasks'], () => fetchGanttTasks({}))
+  const tasks = useMemo(() => data ?? [], [data])
+  // 挂载时快照一次"当前时间";用 lazy state initializer 而非 useMemo 包裹 Date.now(),
+  // 满足 React 纯函数规则(useMemo 体内不得调用 Date.now 等不纯函数)。
+  const [nowMs] = useState(() => Date.now())
+
+  const [orderCode, setOrderCode] = useState('')
+  const [teamId, setTeamId] = useState('all')
+  const [tab, setTab] = useState('resource')
+  const [active, setActive] = useState<GanttTask | null>(null)
+  const [sheetOpen, setSheetOpen] = useState(false)
+
+  const teamOptions = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const t of tasks) m.set(t.teamId, t.teamName || '未分组班组')
+    return [...m].map(([id, name]) => ({ id, name }))
+  }, [tasks])
+
+  const filtered = useMemo(
+    () =>
+      tasks.filter(
+        (t) =>
+          (!orderCode || (t.orderCode ?? '').toLowerCase().includes(orderCode.toLowerCase())) &&
+          (teamId === 'all' || t.teamId === teamId),
+      ),
+    [tasks, orderCode, teamId],
+  )
+
+  const range = useMemo(() => computeRange(filtered, nowMs), [filtered, nowMs])
+  const resourceGroups = useMemo(() => groupByResource(filtered), [filtered])
+  const orderGroups = useMemo(() => groupByOrder(filtered), [filtered])
+
+  const onTaskClick = (t: GanttTask) => {
+    setActive(t)
+    setSheetOpen(true)
+  }
+
+  return (
+    <PageContainer
+      title="生产甘特图"
+      description="按资源/订单两个视角查看工序派工的计划与实际进度"
+      actions={
+        <Button variant="outline" size="sm" onClick={refetch}>
+          刷新
+        </Button>
+      }
+    >
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="space-y-1.5">
+          <label className="text-xs text-muted-foreground" htmlFor="g-code">工单编号</label>
+          <Input
+            id="g-code"
+            className="h-9 w-48"
+            placeholder="按工单编号过滤"
+            value={orderCode}
+            onChange={(e) => setOrderCode(e.target.value)}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-xs text-muted-foreground" htmlFor="g-team">班组</label>
+          <Select value={teamId} onValueChange={setTeamId}>
+            <SelectTrigger id="g-team" className="h-9 w-44">
+              <SelectValue placeholder="全部班组" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部班组</SelectItem>
+              {teamOptions.map((t) => (
+                <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="ml-auto flex flex-wrap items-center gap-3 pb-1.5">
+          {LEGEND.map((l) => (
+            <span key={l.text} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className={`inline-block h-2.5 w-4 rounded-sm ${l.cls}`} />
+              {l.text}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <Tabs value={tab} onValueChange={setTab} className="mt-4">
+        <TabsList>
+          <TabsTrigger value="resource">资源视角</TabsTrigger>
+          <TabsTrigger value="order">订单视角</TabsTrigger>
+        </TabsList>
+        <TabsContent value="resource" className="pt-3">
+          {loading ? (
+            <Skeleton className="h-72 w-full" />
+          ) : (
+            <GanttChart
+              groups={resourceGroups}
+              rangeStartMs={range.startMs}
+              rangeEndMs={range.endMs}
+              nowMs={nowMs}
+              onTaskClick={onTaskClick}
+            />
+          )}
+        </TabsContent>
+        <TabsContent value="order" className="pt-3">
+          {loading ? (
+            <Skeleton className="h-72 w-full" />
+          ) : (
+            <GanttChart
+              groups={orderGroups}
+              rangeStartMs={range.startMs}
+              rangeEndMs={range.endMs}
+              nowMs={nowMs}
+              onTaskClick={onTaskClick}
+            />
+          )}
+        </TabsContent>
+      </Tabs>
+
+      <TaskDetailSheet task={active} nowMs={nowMs} open={sheetOpen} onOpenChange={setSheetOpen} />
+    </PageContainer>
+  )
+}

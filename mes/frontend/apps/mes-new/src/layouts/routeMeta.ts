@@ -25,6 +25,7 @@ export const ROUTE_META: Record<string, { title: string; icon?: string }> = {
   // 计划/订单
   '/order/production': { title: '生产订单', icon: 'schedule' },
   '/order/dispatch': { title: '作业派工', icon: 'team' },
+  '/order/gantt': { title: '生产甘特图', icon: 'schedule' },
 }
 
 /** 在菜单树中按 SPA 路由反查菜单名(用于 ROUTE_META 未登记的路由兜底) */
