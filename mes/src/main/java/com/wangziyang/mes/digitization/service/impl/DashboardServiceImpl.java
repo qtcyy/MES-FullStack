@@ -23,12 +23,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 数字化大屏聚合(只读)。
+ *
+ * 注:订单/设备状态、工单类型分布采用 selectList(null) 全表加载后内存分组,
+ * 依赖本系统数据量较小的假设;若订单/设备量显著增长,应改为 SQL GROUP BY 聚合。
+ */
 @Service
 public class DashboardServiceImpl implements IDashboardService {
 
     private static final DateTimeFormatter YM = DateTimeFormatter.ofPattern("yyyy-MM");
 
-    private static final String[] ORDER_STATUS_LABELS = {"创建", "进行中", "订单结束", "订单终结"};
+    private static final String[] ORDER_STATUS_LABELS = {"已下发", "已派工", "进行中", "订单结束", "订单终结"};
     private static final String[] DEVICE_STATUS_LABELS = {"空闲", "运行中", "维修中", "报废"};
     private static final String[] ORDER_TYPE_LABELS = {"批量", "验证", "返工"};
 
@@ -73,7 +79,8 @@ public class DashboardServiceImpl implements IDashboardService {
             return "未知";
         }
         switch (s) {
-            case 1: return "创建";
+            case 0: return "已下发";
+            case 1: return "已派工";
             case 2: return "进行中";
             case 3: return "订单结束";
             case 4: return "订单终结";

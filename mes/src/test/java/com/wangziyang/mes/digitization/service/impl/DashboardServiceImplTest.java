@@ -62,18 +62,18 @@ public class DashboardServiceImplTest {
         return null;
     }
 
-    // ---------- 订单状态分组 + 1/2/3/4 → 中文映射 ----------
+    // ---------- 订单状态分组 + 0/1/2/3/4 → 中文映射 ----------
     @Test
     public void orderStatusDist_groups_and_maps() {
         List<SpOrder> orders = Arrays.asList(
-                order(1, "P"), order(1, "P"), order(2, "A"), order(3, "F"), order(4, "P"));
+                order(0, "P"), order(1, "P"), order(1, "A"), order(2, "A"), order(3, "F"), order(4, "P"));
         List<NameValueVO> dist = DashboardServiceImpl.orderStatusDist(orders);
-        assertEquals(2L, find(dist, "创建").getValue());
+        assertEquals(1L, find(dist, "已下发").getValue());
+        assertEquals(2L, find(dist, "已派工").getValue());
         assertEquals(1L, find(dist, "进行中").getValue());
         assertEquals(1L, find(dist, "订单结束").getValue());
         assertEquals(1L, find(dist, "订单终结").getValue());
-        // 规范顺序:创建 在 进行中 之前
-        assertEquals("创建", dist.get(0).getName());
+        assertEquals("已下发", dist.get(0).getName());
     }
 
     @Test
