@@ -23,6 +23,7 @@ import DispatchList from '@/pages/order/dispatch/DispatchList'
 import GanttPage from '@/pages/order/gantt/GanttPage'
 import ReceiptList from '@/pages/inventory/receipt/ReceiptList'
 import OutboundList from '@/pages/inventory/outbound/OutboundList'
+import InventoryQuery from '@/pages/inventory/query/InventoryQuery'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
 
@@ -57,6 +58,7 @@ export const router = createBrowserRouter([
           { path: 'order/gantt', element: <GanttPage /> },
           { path: 'inventory/receipt', element: <ReceiptList /> },
           { path: 'inventory/outbound', element: <OutboundList /> },
+          { path: 'inventory/query', element: <InventoryQuery /> },
           { path: '403', element: <Forbidden /> },
           { path: '*', element: <NotFound /> },
         ],
