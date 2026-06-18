@@ -82,7 +82,7 @@ public class SpTableManagerServiceImpl extends ServiceImpl<SpTableManagerMapper,
     public String saveOrUpdateWithItems(SpTableManagerDto dto) {
         List<SpTableManagerItem> items = dto.getSpTableManagerItems();
         if (CollectionUtil.isEmpty(items)) {
-            throw new IllegalArgumentException("显示的，详细的字段不可以为空");
+            throw new RuntimeException("显示的，详细的字段不可以为空");
         }
         SpTableManager header = new SpTableManager();
         BeanUtils.copyProperties(dto, header);

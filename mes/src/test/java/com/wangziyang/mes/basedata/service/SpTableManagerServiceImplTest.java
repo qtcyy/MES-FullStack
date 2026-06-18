@@ -56,7 +56,7 @@ public class SpTableManagerServiceImplTest {
         return d;
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = RuntimeException.class)
     public void empty_items_throws() {
         service.saveOrUpdateWithItems(dto(null, new ArrayList<SpTableManagerItem>()));
     }
