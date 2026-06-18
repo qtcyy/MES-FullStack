@@ -1,5 +1,6 @@
 package com.wangziyang.mes.basedata.common.service;
 
+import com.wangziyang.mes.basedata.common.dto.CommonDto;
 import com.wangziyang.mes.basedata.common.mapper.QueryTableNameDataMapper;
 import com.wangziyang.mes.basedata.common.service.impl.TableNameDataServiceImpl;
 import com.wangziyang.mes.basedata.entity.SpTableManager;
@@ -182,5 +183,20 @@ public class TableNameDataServiceImplTest {
         assertNotNull(data.get("update_time"));
         assertFalse(data.containsKey("id"));
         assertFalse(data.containsKey("create_username"));
+    }
+
+    // 白名单守卫:delete 收到未登记表 → 抛异常,绝不调 commonDelete
+    @Test(expected = RuntimeException.class)
+    public void delete_rejects_unknown_table() throws Exception {
+        CommonDto dto = new CommonDto();
+        dto.setTableName("evil_table");
+        dto.setTableNameId("nope");
+        dto.setId("x");
+        when(iSpTableManagerService.getById("nope")).thenReturn(null);
+        try {
+            service.commonDelete(dto);
+        } finally {
+            verify(queryTableNameDataMapper, never()).commonDelete(any());
+        }
     }
 }

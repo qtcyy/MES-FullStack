@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,15 +30,16 @@ public class TableNameDataServiceImpl implements TableNameDataService {
     private static final Pattern SAFE_COL = Pattern.compile("^[A-Za-z0-9_]+$");
 
     @Autowired
-    public QueryTableNameDataMapper queryTableNameDataMapper;
+    private QueryTableNameDataMapper queryTableNameDataMapper;
     @Autowired
-    public ISpTableManagerItemService iSpTableManagerItemService;
+    private ISpTableManagerItemService iSpTableManagerItemService;
     @Autowired
-    public ISpTableManagerService iSpTableManagerService;
+    private ISpTableManagerService iSpTableManagerService;
 
     @Override
     public IPage<Map<String, String>> queryTableNameDataList(QueryTableNameDataReq page) throws Exception {
-        assertTableWhitelisted(page.getTableName(), page.getTableNameId());
+        String safe = assertTableWhitelisted(page.getTableName(), page.getTableNameId());
+        page.setTableName(safe);
         page.setCol(buildCol(page.getTableNameId()));
         page.setRecords(queryTableNameDataMapper.queryTableNameDataList(page));
         return page;
@@ -46,7 +47,8 @@ public class TableNameDataServiceImpl implements TableNameDataService {
 
     @Override
     public List<Map<String, String>> queryTableNameById(CommonDto commonDto) throws Exception {
-        assertTableWhitelisted(commonDto.getTableName(), commonDto.getTableNameId());
+        String safe = assertTableWhitelisted(commonDto.getTableName(), commonDto.getTableNameId());
+        commonDto.setTableName(safe);
         commonDto.setCol(buildCol(commonDto.getTableNameId()));
         return queryTableNameDataMapper.queryTableNameById(commonDto);
     }
@@ -54,7 +56,7 @@ public class TableNameDataServiceImpl implements TableNameDataService {
     @Override
     public String buildCol(String tableNameId) throws Exception {
         if (StringUtils.isEmpty(tableNameId)) {
-            throw new Exception("表关联ID不能为空");
+            throw new RuntimeException("表关联ID不能为空");
         }
         List<SpTableManagerItem> items = iSpTableManagerItemService.queryItemBytableNameId(tableNameId);
         if (items == null || items.isEmpty()) {
@@ -71,7 +73,8 @@ public class TableNameDataServiceImpl implements TableNameDataService {
     @Override
     @Transactional
     public void commonDelete(CommonDto commonDto) throws Exception {
-        assertTableWhitelisted(commonDto.getTableName(), commonDto.getTableNameId());
+        String safe = assertTableWhitelisted(commonDto.getTableName(), commonDto.getTableNameId());
+        commonDto.setTableName(safe);
         queryTableNameDataMapper.commonDelete(commonDto);
     }
 
@@ -80,7 +83,7 @@ public class TableNameDataServiceImpl implements TableNameDataService {
     public void commonSave(HttpServletRequest request, SysUser user) throws Exception {
         String jsTableName = request.getParameter("jsTableName");
         String jsTableNameId = request.getParameter("jsTableNameId");
-        assertTableWhitelisted(jsTableName, jsTableNameId);
+        String safe = assertTableWhitelisted(jsTableName, jsTableNameId);
 
         List<SpTableManagerItem> items = iSpTableManagerItemService.queryItemBytableNameId(jsTableNameId);
         LinkedHashMap<String, Object> data = new LinkedHashMap<>();
@@ -92,13 +95,13 @@ public class TableNameDataServiceImpl implements TableNameDataService {
         }
         data.put("id", IdUtil.nextId());
         data.put("create_username", user.getUsername());
-        data.put("create_time", new Date());
+        data.put("create_time", LocalDateTime.now());
         data.put("update_username", user.getUsername());
-        data.put("update_time", new Date());
-        if (tableHasColumn(jsTableName, "is_deleted")) {
+        data.put("update_time", LocalDateTime.now());
+        if (tableHasColumn(safe, "is_deleted")) {
             data.putIfAbsent("is_deleted", "0");
         }
-        queryTableNameDataMapper.commonInsert(jsTableName, data);
+        queryTableNameDataMapper.commonInsert(safe, data);
     }
 
     @Override
@@ -107,7 +110,7 @@ public class TableNameDataServiceImpl implements TableNameDataService {
         String jsTableName = request.getParameter("jsTableName");
         String id = request.getParameter("id");
         String jsTableNameId = request.getParameter("jsTableNameId");
-        assertTableWhitelisted(jsTableName, jsTableNameId);
+        String safe = assertTableWhitelisted(jsTableName, jsTableNameId);
         if (StringUtils.isEmpty(id)) {
             throw new RuntimeException("缺少主键 id");
         }
@@ -120,12 +123,12 @@ public class TableNameDataServiceImpl implements TableNameDataService {
             data.put(field, v == null ? "" : v);
         }
         data.put("update_username", user.getUsername());
-        data.put("update_time", new Date());
-        queryTableNameDataMapper.commonUpdateById(jsTableName, id, data);
+        data.put("update_time", LocalDateTime.now());
+        queryTableNameDataMapper.commonUpdateById(safe, id, data);
     }
 
-    /** 表名白名单:必须是 sp_table_manager 已登记(is_deleted='0')且 tableName 与登记一致 */
-    private void assertTableWhitelisted(String tableName, String tableNameId) throws Exception {
+    /** 表名白名单:必须是 sp_table_manager 已登记(is_deleted='0')且 tableName 与登记一致;返回数据库登记的表名 */
+    private String assertTableWhitelisted(String tableName, String tableNameId) throws Exception {
         if (StringUtils.isEmpty(tableName) || StringUtils.isEmpty(tableNameId)) {
             throw new RuntimeException("未选中表信息");
         }
@@ -133,6 +136,7 @@ public class TableNameDataServiceImpl implements TableNameDataService {
         if (m == null || !tableName.equals(m.getTableName()) || !"0".equals(m.getIsDeleted())) {
             throw new RuntimeException("非法的表标识");
         }
+        return m.getTableName();
     }
 
     private void assertSafeColumn(String col) {
@@ -147,6 +151,9 @@ public class TableNameDataServiceImpl implements TableNameDataService {
             SpTableManager req = new SpTableManager();
             req.setTableName(tableName);
             List<SpTableManagerItem> cols = iSpTableManagerService.queryTableFieldByName(req);
+            if (cols == null || cols.isEmpty()) {
+                return false;
+            }
             for (SpTableManagerItem c : cols) {
                 if (column.equalsIgnoreCase(c.getField())) {
                     return true;
