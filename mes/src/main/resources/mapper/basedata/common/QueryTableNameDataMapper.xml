@@ -2,12 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wangziyang.mes.basedata.common.mapper.QueryTableNameDataMapper">
 
-    <!--基础数据通用查询-->
+    <!--基础数据通用分页查询(col 来自白名单+正则校验,tableName 经白名单)-->
     <select id="queryTableNameDataList" resultType="java.util.Map">
         SELECT id,${col} FROM ${tableName}
     </select>
 
-    <!--基础数据通用查询-->
+    <!--按 id 查单行-->
     <select id="queryTableNameById" resultType="java.util.Map">
         SELECT id,${col} FROM ${tableName}
         <where>
@@ -15,17 +15,21 @@
         </where>
     </select>
 
-    <insert id="commonSave">
-        insert  into ${tableName} (${col}) VALUES (${values})
+    <!--新增:列名 ${col} 已白名单,值 #{val} 参数化-->
+    <insert id="commonInsert">
+        INSERT INTO ${tableName}
+        (<foreach collection="data" index="col" item="val" separator=",">${col}</foreach>)
+        VALUES
+        (<foreach collection="data" index="col" item="val" separator=",">#{val}</foreach>)
     </insert>
 
-    <update id="commonUpdate">
+    <!--更新:列名 ${col} 已白名单,值 #{val} 参数化-->
+    <update id="commonUpdateById">
         UPDATE ${tableName}
-        SET ${col}
-        <where>
-            id = #{id}
-        </where>
+        SET <foreach collection="data" index="col" item="val" separator=",">${col} = #{val}</foreach>
+        WHERE id = #{id}
     </update>
+
     <delete id="commonDelete">
         delete from ${tableName}
         <where>
