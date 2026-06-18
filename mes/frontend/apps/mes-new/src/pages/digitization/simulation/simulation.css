@@ -1,0 +1,106 @@
+.mes-sim {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 9rem);
+  min-height: 480px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 38%, #13294d 0%, #070b16 70%, #04060d 100%);
+}
+.mes-sim:fullscreen {
+  height: 100vh;
+  border-radius: 0;
+}
+.mes-sim__topbar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mes-sim__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #cdd9ef;
+  font-size: 14px;
+}
+.mes-sim__overlay--error {
+  color: #fca5a5;
+}
+.mes-hud {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 18;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(8, 16, 32, 0.55);
+  border: 1px solid rgba(40, 70, 130, 0.6);
+  color: #dbe6fb;
+  font-size: 13px;
+  line-height: 1.7;
+  backdrop-filter: blur(4px);
+}
+.mes-hud__stat b {
+  color: #7cc4ff;
+  font-size: 16px;
+}
+.mes-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9db4d8;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.mes-legend__bar {
+  width: 120px;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #1e40af, #06b6d4, #eab308, #f97316, #dc2626);
+}
+.mes-legend__empty {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #6b7280;
+}
+.mes-panels {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 18;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(8, 16, 32, 0.55);
+  border: 1px solid rgba(40, 70, 130, 0.6);
+  backdrop-filter: blur(4px);
+}
+.mes-panels__item {
+  min-width: 140px;
+  color: #cdd9ef;
+  font-size: 12px;
+}
+.mes-panels__bar {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  margin-top: 4px;
+}
+.mes-panels__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+}
