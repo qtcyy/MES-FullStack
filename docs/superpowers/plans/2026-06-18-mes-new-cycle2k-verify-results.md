@@ -50,3 +50,21 @@ SQL 佐证:`table_desc=2k编辑后`;明细按 `sort_num` 为 f_code(1,1)/f_name(
 **调查记录(非 bug):** `item/by/tableNameId` 响应中 `sortNum:null`/`tableNameId:null`,经查 `SpTableManagerItemMapper.xml#queryItemBytableNameId` 仅投影 id/field/field_desc/must_fill(未投影 sort_num/table_name_id),但**含 `ORDER BY sort_num`**;前端 `buildUpsertPayload` 保存时按行序重排 sortNum、不依赖回传值,编辑往返顺序已实证正确 → 投影遗漏无害,不修(记 backlog 可顺手补投影)。
 
 ---
+
+## Phase 2 · 2h 库存 — ✅ PASS(零 bug)
+
+preflight:`sp_warehouse` 有 5 个 `'零件库'` + 1 产品库 → 硬编码 `'零件库'` 校验(by-design)可正常工作。
+
+**入库登账**(item-rcpt-03 PART-003 qty100 → wh-parts-001/loc-parts-03,同物料):`{"code":0}`;明细转 `posted`;`sp_inventory` loc-parts-03 PART-003 **100→200 累加**。
+**幂等**:重复登账同明细 → `{"code":1,"msg":"该明细已登账，请勿重复操作"}`,库存仍 200(不翻倍)→ 生命周期去重正确。
+
+**出库 FIFO**(验证已实现的 FIFO,构造多批次):
+- 手工入库 PART-003 qty30 到新空库位(2063239974832054274/2064530419608580098,time 14:18:25,较新)`{"code":0}` → 同时验证**手工入库**通过。
+- 出库前两批次:loc-parts-03(200,14:17:08 旧)+ 新库位(30,14:18:25 新)。
+- 出库 obi-001-3(PART-003 qty50)`{"code":0}`:**旧批 loc-parts-03 200→150,新批 30 不动**;`allocation_detail=1-010201×50`,`posted` → **FIFO 先扣最早入库批次,正确**。
+
+**库存台账查询**(`materialCode=PART-003`):`{"code":0}` 返回两批次(30+150),join 出 warehouseName/locationCode → 契约正确。
+
+> 结论:FIFO(契约抽取已实证)+ 入库累加 + 幂等去重 + 手工入库 + 查询 全部正确,**无需修复后端**。backlog:台账 upsert 无行锁(并发)、`size=100000`、库房类型抽常量。
+
+---
