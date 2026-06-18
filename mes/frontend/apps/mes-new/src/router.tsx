@@ -31,6 +31,8 @@ import Forbidden from '@/pages/error/Forbidden'
 
 // eslint-disable-next-line react-refresh/only-export-components -- 路由配置模块:lazy() 使本文件被识别为含组件,但其仅导出 router 配置,无 Fast Refresh 边界需求
 const PlanDashboard = lazy(() => import('@/pages/digitization/PlanDashboard'))
+// eslint-disable-next-line react-refresh/only-export-components -- 同上:lazy 路由模块
+const Simulation3DPage = lazy(() => import('@/pages/digitization/simulation/Simulation3DPage'))
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -65,6 +67,14 @@ export const router = createBrowserRouter([
           { path: 'inventory/outbound', element: <OutboundList /> },
           { path: 'inventory/query', element: <InventoryQuery /> },
           { path: 'inventory/manual-inbound', element: <ManualInbound /> },
+          {
+            path: 'digitization/simulation',
+            element: (
+              <Suspense fallback={<div className="p-4 text-muted-foreground">加载 3D 仿真…</div>}>
+                <Simulation3DPage />
+              </Suspense>
+            ),
+          },
           { path: '403', element: <Forbidden /> },
           { path: '*', element: <NotFound /> },
         ],
