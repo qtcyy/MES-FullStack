@@ -31,6 +31,7 @@ import OutboundList from '@/pages/inventory/outbound/OutboundList'
 import InventoryQuery from '@/pages/inventory/query/InventoryQuery'
 import ManualInbound from '@/pages/inventory/manual/ManualInbound'
 import CategoryList from '@/pages/workflow/category/CategoryList'
+import ModelList from '@/pages/workflow/model/ModelList'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
 
@@ -77,6 +78,7 @@ export const router = createBrowserRouter([
           { path: 'inventory/query', element: <InventoryQuery /> },
           { path: 'inventory/manual-inbound', element: <ManualInbound /> },
           { path: 'workflow/category', element: <CategoryList /> },
+          { path: 'workflow/model', element: <ModelList /> },
           {
             path: 'digitization/simulation',
             element: (
