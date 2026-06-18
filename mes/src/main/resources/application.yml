@@ -21,3 +21,8 @@ deepseek:
   api-key: ${DEEPSEEK_API_KEY:}
   base-url: https://api.deepseek.com
   model: deepseek-chat
+
+# 业务自定义配置
+mes:
+  captcha:
+    enabled: true   # 登录图形验证码校验开关;生产保持 true

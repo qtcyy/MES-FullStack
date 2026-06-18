@@ -10,6 +10,7 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 public class SysLoginController {
 
     Logger logger = LoggerFactory.getLogger(SysLoginController.class);
+
+    @Value("${mes.captcha.enabled:true}")
+    private boolean captchaEnabled;
 
 	/**
 	 * 首页默认 - serve React SPA
@@ -72,14 +76,16 @@ public class SysLoginController {
     @PostMapping("/login")
     @ResponseBody
     public Result login(String username, String password, String captcha, String rememberMe, HttpServletRequest request) {
-        //从session中获取随机数
-        String random = (String) request.getSession().getAttribute(RandomVerificationCodeUtil.RANDOM_CODE_KEY);
-        if (StringUtils.isBlank(captcha)) {
-            return Result.failure("请输入验证码");
-        }
-
-        if (!random.equals(captcha)) {
-            return Result.failure("请输入正确的验证码");
+        // dev 可关验证码(mes.captcha.enabled=false,仅 application-dev.yml 覆盖;生产默认 true)
+        if (captchaEnabled) {
+            //从session中获取随机数
+            String random = (String) request.getSession().getAttribute(RandomVerificationCodeUtil.RANDOM_CODE_KEY);
+            if (StringUtils.isBlank(captcha)) {
+                return Result.failure("请输入验证码");
+            }
+            if (random == null || !random.equals(captcha)) {
+                return Result.failure("请输入正确的验证码");
+            }
         }
 
         // TODO loginType 字段用于后期拓展用

@@ -66,3 +66,8 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin
   bucket: mes
+
+# 仅 dev:关闭验证码校验,便于脚本化联调验证(生产 application.yml 默认 true)
+mes:
+  captcha:
+    enabled: false
