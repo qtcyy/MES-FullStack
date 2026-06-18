@@ -93,3 +93,23 @@ preflight:`sp_order_dispatch.dispatch_status` 分布 1→5/2→6/3→8。S1=MK-D
 > 结论:状态机 1→2→3 守卫完整、文案精确、改期保时分秒、actual 部分更新安全,**无需修复后端**。backlog:5 表 JOIN 无索引;时间列用 varchar 存(既有 schema,非本周期)。
 
 ---
+
+## Phase 4 · 2i2 3D 仿真 — ✅ PASS(零 bug)
+
+**数据完整性(决定 3D 是否空白/错位):**
+| 检查 | 结果 |
+|---|---|
+| 库位 warehouse_id 悬空 | `dangling_loc=0` ✓ |
+| 库存 location_id 悬空 | `dangling_inv=0` ✓ |
+| 重复 location_id | 无;`idx_location` UNIQUE(Non_unique=0) ✓ |
+| inventory.warehouse_id 与库位归属一致 | `mismatch=0` ✓ |
+
+**只读端点取数 + 行数对账:**
+- `warehouse/list`:API 3 vs DB 6 → **经查为正确软删除过滤**:DB 6 个中 3 个 `is_deleted=1`(三个 XZH),API 返回 3 个 `is_deleted=0`(电脑配件库/XZHHZX/仓库1)。**非 bug**。
+- 关键:两个有库存的仓库(wh-parts-001、2063239974832054274)**都在 API 返回内** → 所有库存都能落到渲染库区,无孤立/错位。
+- `warehouse/locations/wh-parts-001`:API 8 = DB 8 ✓。
+- `inventory/page size=100000`:API 9 = DB 9 ✓。
+
+> 结论:外键无悬空、一库位一行、仓库列表正确过滤软删除且覆盖全部有库存仓库,**3D 场景数据健康,无需修复**。backlog:warehouse 无分页(规模)。
+
+---
