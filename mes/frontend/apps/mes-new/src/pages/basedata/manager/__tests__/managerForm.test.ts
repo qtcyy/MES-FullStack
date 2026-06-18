@@ -5,7 +5,7 @@ import {
   moveRow,
   type FieldRow,
   type ManagerHeader,
-} from '../managerForm'
+} from '../managerFormUtils'
 
 const header = (over: Partial<ManagerHeader> = {}): ManagerHeader => ({
   tableName: 'product',

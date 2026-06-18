@@ -15,6 +15,7 @@ import DeviceGroupList from '@/pages/basedata/device-group/DeviceGroupList'
 import ProcessUnitList from '@/pages/basedata/process-unit/ProcessUnitList'
 import WarehouseList from '@/pages/basedata/warehouse/WarehouseList'
 import OperList from '@/pages/basedata/oper/OperList'
+import ManagerList from '@/pages/basedata/manager/ManagerList'
 import FlowList from '@/pages/technology/flow/FlowList'
 import ProductBomList from '@/pages/technology/product-bom/ProductBomList'
 import BomFlowList from '@/pages/technology/bom-flow/BomFlowList'
@@ -56,6 +57,7 @@ export const router = createBrowserRouter([
           { path: 'basedata/process-unit', element: <ProcessUnitList /> },
           { path: 'basedata/warehouse', element: <WarehouseList /> },
           { path: 'basedata/oper', element: <OperList /> },
+          { path: 'basedata/manager', element: <ManagerList /> },
           { path: 'technology/flow', element: <FlowList /> },
           { path: 'technology/product-bom', element: <ProductBomList /> },
           { path: 'technology/process-flow', element: <BomFlowList /> },

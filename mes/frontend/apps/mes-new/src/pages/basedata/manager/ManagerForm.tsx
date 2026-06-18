@@ -13,7 +13,7 @@ import {
   validateManagerForm,
   type FieldRow,
   type ManagerHeader,
-} from './managerForm'
+} from './managerFormUtils'
 import type { ManagerUpsertPayload, SpTableManager } from '@/types/manager'
 
 interface Props {
