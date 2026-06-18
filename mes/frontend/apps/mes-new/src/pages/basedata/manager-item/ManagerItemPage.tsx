@@ -79,6 +79,10 @@ export default function ManagerItemPage() {
   const selectTable = (row: SpTableManager) => {
     setSelected(row)
     setDataParams({ current: 1, size: DATA_PAGE_SIZE })
+    // 切表即清瞬态表单态,避免遗留上一张表的编辑上下文
+    setFormOpen(false)
+    setEditing(null)
+    setDeleting(null)
   }
 
   const openCreate = () => {
