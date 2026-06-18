@@ -184,7 +184,7 @@ export default function ManagerForm({ open, onOpenChange, record }: Props) {
                   >
                     <ArrowDown className="size-3.5" />
                   </Button>
-                  <Button type="button" variant="ghost" size="icon-sm" onClick={() => removeRow(r.key)}>
+                  <Button type="button" variant="ghost" size="icon-sm" disabled={rows.length === 1} onClick={() => removeRow(r.key)}>
                     <Trash2 className="size-3.5 text-destructive" />
                   </Button>
                 </div>
