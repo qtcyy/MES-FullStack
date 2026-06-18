@@ -1,0 +1,90 @@
+/* BPMN 设计器外壳主题：跟随 app 的 shadcn/Tailwind token，亮/暗自适应。
+   语义节点配色由 CustomRenderer 负责，这里只管画布外壳与标签/错误态。 */
+
+/* 点阵网格背景 */
+.djs-container {
+  background-color: var(--background);
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* 调色板：卡片化 */
+.djs-palette {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius, 8px) !important;
+  background: var(--card) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+}
+.djs-palette .entry {
+  color: var(--muted-foreground) !important;
+  border-radius: 6px;
+  margin: 2px;
+  transition: background-color 0.12s, color 0.12s;
+}
+.djs-palette .entry:hover {
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+.djs-palette .separator {
+  border-bottom: 1px solid var(--border) !important;
+  margin: 4px 6px !important;
+}
+
+/* 上下文菜单：卡片化 */
+.djs-context-pad .entry {
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  background: var(--card) !important;
+  color: var(--muted-foreground) !important;
+  border: 1px solid var(--border) !important;
+}
+.djs-context-pad .entry:hover {
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+/* 选中 / hover 态 */
+.djs-element.selected .djs-outline {
+  stroke: var(--primary) !important;
+  stroke-width: 2px !important;
+}
+.djs-element.hover .djs-outline {
+  stroke: var(--ring) !important;
+}
+
+/* 暗色画布下标签文字提亮（语义填充为半透明，需保证对比度） */
+.dark .djs-label,
+.dark text.djs-label,
+.dark .djs-element text {
+  fill: #e6e9ef;
+}
+
+/* 检查定义未通过：问题节点红色描边 + 脉冲 */
+.djs-element.bpmn-error .djs-visual > :nth-child(1) {
+  stroke: #e11d48 !important;
+  stroke-width: 2.5px !important;
+}
+.djs-element.bpmn-error {
+  animation: bpmn-error-pulse 1.1s ease-in-out infinite;
+}
+@keyframes bpmn-error-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* 小地图 chrome 卡片化 */
+.djs-minimap {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius, 8px) !important;
+  background: var(--card) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden;
+}
+.djs-minimap .toggle {
+  background: var(--muted) !important;
+  color: var(--muted-foreground) !important;
+}
+.djs-minimap .map {
+  background: var(--background) !important;
+}

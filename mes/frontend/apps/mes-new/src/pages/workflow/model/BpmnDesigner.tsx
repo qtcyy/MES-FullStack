@@ -1,8 +1,11 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import Modeler from 'bpmn-js/lib/Modeler'
+import minimapModule from 'diagram-js-minimap'
 import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
+import 'diagram-js-minimap/assets/diagram-js-minimap.css'
+import './bpmn-theme.css'
 import flowableModdle from './flowableModdle'
 import type { BpmnSummary, UserTaskSummary } from './bpmnUtils'
 
@@ -88,6 +91,7 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
     if (!containerRef.current) return
     const modeler = new Modeler({
       container: containerRef.current,
+      additionalModules: [minimapModule],
       moddleExtensions: { flowable: flowableModdle },
     })
     modelerRef.current = modeler
@@ -111,6 +115,8 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
       .then(() => {
         const canvas = modeler.get<{ zoom: (m: string) => void }>('canvas')
         canvas.zoom('fit-viewport')
+        const minimap = modeler.get<{ close: () => void }>('minimap')
+        minimap.close()
       })
       .catch((err) => {
         console.error('[BpmnDesigner] importXML 失败', err)

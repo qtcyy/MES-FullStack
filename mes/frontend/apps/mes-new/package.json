@@ -21,6 +21,7 @@
     "@workspace/ui": "workspace:*",
     "@workspace/utils": "workspace:*",
     "bpmn-js": "^18.18.0",
+    "diagram-js-minimap": "^5.3.0",
     "echarts": "^6.1.0",
     "lucide-react": "^0.475.0",
     "next-themes": "^0.4.6",
