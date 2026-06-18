@@ -28,7 +28,7 @@
 
 ### 1.3 修复深度(用户决策)
 
-**只修真实暴露的正确性/契约 bug**(契约不一致、状态机错、数据错位、缺事务、FIFO 缺实现、硬编码与真实数据对不上等);latent 规模/并发隐患记 backlog。符合"业务收官·轻量·最小必要改后端"+「每周期审查涉及后端」约定。
+**只修真实暴露的正确性/契约 bug**(契约不一致、状态机错、数据错位、缺事务、硬编码与真实数据对不上等);latent 规模/并发隐患记 backlog。符合"业务收官·轻量·最小必要改后端"+「每周期审查涉及后端」约定。
 
 ---
 
@@ -97,8 +97,8 @@ cd mes/frontend && pnpm dev
 
 - 端点:`/inventory/receipt/page`、`/receipt/{id}/items`、`/receipt/item/post`(JSON)、`/outbound/page`、`/outbound/{id}/items`、`/outbound/item/post`(JSON)、`/inventory/page`、`/manual-inbound`(JSON)。
 - **必验/必修(正确性):**
-  - **库房类型硬编码 `'零件库'` vs 真实 `sp_warehouse.type`**:`postItem`/`manualInbound` 要求 `wh.getType().equals('零件库')`;MySQL 直查真实库房 type,**对不上则入库全废 → 修(对齐真实值或放宽)**。
-  - **出库 FIFO**:`SpOutboundOrderServiceImpl.postOutboundItem` 方法名暗示 FIFO 但疑无排序实现 —— 读码核实,真缺则补 FIFO 排序(正确性)。
+  - **库房类型 `'零件库'`(契约抽取确认 by-design,非 bug)**:`postItem`/`manualInbound` 要求 `wh.getType().equals('零件库')`,前端亦同;MySQL 直查真实库房 type **验证确有 `'零件库'`**(否则入库无法登账);抽常量记 backlog。
+  - **出库 FIFO(契约抽取实证已正确实现,验证非修复)**:`SpOutboundOrderServiceImpl.postOutboundItem:51-122` 按 `last_inbound_time asc, create_time asc`(`:65-70`)排序逐行扣减 —— 跑一单确认 `allocation_detail` 体现最早批次先扣。
   - 入库登账 → `sp_inventory` 落库(数量累加正确)。
   - 库位混放校验脏数据边界(库位曾存 A(qty=0)删后再入 B)。
   - item 生命周期重试去重(inventory insert 失败但 item 已 posted 再重试不产生重复)。
@@ -175,8 +175,8 @@ cd mes/frontend && pnpm dev
 | 2j | 明细 id 强制重置往返丢数据 | **验**(确认不丢) |
 | 2j | 字段白名单/注入(Layer 2 范畴) | backlog(2j-2) |
 | 2j | 无乐观锁 | backlog(并发) |
-| 2h | 库房类型硬编码 '零件库' vs 真实数据 | **修**(契约/数据) |
-| 2h | 出库 FIFO 疑缺排序实现 | **修**(正确性) |
+| 2h | 库房类型 '零件库'(by-design)vs 真实数据 | **验**(确有该值)+ 抽常量 backlog |
+| 2h | 出库 FIFO(契约抽取实证已正确实现) | **验**(非修复) |
 | 2h | 库位混放脏数据边界 | **验/修** |
 | 2h | item 生命周期重试重复 | **验/修** |
 | 2h | 台账 upsert 无行锁 | backlog(并发) |
