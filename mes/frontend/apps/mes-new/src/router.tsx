@@ -20,6 +20,7 @@ import FlowList from '@/pages/technology/flow/FlowList'
 import ProductBomList from '@/pages/technology/product-bom/ProductBomList'
 import BomFlowList from '@/pages/technology/bom-flow/BomFlowList'
 import ProcessContentList from '@/pages/technology/process-content/ProcessContentList'
+import ProcessQueryPage from '@/pages/technology/process-query/ProcessQueryPage'
 import OrderList from '@/pages/order/production/OrderList'
 import DispatchList from '@/pages/order/dispatch/DispatchList'
 import GanttPage from '@/pages/order/gantt/GanttPage'
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
           { path: 'technology/product-bom', element: <ProductBomList /> },
           { path: 'technology/process-flow', element: <BomFlowList /> },
           { path: 'technology/process-content', element: <ProcessContentList /> },
+          { path: 'technology/process-query', element: <ProcessQueryPage /> },
           { path: 'order/production', element: <OrderList /> },
           { path: 'order/dispatch', element: <DispatchList /> },
           { path: 'order/gantt', element: <GanttPage /> },

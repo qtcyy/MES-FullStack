@@ -113,3 +113,20 @@ preflight:`sp_order_dispatch.dispatch_status` 分布 1→5/2→6/3→8。S1=MK-D
 > 结论:外键无悬空、一库位一行、仓库列表正确过滤软删除且覆盖全部有库存仓库,**3D 场景数据健康,无需修复**。backlog:warehouse 无分页(规模)。
 
 ---
+
+## Phase 5 · 工艺查询只读页 process-query — ✅ 构建+脚本 PASS(人工待确认)
+
+**前端构建:** 新建 `pages/technology/process-query/ProcessQueryPage.tsx`(纯只读:产品 Select → BOM 树 → 只读 Tabs[主信息/要求/检验/注意/设备/文档/物料]+图片,无任何写入口),复用 `MasterDetailLayout`/`TreeDataTable`/`DataTable`/`MultiImageUpload(disabled)`/`useQuery$`。注册路由三处:`router.tsx`(`technology/process-query`)+ `routeMeta.ts`(`产品工艺查询`)+ 菜单 116 已存在(零 SQL)。
+验证:`check-types` 0 错、`lint` 0 error(21 既有警告)、`build` ✓。
+
+**4 只读端点脚本验证:**
+- `products`:`{"code":0}` 产品列表(台式电脑主机v2 等)。
+- `list/{rootId}`:`{"code":0}` 节点数组(bomNode+content)。
+- `get/{bomId}`:`{"code":0}` ProcessContentDetailVO(content+equipment+documents+imageUrls)。
+- `bom-items/{bomId}`:`{"code":0}`(该节点 `[]`,数据相关非 bug)。
+
+**⚠️ 跨周期发现(2f 图片数据,记 backlog,非 2k 范围、非 process-query bug):** `get` 返回的 `contentImageUrls` 对**遗留记录**双重签名 —— `sp_process_content.content_images` 存在两种历史格式:① 完整预签名 MinIO URL(如 bom 6c68d770,2f 改存 key 前的遗留)→ 重签二次包裹成 `http://…/mes/http%3A/…`;② `/technology/process-content/image/xxx.jpg` 相对路径。均非裸对象 key。**影响**:编制页 process-content 与查询页 process-query 同源显示这些遗留图会坏。**处置**:属 2f 图片管线/数据迁移,不在 2k 四周期范围且 process-query 零后端改动 → 记 2f-backlog,向用户 flag;新上传走 key 不受影响。
+
+> 结论:process-query 页构建通过、端点契约正确、只读形态完整;遗留图片显示问题归 2f-backlog。**人工抽查(侧边栏进入 + 点选浏览)待用户确认。**
+
+---
