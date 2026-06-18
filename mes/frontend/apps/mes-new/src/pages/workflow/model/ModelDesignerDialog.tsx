@@ -94,7 +94,9 @@ export default function ModelDesignerDialog({ open, onOpenChange, modelId }: Mod
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[90vh] max-w-[95vw] flex-col gap-0 p-0">
+      <DialogContent
+        className="flex h-[85vh] max-h-[96vh] min-h-[420px] w-[90vw] min-w-[520px] max-w-[98vw] resize flex-col gap-0 overflow-hidden p-0 sm:max-w-[98vw]"
+      >
         <DialogHeader className="flex flex-row items-center justify-between border-b px-4 py-3">
           <DialogTitle className="text-base">
             流程模型设计{modelMeta ? ` — ${modelMeta.name}` : ''}
