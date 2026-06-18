@@ -24,3 +24,8 @@ export function warehouseDelete(id: string) {
 export function warehouseLocations(warehouseId: string) {
   return http.get<SpWarehouseLocation[]>(`/basedata/warehouse/locations/${warehouseId}`)
 }
+
+/** 取全部仓库(后端 GET /basedata/warehouse/list 已存在) */
+export function warehouseList() {
+  return http.get<SpWarehouse[]>('/basedata/warehouse/list')
+}
