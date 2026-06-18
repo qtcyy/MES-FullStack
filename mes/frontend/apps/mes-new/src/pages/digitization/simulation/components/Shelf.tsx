@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useLoader, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { heatColor } from '../heatColor'
@@ -45,10 +45,19 @@ function CargoBox({
   const [hovered, setHovered] = useState(false)
   const clickable = locationId !== null
 
+  // 悬停态卸载兜底:若货物盒在 hover 中被卸载(数据刷新/重排),onPointerOut 可能不触发,
+  // 这里在卸载或 hover 结束时复位光标,避免指针卡在 pointer。
+  useEffect(() => {
+    if (!hovered) return
+    return () => {
+      document.body.style.cursor = 'auto'
+    }
+  }, [hovered])
+
   return (
     <mesh
       position={position}
-      name={locationId ? `货物$${locationId}` : '货位'}
+      name={locationId ? `货物${locationId}` : '货位'}
       scale={hovered ? 1.18 : 1}
       castShadow
       onPointerOver={
