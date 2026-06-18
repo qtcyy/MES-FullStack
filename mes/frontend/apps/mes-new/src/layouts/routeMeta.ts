@@ -28,6 +28,9 @@ export const ROUTE_META: Record<string, { title: string; icon?: string }> = {
   '/order/production': { title: '生产订单', icon: 'schedule' },
   '/order/dispatch': { title: '作业派工', icon: 'team' },
   '/order/gantt': { title: '生产甘特图', icon: 'schedule' },
+  // 流程配置工具
+  '/workflow/category': { title: '流程分类管理', icon: 'apartment' },
+  '/workflow/model': { title: '流程模型设计', icon: 'branches' },
 }
 
 /** 在菜单树中按 SPA 路由反查菜单名(用于 ROUTE_META 未登记的路由兜底) */

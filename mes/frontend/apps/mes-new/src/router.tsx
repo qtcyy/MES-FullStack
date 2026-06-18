@@ -30,6 +30,7 @@ import ReceiptList from '@/pages/inventory/receipt/ReceiptList'
 import OutboundList from '@/pages/inventory/outbound/OutboundList'
 import InventoryQuery from '@/pages/inventory/query/InventoryQuery'
 import ManualInbound from '@/pages/inventory/manual/ManualInbound'
+import CategoryList from '@/pages/workflow/category/CategoryList'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
 
@@ -75,6 +76,7 @@ export const router = createBrowserRouter([
           { path: 'inventory/outbound', element: <OutboundList /> },
           { path: 'inventory/query', element: <InventoryQuery /> },
           { path: 'inventory/manual-inbound', element: <ManualInbound /> },
+          { path: 'workflow/category', element: <CategoryList /> },
           {
             path: 'digitization/simulation',
             element: (

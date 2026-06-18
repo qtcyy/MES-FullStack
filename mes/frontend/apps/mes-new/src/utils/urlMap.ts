@@ -23,6 +23,8 @@ const URL_MAP: Record<string, string> = {
   '/order/release/list-ui': '/order/production',
   '/digitization/plan/plan-ui': '/digitization/plan',
   '/digital/simulation/list-ui': '/digitization/simulation',
+  '/workflow/category/list-ui': '/workflow/category',
+  '/workflow/model/list-ui': '/workflow/model',
 }
 
 /** 转换后端 url 为 SPA 路由;不可导航(#、空、javascript:)返回 undefined */
