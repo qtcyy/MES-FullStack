@@ -10,6 +10,7 @@ export const ROUTE_META: Record<string, { title: string; icon?: string }> = {
   '/system/menu': { title: '菜单管理', icon: 'menu' },
   '/system/dict': { title: '字典管理', icon: 'database' },
   '/system/department': { title: '部门管理', icon: 'apartment' },
+  '/system/team': { title: '班组员工定义', icon: 'team' },
   // 基础数据
   '/basedata/component': { title: '元器件管理', icon: 'block' },
   '/basedata/materile': { title: '物料管理', icon: 'gold' },

@@ -9,6 +9,7 @@ import RoleList from '@/pages/system/role/RoleList'
 import MenuList from '@/pages/system/menu/MenuList'
 import DictList from '@/pages/system/dict/DictList'
 import DeptList from '@/pages/system/dept/DeptList'
+import TeamPage from '@/pages/system/team/TeamPage'
 import ComponentList from '@/pages/basedata/component/ComponentList'
 import MaterileList from '@/pages/basedata/materile/MaterileList'
 import DeviceGroupList from '@/pages/basedata/device-group/DeviceGroupList'
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
           { path: 'system/menu', element: <MenuList /> },
           { path: 'system/dict', element: <DictList /> },
           { path: 'system/department', element: <DeptList /> },
+          { path: 'system/team', element: <TeamPage /> },
           { path: 'basedata/component', element: <ComponentList /> },
           { path: 'basedata/materile', element: <MaterileList /> },
           { path: 'basedata/device-group', element: <DeviceGroupList /> },
