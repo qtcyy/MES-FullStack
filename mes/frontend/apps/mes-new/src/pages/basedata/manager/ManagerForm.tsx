@@ -10,6 +10,7 @@ import { managerAddOrUpdate, managerItems } from '@/api/basedata/manager'
 import {
   buildUpsertPayload,
   moveRow,
+  parseMustFill,
   validateManagerForm,
   type FieldRow,
   type ManagerHeader,
@@ -54,7 +55,7 @@ export default function ManagerForm({ open, onOpenChange, record }: Props) {
               key: newKey(),
               field: it.field ?? '',
               fieldDesc: it.fieldDesc ?? '',
-              mustFill: it.mustFill === '1',
+              mustFill: parseMustFill(it.mustFill),
             })),
           )
         })

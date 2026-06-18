@@ -20,6 +20,11 @@ export interface ValidationResult {
   errors: string[]
 }
 
+/** 解析后端 must_fill(varchar(1)):支持新编码 "1" 与遗留 "Y"/"y";其余(含 "0"/空/undefined)为非必填 */
+export function parseMustFill(raw: string | undefined): boolean {
+  return raw === '1' || (raw ?? '').toUpperCase() === 'Y'
+}
+
 /** 提交前校验:表名必填、至少 1 字段、每行字段名/显示名非空、字段名不重复(忽略大小写) */
 export function validateManagerForm(header: ManagerHeader, rows: FieldRow[]): ValidationResult {
   const errors: string[] = []

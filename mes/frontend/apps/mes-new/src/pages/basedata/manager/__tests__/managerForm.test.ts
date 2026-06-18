@@ -3,6 +3,7 @@ import {
   validateManagerForm,
   buildUpsertPayload,
   moveRow,
+  parseMustFill,
   type FieldRow,
   type ManagerHeader,
 } from '../managerFormUtils'
@@ -96,4 +97,13 @@ describe('buildUpsertPayload', () => {
     const p = buildUpsertPayload(header(), reordered)
     expect(p.spTableManagerItems.map((it) => [it.field, it.sortNum])).toEqual([['b', 1], ['a', 2]])
   })
+})
+
+describe('parseMustFill', () => {
+  it("'1' → true", () => { expect(parseMustFill('1')).toBe(true) })
+  it("'0' → false", () => { expect(parseMustFill('0')).toBe(false) })
+  it("遗留 'Y' → true", () => { expect(parseMustFill('Y')).toBe(true) })
+  it("遗留小写 'y' → true", () => { expect(parseMustFill('y')).toBe(true) })
+  it("空串 → false", () => { expect(parseMustFill('')).toBe(false) })
+  it("undefined → false", () => { expect(parseMustFill(undefined)).toBe(false) })
 })
