@@ -26,17 +26,20 @@ bpmn-js 将节点的 `fill`/`stroke` 以 inline SVG 属性渲染，纯 CSS 无�
 
 ## 3. 配色风格
 
-采用**专业流程图语义化配色**（参考 Camunda/Flowable 语义），而非单纯跟随 app 主题：
+采用**专业流程图语义化配色 · 方向 A「语义鲜明（填充色）」**（参考 Camunda/Flowable 语义；经视觉伴侣对比后用户选定，对比方案 B「极简描边」未采用）。每类节点用淡彩填充 + 同色描边，类别一眼可辨。
 
-| 节点类型 | stroke | fill | 说明 |
+确切色值（亮色 / 暗色两套，暗色用较亮色阶 + 半透明填充保证对比度）：
+
+| 节点类型 | 亮色 stroke / fill | 暗色 stroke / fill | 说明 |
 |---|---|---|---|
-| StartEvent | emerald 600 / 暗色 400 | emerald 50 / 暗色半透明 | 开始绿 |
-| EndEvent | rose 600 / 暗色 400 | rose 50 / 暗色半透明 | 结束红 |
-| UserTask / Task | primary（`--primary`） | 任务浅蓝 / `--card` | 任务蓝 |
-| Gateway | amber 500 | amber 50 | 网关琥珀 |
-| SequenceFlow | 中性灰（`--muted-foreground`） | — | 连线中性 |
+| StartEvent | `#059669` / `#d1fae5` | `#34d399` / `rgba(16,185,129,.18)` | 开始绿 |
+| UserTask / Task | `#2563eb` / `#dbeafe` | `#60a5fa` / `rgba(59,130,246,.20)` | 任务蓝 |
+| Gateway | `#d97706` / `#fef3c7` | `#fbbf24` / `rgba(245,158,11,.18)` | 网关琥珀 |
+| EndEvent | `#e11d48` / `#ffe4e6` | `#fb7185` / `rgba(244,63,94,.18)` | 结束红（描边加粗） |
+| SequenceFlow | `#64748b`（描边） | `#7c8699`（描边） | 连线中性灰 |
+| 文字 label | `#1e293b` | `#e6e9ef` | — |
 
-画布外壳（调色板/面板/工具栏/小地图）走 app 主题 token（`--card` `--border` `--primary` `--ring` `--accent` `--muted-foreground`），自动适配亮/暗/自定义三套主题。语义节点色在暗色下用对应色阶的较亮值 + 半透明填充，保证对比度。
+实现取色：CustomRenderer 内定义上述常量映射表（亮/暗两套），运行时根据 `document.documentElement` 当前主题类（light/dark）选择。画布外壳（调色板/面板/工具栏/小地图/网格）走 app 主题 token（`--card` `--border` `--primary` `--ring` `--accent` `--muted-foreground`），自动适配亮/暗/自定义三套主题。
 
 ## 4. 模块设计
 
