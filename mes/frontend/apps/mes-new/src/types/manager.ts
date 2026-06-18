@@ -21,15 +21,10 @@ export interface SpTableManagerItem {
   sortNum: number
 }
 
-/** 字段明细提交体(剥离 id) */
-export interface ManagerItemPayload {
-  field: string
-  fieldDesc: string
-  mustFill: string
-  sortNum: number
-}
+/** 字段明细提交体(从 SpTableManagerItem 剥离 id / tableNameId,避免双重维护漂移) */
+export type ManagerItemPayload = Omit<SpTableManagerItem, 'id' | 'tableNameId'>
 
-/** add-or-update 整体提交体(JSON) */
+/** add-or-update 整体提交体(JSON);写模型:tableDesc/permission 须为字符串(允许空串),后端可存 null */
 export interface ManagerUpsertPayload {
   id?: string
   tableName: string
