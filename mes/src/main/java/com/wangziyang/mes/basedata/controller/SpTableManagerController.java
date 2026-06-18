@@ -18,7 +18,6 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -100,7 +99,7 @@ public class SpTableManagerController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     public Result page(SpTableManagerReq req) {
-        IPage result = iSpTableManagerService.page(req);
+        IPage result = iSpTableManagerService.pageList(req);
         return Result.success(result);
     }
 
@@ -129,25 +128,10 @@ public class SpTableManagerController extends BaseController {
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(@RequestBody SpTableManagerDto record) {
-        //分解DTO 转化实体类
-        SpTableManager spTableManager = new SpTableManager();
-        BeanUtils.copyProperties(record, spTableManager);
-        List<SpTableManagerItem> spTableManagerItems = record.getSpTableManagerItems();
-        if (CollectionUtil.isEmpty(spTableManagerItems)) {
-            Result.failure("显示的，详细的字段不可以为空");
-        } else {
-            iSpTableManagerService.saveOrUpdate(spTableManager);
-            //先删除已有的数据，然后插入
-            if (StringUtils.isNotEmpty(record.getId())) {
-                iSpTableManagerItemService.deleteItemBytableNameId(record.getId());
-            } else {
-                for (SpTableManagerItem spTableManagerItem : spTableManagerItems) {
-                    spTableManagerItem.setTableNameId(spTableManager.getId());
-                }
-            }
-            iSpTableManagerItemService.saveOrUpdateBatch(spTableManagerItems);
+        if (CollectionUtil.isEmpty(record.getSpTableManagerItems())) {
+            return Result.failure("显示的，详细的字段不可以为空");
         }
-        return Result.success(record.getId());
+        return Result.success(iSpTableManagerService.saveOrUpdateWithItems(record));
     }
 
     /**
