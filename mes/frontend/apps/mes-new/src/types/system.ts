@@ -1,4 +1,6 @@
 // apps/mes-new/src/types/system.ts
+import type { SpTeam } from './process-unit'
+import type { SysUser } from './user'
 
 export interface SysRole {
   id: string
@@ -42,4 +44,12 @@ export interface SysDepartment {
   createUsername?: string
   updateTime?: string
   updateUsername?: string
+}
+
+/** 班组分页 DTO:在 SpTeam 基础上带关联展示字段(userList 仅 detail 接口返回) */
+export interface SpTeamDTO extends SpTeam {
+  lineName?: string
+  workshopName?: string
+  userCount?: number
+  userList?: SysUser[]
 }
