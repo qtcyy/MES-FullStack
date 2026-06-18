@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import Modeler from 'bpmn-js/lib/Modeler'
 import minimapModule from 'diagram-js-minimap'
+import { customRendererModule } from './CustomRenderer'
 import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
@@ -91,7 +92,7 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
     if (!containerRef.current) return
     const modeler = new Modeler({
       container: containerRef.current,
-      additionalModules: [minimapModule],
+      additionalModules: [minimapModule, customRendererModule],
       moddleExtensions: { flowable: flowableModdle },
     })
     modelerRef.current = modeler
