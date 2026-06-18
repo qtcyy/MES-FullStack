@@ -23,11 +23,13 @@ export default defineConfig([
       //   - set-state-in-effect:挂载守卫与数据拉取副作用(ThemeSwitch、useQuery$)
       //   - static-components:运行时按菜单 icon 选取组件(getIcon,见 AppSidebar)
       //   - incompatible-library:react-hook-form 的 watch() 固有,无法被编译器记忆化
+      //   - immutability:Three.js useLoader() 返回值需就地改写 wrapS/wrapT 是 R3F 标准用法
       // 降为 warn 以保留可见性,同时不阻塞构建/门禁。rules-of-hooks 等核心规则仍为 error。
       'react-hooks/refs': 'warn',
       'react-hooks/set-state-in-effect': 'warn',
       'react-hooks/static-components': 'warn',
       'react-hooks/incompatible-library': 'warn',
+      'react-hooks/immutability': 'warn',
     },
   },
 ])
