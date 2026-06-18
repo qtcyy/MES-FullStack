@@ -68,3 +68,28 @@ preflight:`sp_warehouse` 有 5 个 `'零件库'` + 1 产品库 → 硬编码 `'�
 > 结论:FIFO(契约抽取已实证)+ 入库累加 + 幂等去重 + 手工入库 + 查询 全部正确,**无需修复后端**。backlog:台账 upsert 无行锁(并发)、`size=100000`、库房类型抽常量。
 
 ---
+
+## Phase 3 · 2g3 生产甘特 — ✅ PASS(零 bug)
+
+preflight:`sp_order_dispatch.dispatch_status` 分布 1→5/2→6/3→8。S1=MK-DSP-0103、S2=MK-DSP-0102、S3=MK-DSP-0101。
+
+**tasks 查询**(空参):`{"code":0}`,返回 **19** 条派工任务(订单×工序×班组×作业员)→ form 空参不静默空。
+
+**状态机守卫 — 非法转移全部被拒(状态未被篡改):**
+| 用例 | 结果 |
+|---|---|
+| start on S3(已完工) | `{"code":1,"msg":"仅已派工任务可记录开工"}` ✓ |
+| finish on S1(已派工) | `{"code":1,"msg":"仅已开工任务可记录完工"}` ✓ |
+| reschedule on S3(已完工) | `{"code":1,"msg":"任务已完工,不可改期"}` ✓ |
+| progress on S1(已派工) | `{"code":1,"msg":"仅已开工任务可更新进度"}` ✓ |
+
+非法操作后 SQL 复查:S1 仍=1、S3 仍=3(未被篡改)。
+
+**合法转移生效:**
+- start on S1(MK-DSP-0103)→ `{"code":0}`,`dispatch_status=2`,`actual_start_time=2026-06-18 09:00:00`。
+- reschedule on S2(MK-DSP-0102)带时分秒 → `{"code":0}`;DB `plan_start_time=2026-06-19 08:30:00`、`plan_end_time=2026-06-21 17:45:00` → **时分秒完整保留**(列为 varchar(255) 存 datetime 串)。
+- actual on S2 仅传 start → `{"code":0}`;`actual_start_time` 2026-06-15→2026-06-18 10:00:00,`actual_end_time` 保持 NULL(**部分更新不清空另一字段**)。
+
+> 结论:状态机 1→2→3 守卫完整、文案精确、改期保时分秒、actual 部分更新安全,**无需修复后端**。backlog:5 表 JOIN 无索引;时间列用 varchar 存(既有 schema,非本周期)。
+
+---
