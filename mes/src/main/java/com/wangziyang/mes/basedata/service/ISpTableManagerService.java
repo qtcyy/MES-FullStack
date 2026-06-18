@@ -42,4 +42,12 @@ public interface ISpTableManagerService extends IService<SpTableManager> {
      * @return 表头 id
      */
     String saveOrUpdateWithItems(SpTableManagerDto dto);
+
+    /**
+     * 级联删除表头 + 字段明细(事务):保证两次删除原子性,
+     * 避免删头成功、删明细失败产生孤儿明细。
+     *
+     * @param id 表头 id
+     */
+    void removeWithItems(String id);
 }

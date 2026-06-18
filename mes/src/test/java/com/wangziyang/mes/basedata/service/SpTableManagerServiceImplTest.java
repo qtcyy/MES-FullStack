@@ -7,6 +7,7 @@ import com.wangziyang.mes.basedata.mapper.SpTableManagerMapper;
 import com.wangziyang.mes.basedata.service.impl.SpTableManagerServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -21,6 +22,8 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -95,5 +98,16 @@ public class SpTableManagerServiceImplTest {
         verify(iSpTableManagerItemService).deleteItemBytableNameId("mgr-9");
         verify(iSpTableManagerItemService).saveOrUpdateBatch(anyList());
         assertEquals("mgr-9", items.get(0).getTableNameId());
+    }
+
+    @Test
+    public void removeWithItems_deletes_header_then_items_in_order() {
+        doReturn(true).when(service).removeById("mgr-7");
+
+        service.removeWithItems("mgr-7");
+
+        InOrder order = inOrder(service, iSpTableManagerItemService);
+        order.verify(service).removeById("mgr-7");
+        order.verify(iSpTableManagerItemService).deleteItemBytableNameId("mgr-7");
     }
 }

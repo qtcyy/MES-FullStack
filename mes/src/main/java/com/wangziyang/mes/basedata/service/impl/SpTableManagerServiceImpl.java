@@ -99,4 +99,15 @@ public class SpTableManagerServiceImpl extends ServiceImpl<SpTableManagerMapper,
         iSpTableManagerItemService.saveOrUpdateBatch(items);
         return header.getId();
     }
+
+    /**
+     * 级联删除表头 + 字段明细(事务)。修复原 controller deleteByTableNameId 无事务缺陷:
+     * removeById(header) 与 deleteItemBytableNameId(items) 两次写无原子性,中途异常致孤儿明细。
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeWithItems(String id) {
+        this.removeById(id);
+        iSpTableManagerItemService.deleteItemBytableNameId(id);
+    }
 }

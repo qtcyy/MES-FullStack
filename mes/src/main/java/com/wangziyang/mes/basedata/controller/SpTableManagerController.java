@@ -7,7 +7,6 @@ import com.wangziyang.mes.basedata.dto.SpTableManagerDto;
 import com.wangziyang.mes.basedata.entity.SpTableManager;
 import com.wangziyang.mes.basedata.entity.SpTableManagerItem;
 import com.wangziyang.mes.basedata.request.SpTableManagerReq;
-import com.wangziyang.mes.basedata.service.ISpTableManagerItemService;
 import com.wangziyang.mes.basedata.service.ISpTableManagerService;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
@@ -42,11 +41,6 @@ public class SpTableManagerController extends BaseController {
      */
     @Autowired
     public ISpTableManagerService iSpTableManagerService;
-    /**
-     * 字段明细表
-     */
-    @Autowired
-    public ISpTableManagerItemService iSpTableManagerItemService;
     Logger log = LoggerFactory.getLogger(SpTableManagerController.class);
 
     /**
@@ -144,9 +138,8 @@ public class SpTableManagerController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "req", value = "表信息", defaultValue = "表信息")})
     @PostMapping("delete/by/tableNameId")
     @ResponseBody
-    public Result deleteByTableNameId(SpTableManager req) throws Exception {
-        iSpTableManagerService.removeById(req.getId());
-        iSpTableManagerItemService.deleteItemBytableNameId(req.getId());
+    public Result deleteByTableNameId(SpTableManager req) {
+        iSpTableManagerService.removeWithItems(req.getId());
         return Result.success();
     }
 }
