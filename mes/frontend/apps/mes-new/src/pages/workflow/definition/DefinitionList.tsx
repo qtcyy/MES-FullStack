@@ -83,7 +83,7 @@ export default function DefinitionList() {
         ),
       },
     ],
-    // onToggle 用到的 mutate 引用稳定,空依赖可接受(对齐 CategoryList 列定义风格)
+    // 列定义引用 onToggle(每次渲染重建,但内部仅用稳定的 mutate/setState);空依赖即可,显式禁用 exhaustive-deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
