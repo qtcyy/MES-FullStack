@@ -203,7 +203,7 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
     if (!canvas) return
     canvas.zoom(canvas.zoom() * factor)
   }
-  const fit = () => getCanvas()?.zoom('fit-viewport', 'auto')
+  const fit = () => getCanvas()?.zoom('fit-viewport')
   const reset = () => getCanvas()?.zoom(1)
   const undo = () => getStack()?.undo()
   const redo = () => getStack()?.redo()
