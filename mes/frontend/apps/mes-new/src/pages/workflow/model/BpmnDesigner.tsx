@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import Modeler from 'bpmn-js/lib/Modeler'
 import minimapModule from 'diagram-js-minimap'
 import { customRendererModule } from './CustomRenderer'
@@ -7,6 +7,8 @@ import 'bpmn-js/dist/assets/bpmn-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
 import 'diagram-js-minimap/assets/diagram-js-minimap.css'
 import './bpmn-theme.css'
+import { Button } from '@workspace/ui'
+import { ZoomIn, ZoomOut, Maximize, RotateCcw, Undo2, Redo2 } from 'lucide-react'
 import flowableModdle from './flowableModdle'
 import type { BpmnSummary, UserTaskSummary } from './bpmnUtils'
 
@@ -88,6 +90,10 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
   const onSelectRef = useRef(onSelect)
   onSelectRef.current = onSelect
 
+  const [zoom, setZoom] = useState(1)
+  const [canUndo, setCanUndo] = useState(false)
+  const [canRedo, setCanRedo] = useState(false)
+
   useEffect(() => {
     if (!containerRef.current) return
     const modeler = new Modeler({
@@ -109,6 +115,15 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
         currentRef.current = changed
         onSelectRef.current(toSelected(changed))
       }
+    })
+    modeler.on('canvas.viewbox.changed', (e: unknown) => {
+      const scale = (e as { viewbox: { scale: number } }).viewbox?.scale
+      if (typeof scale === 'number') setZoom(scale)
+    })
+    modeler.on('commandStack.changed', () => {
+      const cs = modeler.get<{ canUndo: () => boolean; canRedo: () => boolean }>('commandStack')
+      setCanUndo(cs.canUndo())
+      setCanRedo(cs.canRedo())
     })
 
     modeler
@@ -178,7 +193,51 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
     },
   }))
 
-  return <div ref={containerRef} className="h-full w-full" />
+  const getCanvas = () =>
+    modelerRef.current?.get<{ zoom: (s?: number | string, c?: string) => number }>('canvas')
+  const getStack = () =>
+    modelerRef.current?.get<{ undo: () => void; redo: () => void }>('commandStack')
+
+  const zoomBy = (factor: number) => {
+    const canvas = getCanvas()
+    if (!canvas) return
+    canvas.zoom(canvas.zoom() * factor)
+  }
+  const fit = () => getCanvas()?.zoom('fit-viewport', 'auto')
+  const reset = () => getCanvas()?.zoom(1)
+  const undo = () => getStack()?.undo()
+  const redo = () => getStack()?.redo()
+
+  return (
+    <div className="relative h-full w-full">
+      <div ref={containerRef} className="h-full w-full" />
+      <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-lg border bg-card/95 px-1.5 py-1 shadow-md backdrop-blur">
+        <Button variant="ghost" size="icon-sm" title="缩小" onClick={() => zoomBy(1 / 1.2)}>
+          <ZoomOut className="size-4" />
+        </Button>
+        <span className="w-12 text-center text-xs tabular-nums text-muted-foreground">
+          {Math.round(zoom * 100)}%
+        </span>
+        <Button variant="ghost" size="icon-sm" title="放大" onClick={() => zoomBy(1.2)}>
+          <ZoomIn className="size-4" />
+        </Button>
+        <div className="mx-1 h-5 w-px bg-border" />
+        <Button variant="ghost" size="icon-sm" title="适应窗口" onClick={fit}>
+          <Maximize className="size-4" />
+        </Button>
+        <Button variant="ghost" size="icon-sm" title="实际大小(100%)" onClick={reset}>
+          <RotateCcw className="size-4" />
+        </Button>
+        <div className="mx-1 h-5 w-px bg-border" />
+        <Button variant="ghost" size="icon-sm" title="撤销" disabled={!canUndo} onClick={undo}>
+          <Undo2 className="size-4" />
+        </Button>
+        <Button variant="ghost" size="icon-sm" title="重做" disabled={!canRedo} onClick={redo}>
+          <Redo2 className="size-4" />
+        </Button>
+      </div>
+    </div>
+  )
 })
 
 export default BpmnDesigner
