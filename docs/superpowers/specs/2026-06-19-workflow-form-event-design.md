@@ -60,9 +60,9 @@ PPT 要求：在「流程定义管理」中，为已发布的生产订单审批�
   - PC 地址：`"/order/detail?id=" + businessId`
   - 手机地址：`"/mobile/order/detail?id=" + businessId`
 
-### 3.4 校验（纯函数 `validateForm`，vitest）
-- 名称非空、key 非空且匹配正则、（URL表单）三个脚本均非空。
-- 返回 `{ ok: boolean, issues: string[] }`，沿用 `validateSummary` 风格。
+### 3.4 校验（zod schema + 共享常量）
+- 名称非空、key 非空且匹配正则、（URL表单）三个脚本均非空 —— 由 `zod` schema 完成（沿用 app 的 `zodResolver` 模式），UX 即时报错。
+- key 规则抽为纯常量 `FORM_KEY_REGEX`（zod 复用 + vitest 测试，保证 DRY，避免与 zod 重复实现 `validateForm`）。
 - key 唯一性在提交时于 mock 列表校验（编辑时排除自身）。
 
 ## 4. 流程定义管理 `/workflow/definition`
@@ -172,7 +172,7 @@ export interface WorkflowEventRule {
 | `src/pages/workflow/definition/AssociateFormDialog.tsx` | 新增（关联表单） |
 | `src/pages/workflow/definition/EventConfigDialog.tsx` | 新增（事件配置） |
 | `src/components/ScriptEditor.tsx` | 新增（等宽 Textarea + 变量提示） |
-| `src/pages/workflow/formUtils.ts` | 新增（`validateForm`、脚本模板常量、`defaultEventRules`） |
+| `src/pages/workflow/formUtils.ts` | 新增（`FORM_KEY_REGEX`、脚本模板常量、选项常量、`defaultEventRules`） |
 | `src/pages/workflow/__tests__/formUtils.test.ts` | 新增（vitest） |
 | `src/router.tsx` | 改（2 条路由） |
 | `scripts/sql/workflow-form-event-config.sql` | 新增（菜单 seed） |
