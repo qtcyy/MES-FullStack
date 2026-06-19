@@ -39,15 +39,13 @@ export default class CustomRenderer {
     this.bpmnRenderer = bpmnRenderer
 
     // 内联 BaseRenderer 事件注册逻辑
-    const self = this
-    eventBus.on(['render.shape', 'render.connection'], HIGH_PRIORITY, function (evt, context) {
+    eventBus.on(['render.shape', 'render.connection'], HIGH_PRIORITY, (evt, context) => {
       const { element, gfx } = context as RenderContext
-      if (!self.canRender(element)) return undefined
+      if (!this.canRender(element)) return undefined
       if (evt.type === 'render.shape') {
-        return self.drawShape(gfx, element)
-      } else {
-        return self.drawConnection(gfx, element)
+        return this.drawShape(gfx, element)
       }
+      return this.drawConnection(gfx, element)
     })
   }
 
