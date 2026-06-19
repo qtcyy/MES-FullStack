@@ -15,7 +15,7 @@ import { modelGet, modelSave } from '@/api/workflow/model'
 import { rolePage } from '@/api/system/role'
 import BpmnDesigner, { type BpmnDesignerHandle, type SelectedElement } from './BpmnDesigner'
 import PropertiesPanel from './PropertiesPanel'
-import { validateSummary, buildAssigneeProps, type AssigneeType } from './bpmnUtils'
+import { validateSummary, errorTaskIds, buildAssigneeProps, type AssigneeType } from './bpmnUtils'
 import type { SysRole } from '@/types/system'
 
 interface ModelDesignerDialogProps {
@@ -84,10 +84,13 @@ export default function ModelDesignerDialog({ open, onOpenChange, modelId }: Mod
 
   const handleValidate = () => {
     if (!designerRef.current) return
-    const result = validateSummary(designerRef.current.getSummary())
+    const summary = designerRef.current.getSummary()
+    const result = validateSummary(summary)
+    designerRef.current.clearErrors()
     if (result.ok) {
       toast.success('校验通过:流程定义完整')
     } else {
+      designerRef.current.markErrors(errorTaskIds(summary))
       toast.error(`校验未通过:${result.issues.join('；')}`)
     }
   }

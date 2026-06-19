@@ -26,6 +26,10 @@ export interface BpmnDesignerHandle {
   getSummary: () => BpmnSummary
   /** 给当前选中的用户任务写属性(name 或 flowable:* );值为 undefined 即清除 */
   updateSelected: (props: Record<string, unknown>) => void
+  /** 给指定节点加红色错误标记 */
+  markErrors: (ids: string[]) => void
+  /** 清除上一次的错误标记 */
+  clearErrors: () => void
 }
 
 interface BpmnDesignerProps {
@@ -88,6 +92,7 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
   const modelerRef = useRef<Modeler | null>(null)
   const currentRef = useRef<El | null>(null)
   const onSelectRef = useRef(onSelect)
+  const errorIdsRef = useRef<string[]>([])
   onSelectRef.current = onSelect
 
   const [zoom, setZoom] = useState(1)
@@ -190,6 +195,24 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
       if (!modeler || !el) return
       const modeling = modeler.get<{ updateProperties: (e: El, p: Record<string, unknown>) => void }>('modeling')
       modeling.updateProperties(el, props)
+    },
+    markErrors(ids: string[]) {
+      const modeler = modelerRef.current
+      if (!modeler) return
+      const canvas = modeler.get<{
+        addMarker: (id: string, cls: string) => void
+        removeMarker: (id: string, cls: string) => void
+      }>('canvas')
+      errorIdsRef.current.forEach((id) => canvas.removeMarker(id, 'bpmn-error'))
+      ids.forEach((id) => canvas.addMarker(id, 'bpmn-error'))
+      errorIdsRef.current = ids
+    },
+    clearErrors() {
+      const modeler = modelerRef.current
+      if (!modeler) return
+      const canvas = modeler.get<{ removeMarker: (id: string, cls: string) => void }>('canvas')
+      errorIdsRef.current.forEach((id) => canvas.removeMarker(id, 'bpmn-error'))
+      errorIdsRef.current = []
     },
   }))
 

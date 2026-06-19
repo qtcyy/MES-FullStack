@@ -61,6 +61,13 @@ export function validateSummary(s: BpmnSummary): ValidationResult {
   return { ok: issues.length === 0, issues }
 }
 
+/** 纯函数:提取「未命名」或「未配置办理人」的用户任务 id（与 validateSummary 判定一致），用于画布错误高亮。 */
+export function errorTaskIds(s: BpmnSummary): string[] {
+  return s.userTasks
+    .filter((t) => !t.name?.trim() || (!t.assignee && !t.candidateGroups))
+    .map((t) => t.id)
+}
+
 /** 纯函数:由办理人类型计算 flowable 属性(两者互斥,另一个置 undefined 以清除) */
 export function buildAssigneeProps(
   type: AssigneeType,

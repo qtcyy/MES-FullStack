@@ -1,5 +1,33 @@
 import { describe, it, expect } from 'vitest'
-import { initialBpmnXml, validateSummary, buildAssigneeProps, type BpmnSummary } from '../bpmnUtils'
+import { initialBpmnXml, validateSummary, buildAssigneeProps, errorTaskIds, type BpmnSummary } from '../bpmnUtils'
+
+function summary(userTasks: BpmnSummary['userTasks']): BpmnSummary {
+  return { hasStart: true, hasEnd: true, userTasks, disconnectedCount: 0 }
+}
+
+describe('errorTaskIds', () => {
+  it('未命名的任务被标记', () => {
+    expect(errorTaskIds(summary([{ id: 'T1', assignee: '${initiator}' }]))).toEqual(['T1'])
+  })
+  it('未配置办理人的任务被标记', () => {
+    expect(errorTaskIds(summary([{ id: 'T2', name: '审批' }]))).toEqual(['T2'])
+  })
+  it('名称为纯空白视为未命名', () => {
+    expect(errorTaskIds(summary([{ id: 'T3', name: '   ', candidateGroups: 'role_a' }]))).toEqual(['T3'])
+  })
+  it('完整配置的任务不被标记', () => {
+    expect(errorTaskIds(summary([{ id: 'T4', name: '审批', assignee: '${initiator}' }]))).toEqual([])
+  })
+  it('混合：只返回有问题的 id', () => {
+    const ids = errorTaskIds(
+      summary([
+        { id: 'A', name: '好', candidateGroups: 'r1' },
+        { id: 'B', name: '坏' },
+      ]),
+    )
+    expect(ids).toEqual(['B'])
+  })
+})
 
 describe('initialBpmnXml', () => {
   it('process id=modelKey、含 name 与开始事件', () => {
