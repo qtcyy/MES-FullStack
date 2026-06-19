@@ -120,6 +120,13 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
         currentRef.current = changed
         onSelectRef.current(toSelected(changed))
       }
+      // 元素变更时清除该节点的错误高亮(用户正在修正)，delete-safe
+      if (changed && errorIdsRef.current.includes(changed.id)) {
+        const canvas = modeler.get<{ removeMarker: (id: string, cls: string) => void }>('canvas')
+        const registry = modeler.get<{ get: (id: string) => unknown }>('elementRegistry')
+        if (registry.get(changed.id)) canvas.removeMarker(changed.id, 'bpmn-error')
+        errorIdsRef.current = errorIdsRef.current.filter((id) => id !== changed.id)
+      }
     })
     modeler.on('canvas.viewbox.changed', (e: unknown) => {
       const scale = (e as { viewbox: { scale: number } }).viewbox?.scale
@@ -203,15 +210,22 @@ const BpmnDesigner = forwardRef<BpmnDesignerHandle, BpmnDesignerProps>(function 
         addMarker: (id: string, cls: string) => void
         removeMarker: (id: string, cls: string) => void
       }>('canvas')
-      errorIdsRef.current.forEach((id) => canvas.removeMarker(id, 'bpmn-error'))
-      ids.forEach((id) => canvas.addMarker(id, 'bpmn-error'))
-      errorIdsRef.current = ids
+      const registry = modeler.get<{ get: (id: string) => unknown }>('elementRegistry')
+      errorIdsRef.current.forEach((id) => {
+        if (registry.get(id)) canvas.removeMarker(id, 'bpmn-error')
+      })
+      const present = ids.filter((id) => registry.get(id))
+      present.forEach((id) => canvas.addMarker(id, 'bpmn-error'))
+      errorIdsRef.current = present
     },
     clearErrors() {
       const modeler = modelerRef.current
       if (!modeler) return
       const canvas = modeler.get<{ removeMarker: (id: string, cls: string) => void }>('canvas')
-      errorIdsRef.current.forEach((id) => canvas.removeMarker(id, 'bpmn-error'))
+      const registry = modeler.get<{ get: (id: string) => unknown }>('elementRegistry')
+      errorIdsRef.current.forEach((id) => {
+        if (registry.get(id)) canvas.removeMarker(id, 'bpmn-error')
+      })
       errorIdsRef.current = []
     },
   }))

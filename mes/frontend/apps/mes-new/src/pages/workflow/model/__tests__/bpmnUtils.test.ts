@@ -27,6 +27,19 @@ describe('errorTaskIds', () => {
     )
     expect(ids).toEqual(['B'])
   })
+  it('空任务列表返回空数组', () => {
+    expect(errorTaskIds(summary([]))).toEqual([])
+  })
+  it('保留多个问题任务的顺序', () => {
+    const ids = errorTaskIds(
+      summary([
+        { id: 'X' },
+        { id: 'Y', name: '完整', assignee: '${initiator}' },
+        { id: 'Z', name: '   ' },
+      ]),
+    )
+    expect(ids).toEqual(['X', 'Z'])
+  })
 })
 
 describe('initialBpmnXml', () => {
