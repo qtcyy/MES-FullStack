@@ -26,6 +26,7 @@ const URL_MAP: Record<string, string> = {
   '/workflow/category/list-ui': '/workflow/category',
   '/workflow/model/list-ui': '/workflow/model',
   '/workflow/form/list-ui': '/workflow/form',
+  '/workflow/definition/list-ui': '/workflow/definition',
 }
 
 /** 转换后端 url 为 SPA 路由;不可导航(#、空、javascript:)返回 undefined */
