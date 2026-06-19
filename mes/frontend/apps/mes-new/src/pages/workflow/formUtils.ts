@@ -9,9 +9,9 @@ import type {
 export const FORM_KEY_REGEX = /^[a-zA-Z][a-zA-Z0-9_]*$/
 
 /** 默认脚本模板（新建表单预填，便于演示；mock 不执行） */
-export const DEFAULT_TITLE_SCRIPT = '"生产订单审批 - " + orderCode'
-export const DEFAULT_PC_URL_SCRIPT = '"/order/detail?id=" + businessId'
-export const DEFAULT_MOBILE_URL_SCRIPT = '"/mobile/order/detail?id=" + businessId'
+export const DEFAULT_TITLE_SCRIPT = '生产订单审批 - ${orderCode}'
+export const DEFAULT_PC_URL_SCRIPT = '/order/detail?id=${businessId}'
+export const DEFAULT_MOBILE_URL_SCRIPT = '/mobile/order/detail?id=${businessId}'
 
 /** 脚本可用变量提示 */
 export const SCRIPT_VARIABLES: { token: string; label: string }[] = [

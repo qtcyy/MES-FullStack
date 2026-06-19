@@ -5,6 +5,8 @@ import {
   DEFAULT_TITLE_SCRIPT,
   DEFAULT_PC_URL_SCRIPT,
   DEFAULT_MOBILE_URL_SCRIPT,
+  triggerLabel,
+  auditStatusLabel,
 } from '../formUtils'
 
 describe('FORM_KEY_REGEX', () => {
@@ -24,6 +26,17 @@ describe('脚本模板常量', () => {
     expect(DEFAULT_TITLE_SCRIPT.trim()).not.toBe('')
     expect(DEFAULT_PC_URL_SCRIPT.trim()).not.toBe('')
     expect(DEFAULT_MOBILE_URL_SCRIPT.trim()).not.toBe('')
+  })
+})
+
+describe('label 助手', () => {
+  it('triggerLabel 命中返回中文', () => {
+    expect(triggerLabel('START')).toBe('流程启动')
+    expect(triggerLabel('REJECT')).toBe('流程驳回')
+  })
+  it('auditStatusLabel 命中与 undefined 回退', () => {
+    expect(auditStatusLabel('APPROVED')).toBe('审批通过')
+    expect(auditStatusLabel(undefined)).toBe('')
   })
 })
 
