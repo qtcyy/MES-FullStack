@@ -18,8 +18,8 @@ describe('toFormUrlEncoded 数组', () => {
   it('数组追加为重复键', () => {
     expect(toFormUrlEncoded({ a: 1, ids: ['x', 'y'] })).toBe('a=1&ids=x&ids=y')
   })
-  it('跳过 undefined/null,保留标量', () => {
-    expect(toFormUrlEncoded({ a: 'v', b: undefined, c: null })).toBe('a=v')
+  it('数组内 null/undefined 元素跳过', () => {
+    expect(toFormUrlEncoded({ ids: ['x', null, undefined, 'y'] })).toBe('ids=x&ids=y')
   })
 })
 

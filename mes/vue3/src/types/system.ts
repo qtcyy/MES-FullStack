@@ -85,3 +85,9 @@ export interface SysDepartment {
 export interface SysDepartmentPageReq extends PageReq {
   nameLike?: string
 }
+
+// ─── 菜单 ──────────────────────────────────────────────────────────────────────
+
+export interface SysMenuPageReq extends PageReq {
+  nameLike?: string
+}

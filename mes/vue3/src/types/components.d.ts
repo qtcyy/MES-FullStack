@@ -38,10 +38,12 @@ declare module 'vue' {
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     FormDialog: typeof import('./../components/FormDialog.vue')['default']
+    MasterDetailLayout: typeof import('./../components/MasterDetailLayout.vue')['default']
     PageContainer: typeof import('./../components/PageContainer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchForm: typeof import('./../components/SearchForm.vue')['default']
     TableSkeleton: typeof import('./../components/skeletons/TableSkeleton.vue')['default']
+    TreeTable: typeof import('./../components/TreeTable.vue')['default']
   }
 }

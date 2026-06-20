@@ -7,13 +7,8 @@ export function buildTree<T extends HasIdParent>(flat: T[], rootId = '0'): Tree<
   flat.forEach((n) => map.set(n.id, { ...n }))
   const roots: Tree<T>[] = []
   map.forEach((node) => {
-    if (node.parentId === rootId || !map.has(node.parentId)) {
-      if (node.parentId === rootId) roots.push(node)
-      else roots.push(node) // 父不在集合内也作根,避免丢节点
-    } else {
-      const parent = map.get(node.parentId)!
-      ;(parent.children ??= []).push(node)
-    }
+    if (node.parentId === rootId || !map.has(node.parentId)) roots.push(node) // 真根或孤儿(父不在集合)都作根
+    else (map.get(node.parentId)!.children ??= []).push(node)
   })
   return roots
 }
@@ -21,7 +16,10 @@ export function buildTree<T extends HasIdParent>(flat: T[], rootId = '0'): Tree<
 /** 自身 + 全部后代 id(tree-select 排除自身防环) */
 export function collectSubtreeIds<T extends HasIdParent>(flat: T[], targetId: string): Set<string> {
   const childrenOf = new Map<string, string[]>()
-  flat.forEach((n) => { (childrenOf.get(n.parentId) ?? childrenOf.set(n.parentId, []).get(n.parentId)!).push(n.id) })
+  flat.forEach((n) => {
+    if (!childrenOf.has(n.parentId)) childrenOf.set(n.parentId, [])
+    childrenOf.get(n.parentId)!.push(n.id)
+  })
   const out = new Set<string>()
   const stack = [targetId]
   while (stack.length) {
