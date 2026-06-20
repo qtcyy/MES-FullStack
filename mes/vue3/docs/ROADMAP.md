@@ -152,7 +152,7 @@ mes/vue3/
 
 > 状态图例：✅ 完成 ｜ 🚧 进行中 ｜ ☐ 待开始
 
-### Cycle 0 — 基础设施（🚧 进行中）
+### Cycle 0 — 基础设施（✅ 完成）
 脚手架依赖、Vite 配置（代理/按需/分包/别名）、请求层、类型、路由+守卫、Pinia 四 store、双主题、`AdminLayout`/`ScreenLayout`、通用组件、指令、组合式函数、登录页 + 鉴权闭环 + 菜单驱动侧栏 + 动态路由。
 
 ### Cycle 1 — 核心业务闭环 + 三大亮点（☐ 本作业主交付）
@@ -176,8 +176,8 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 ### 9.1 系统管理 system
 | 功能 | 关键后端接口 | 周期 | 状态 |
 |---|---|---|---|
-| 登录 / 验证码 / 登出 | `/login` `/verification/code` `/logout` | C0 | ☐ |
-| 当前用户 / 菜单树 | `/admin/user/info` `/admin/list/index/menu/tree` | C0 | ☐ |
+| 登录 / 验证码 / 登出 | `/login` `/verification/code` `/logout` | C0 | ✅ |
+| 当前用户 / 菜单树 | `/admin/user/info` `/admin/list/index/menu/tree` | C0 | ✅ |
 | 用户管理 | `/admin/sys/user/page|get-by-id|add-or-update` | C1 | ☐ |
 | 角色管理（+菜单权限树） | `/admin/sys/role/page|add-or-update|tree/{roleId}` | C1 | ☐ |
 | 菜单管理（树） | `/admin/sys/menu/page|tree|add-or-update` | C1 | ☐ |
@@ -243,7 +243,7 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 |---|---|---|---|
 | AI 助手（SSE 流式，亮点③） | `/admin/ai/chat` | C1 | ☐ |
 | 实时通知中心 | 大屏轮询 / 派生 | C4 | ☐ |
-| 错误页 403/404/500 | — | C0 | ☐ |
+| 错误页 403/404/500 | — | C0 | ✅ |
 
 ---
 
@@ -257,7 +257,9 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 ---
 
 ## 11. 当前进度快照（2026-06-20）
-- ✅ Vite + Vue3 + TS 脚手架已就位（默认模板）。
-- 🚧 Cycle 0 基础设施：规划完成，待落地。
-- ☐ 其余全部模块：待开发。
-- **下一步**：经你确认本路线图后 → 生成实现计划（writing-plans）→ 搭建 `develop` 分支与基础设施。
+- ✅ **Cycle 0 基础设施完成**：脚手架、Vite（代理/按需/分包）、请求层（+单测）、双主题、Pinia 四 store（持久化）、路由+守卫、通用组件、指令/插件、登录鉴权闭环、布局（菜单树侧栏/页签）、Welcome/错误页。
+- ✅ 质量门禁全绿：`typecheck` 0 错误、`test` 8/8 通过、`build` 成功（vue/element 分包）、dev server 正常启动（665ms）。
+- ✅ Git：`develop` + `feature/infra` 分支，约 20 个语义化 emoji 提交。
+- ⏳ 待你启动后端（9090）后做浏览器联调冒烟：`admin/123` 登录 → 菜单树侧栏 → 主题切换持久化 → 刷新保持登录 → 退出拦截。
+- ☐ 其余全部模块：待开发（Cycle 1 起）。
+- **下一步**：合并 `feature/infra` → `develop`；后端联调冒烟；启动 Cycle 1（核心业务闭环 + 三大亮点）实现计划。
