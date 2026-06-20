@@ -57,6 +57,7 @@ declare module 'vue' {
     FormDialog: typeof import('./../components/FormDialog.vue')['default']
     ImageUpload: typeof import('./../components/ImageUpload.vue')['default']
     MasterDetailLayout: typeof import('./../components/MasterDetailLayout.vue')['default']
+    OrderedTransfer: typeof import('./../components/OrderedTransfer.vue')['default']
     PageContainer: typeof import('./../components/PageContainer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
