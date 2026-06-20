@@ -23,7 +23,7 @@
           </el-button>
         </div>
 
-        <!-- 类型列表:数据量小,一次性全量展示,客户端过滤后分页 -->
+        <!-- 类型列表:数据量小,一次性全量展示,客户端过滤后分页;整行可点击选中 -->
         <DataTable
           :data="filteredTypePage"
           :loading="loading"
@@ -32,16 +32,13 @@
           :action-width="120"
           @page-change="(p) => (typePager.current = p)"
           @size-change="(s) => { typePager.size = s; typePager.current = 1 }"
+          @row-click="(row) => handleSelectType(row as SysDict)"
         >
-          <!-- 名称列:可点击高亮选中 -->
+          <!-- 名称列:高亮选中行 -->
           <template #col-name="{ row }">
-            <el-link
-              :type="selectedType?.id === (row as SysDict).id ? 'primary' : 'default'"
-              :underline="false"
-              @click="handleSelectType(row as SysDict)"
-            >
+            <span :class="selectedType?.id === (row as SysDict).id ? 'dict-type-selected' : ''">
               {{ (row as SysDict).name }}
-            </el-link>
+            </span>
           </template>
 
           <!-- 操作列 -->
@@ -55,7 +52,7 @@
       <!-- ══════════════════ 右侧:字典项 ══════════════════ -->
       <template #detail>
         <div class="dict-detail-header">
-          <span class="dict-detail-title">【{{ selectedType!.name }}】字典项</span>
+          <span class="dict-detail-title">【{{ selectedType?.name }}】字典项</span>
         </div>
 
         <!-- 字典项工具栏 -->
@@ -118,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import PageContainer from '@/components/PageContainer.vue'
@@ -145,16 +142,11 @@ const { data: pageData, loading, run } = useRequest(
  *   types       = 类型记录列表
  *   itemsByType = { [类型id]: 项记录[] }
  * NOTE: 类型行判定依赖 parentId==='0',此为运行时假设,待后端接入后核实。
+ * partitionDict 只调用一次,避免重复计算。
  */
-const allTypes = computed<SysDict[]>(() => {
-  const records = (pageData.value?.records ?? []) as SysDict[]
-  return partitionDict(records).types
-})
-
-const itemsByType = computed<Record<string, SysDict[]>>(() => {
-  const records = (pageData.value?.records ?? []) as SysDict[]
-  return partitionDict(records).itemsByType
-})
+const partitioned = computed(() => partitionDict((pageData.value?.records ?? []) as SysDict[]))
+const allTypes = computed<SysDict[]>(() => partitioned.value.types)
+const itemsByType = computed<Record<string, SysDict[]>>(() => partitioned.value.itemsByType)
 
 // ─── 选中类型 ─────────────────────────────────────────────────────────────────
 const selectedType = ref<SysDict | null>(null)
@@ -186,9 +178,25 @@ function handleTypeReset() {
 // ─── 类型客户端分页 ───────────────────────────────────────────────────────────
 const typePager = reactive({ current: 1, size: 10, total: 0 })
 
+// total 赋值移出 computed,改用 watch,同时搜索词变化时重置到第1页(MIN-1)
+watch(
+  filteredTypes,
+  (list) => {
+    typePager.total = list.length
+    typePager.current = 1
+  },
+  { immediate: true },
+)
+
+watch(
+  () => typeSearch.nameLike,
+  () => {
+    typePager.current = 1
+  },
+)
+
 const filteredTypePage = computed<SysDict[]>(() => {
   const list = filteredTypes.value
-  typePager.total = list.length
   const start = (typePager.current - 1) * typePager.size
   return list.slice(start, start + typePager.size)
 })
@@ -201,9 +209,18 @@ const currentItems = computed<SysDict[]>(() => {
   return itemsByType.value[selectedType.value.id] ?? []
 })
 
+// total 赋值移出 computed,改用 watch
+watch(
+  currentItems,
+  (list) => {
+    itemPager.total = list.length
+    itemPager.current = 1
+  },
+  { immediate: true },
+)
+
 const itemPage = computed<SysDict[]>(() => {
   const list = currentItems.value
-  itemPager.total = list.length
   const start = (itemPager.current - 1) * itemPager.size
   return list.slice(start, start + itemPager.size)
 })
@@ -345,5 +362,10 @@ async function handleDeleteItem(row: SysDict) {
   font-size: 15px;
   font-weight: 600;
   color: var(--el-text-color-primary);
+}
+
+.dict-type-selected {
+  color: var(--el-color-primary);
+  font-weight: 600;
 }
 </style>

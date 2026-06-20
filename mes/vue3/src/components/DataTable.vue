@@ -4,7 +4,7 @@
 
     <TableSkeleton v-if="loading && !data.length" :rows="pager.size" />
 
-    <el-table v-else v-loading="loading" :data="data" :row-key="rowKey" stripe v-auto-animate>
+    <el-table v-else v-loading="loading" :data="data" :row-key="rowKey" stripe v-auto-animate @row-click="(row: T) => emit('row-click', row)">
       <el-table-column
         v-for="c in columns"
         :key="c.prop"
@@ -63,7 +63,11 @@ withDefaults(
   }>(),
   { loading: false, rowKey: 'id', actionWidth: 180 },
 )
-const emit = defineEmits<{ 'page-change': [number]; 'size-change': [number] }>()
+const emit = defineEmits<{
+  'page-change': [number]
+  'size-change': [number]
+  'row-click': [T]
+}>()
 </script>
 
 <style scoped>
