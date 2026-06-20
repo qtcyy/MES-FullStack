@@ -49,6 +49,12 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/system/dept/DeptList.vue'),
         meta: { title: '部门管理', perm: 'dept:add' },
       },
+      {
+        path: 'system/dict',
+        name: 'system-dict',
+        component: () => import('@/views/system/dict/DictList.vue'),
+        meta: { title: '字典管理', perm: 'dict:add' },
+      },
     ],
   },
   { path: '/403', component: () => import('@/views/error/403.vue'), meta: { public: true, title: '403' } },
