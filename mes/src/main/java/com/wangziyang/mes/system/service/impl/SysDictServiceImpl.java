@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wangziyang.mes.system.entity.SysDict;
 import com.wangziyang.mes.system.mapper.SysDictMapper;
 import com.wangziyang.mes.system.service.ISysDictService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> implements ISysDictService {
-
-    @Autowired
-    private SysDictMapper sysDictMapper;
 
     /**
      * 软删除字典（is_deleted = '1'）
