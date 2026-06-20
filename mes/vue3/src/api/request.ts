@@ -39,8 +39,9 @@ service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 })
 
 // 响应拦截:解包 Result(失败 toast);401 跳登录
+// 返回值即业务 data(非 AxiosResponse),故标注 any 绕过 axios 拦截器类型约束
 service.interceptors.response.use(
-  (resp) => {
+  (resp): any => {
     try {
       return unwrapResult(resp.data as Result)
     } catch (e) {
