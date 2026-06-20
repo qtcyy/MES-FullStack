@@ -1,3 +1,4 @@
+import type { SysUserDTO } from '@/types/system'
 export interface HasIdParent { id: string; parentId: string }
 export type Tree<T> = T & { children?: Tree<T>[] }
 
@@ -37,7 +38,7 @@ export function mergeCheckedMenuIds(checked: string[], halfChecked: string[]): s
 }
 
 /** 用户表单提交裁剪:编辑且密码空→剔除 password */
-export function buildUserPayload(form: Record<string, unknown>, isEdit: boolean): Record<string, unknown> {
+export function buildUserPayload(form: SysUserDTO, isEdit: boolean): SysUserDTO {
   const out = { ...form }
   if (isEdit && (!out.password || String(out.password).trim() === '')) delete out.password
   return out

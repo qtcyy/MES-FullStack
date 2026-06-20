@@ -29,7 +29,7 @@ export const routes: RouteRecordRaw[] = [
         path: 'system/user',
         name: 'system-user',
         component: () => import('@/views/system/user/UserList.vue'),
-        meta: { title: '用户管理', perm: 'user:add' },
+        meta: { title: '用户管理', perm: 'user:add' /* 后端菜单权限粒度仅 <模块>:add,故视图/按钮门控复用之 */ },
       },
     ],
   },

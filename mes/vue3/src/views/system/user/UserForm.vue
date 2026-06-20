@@ -145,7 +145,7 @@ const rules = computed<FormRules>(() => ({
 
 async function handleSubmit() {
   await formRef.value?.validate()
-  const payload = buildUserPayload(form as Record<string, unknown>, isEdit.value) as SysUserDTO
+  const payload = buildUserPayload(form, isEdit.value)
   emit('submit', payload)
 }
 </script>

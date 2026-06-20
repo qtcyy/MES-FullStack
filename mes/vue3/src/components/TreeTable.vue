@@ -25,7 +25,7 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="T extends object">
 /** 列定义(与 DataTable 同形,避免跨 SFC 类型导入) */
 export interface Column { prop: string; label: string; width?: number | string; minWidth?: number | string }
 withDefaults(

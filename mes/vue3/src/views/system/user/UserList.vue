@@ -1,5 +1,5 @@
 <template>
-  <div class="user-list">
+  <PageContainer>
     <!-- 搜索栏 -->
     <SearchForm :model="search" @search="handleSearch" @reset="handleReset">
       <el-form-item label="登录名">
@@ -29,7 +29,7 @@
       <!-- 状态列:徽标渲染 -->
       <template #col-deleted="{ row }">
         <el-tag v-if="row.deleted === '0'" type="success">正常</el-tag>
-        <el-tag v-else-if="row.deleted === '2'" type="info">禁用</el-tag>
+        <el-tag v-else-if="row.deleted === '2'" type="warning">禁用</el-tag>
         <el-tag v-else-if="row.deleted === '1'" type="danger">已删除</el-tag>
         <el-tag v-else type="warning">未知</el-tag>
       </template>
@@ -50,13 +50,14 @@
       :loading="submitLoading"
       @submit="handleFormSubmit"
     />
-  </div>
+  </PageContainer>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import PageContainer from '@/components/PageContainer.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import DataTable from '@/components/DataTable.vue'
 import type { Column } from '@/components/DataTable.vue'
@@ -81,11 +82,11 @@ const { data: pageData, loading, run } = useRequest(
   { immediate: true },
 )
 
-// 拉取后同步 total;DataTable 泛型要求 Record<string,unknown>,用 as 适配
-const tableData = computed<Record<string, unknown>[]>(() => {
+// 拉取后同步 total;T 推断为 SysUser,无需强转
+const tableData = computed<SysUser[]>(() => {
   const result = pageData.value
   if (result) setTotal(result.total)
-  return (result?.records ?? []) as unknown as Record<string, unknown>[]
+  return result?.records ?? []
 })
 
 // ─── 表格列定义 ───────────────────────────────────────────────────────────────
@@ -101,15 +102,17 @@ const roleList = ref<SysRole[]>([])
 const deptTree = ref<Tree<SysDepartment>[]>([])
 
 onMounted(async () => {
-  // 并行加载角色列表和部门树
   const [roleRes, deptRes] = await Promise.allSettled([
     rolePage({ current: 1, size: 9999 }),
     deptAll(),
   ])
   if (roleRes.status === 'fulfilled') roleList.value = roleRes.value?.records ?? []
+  else ElMessage.warning('角色列表加载失败,请刷新重试')
   if (deptRes.status === 'fulfilled') {
     const records = deptRes.value?.records ?? []
     deptTree.value = buildTree(records)
+  } else {
+    ElMessage.warning('部门列表加载失败,请刷新重试')
   }
 })
 
@@ -168,19 +171,17 @@ async function handleFormSubmit(dto: SysUserDTO) {
 
 // ─── 删除 ─────────────────────────────────────────────────────────────────────
 async function handleDelete(row: SysUser) {
-  await ElMessageBox.confirm(`确认删除用户「${row.name}」?`, '提示', {
-    type: 'warning',
-    confirmButtonText: '确认删除',
-    cancelButtonText: '取消',
-  })
+  try {
+    await ElMessageBox.confirm(`确认删除用户「${row.name}」?`, '提示', {
+      type: 'warning',
+      confirmButtonText: '确认删除',
+      cancelButtonText: '取消',
+    })
+  } catch {
+    return
+  }
   await userDelete(row.id)
   ElMessage.success('删除成功')
   run()
 }
 </script>
-
-<style scoped>
-.user-list {
-  padding: var(--sp-4);
-}
-</style>

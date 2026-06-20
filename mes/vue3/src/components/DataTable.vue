@@ -40,7 +40,7 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="T extends object">
 import TableSkeleton from './skeletons/TableSkeleton.vue'
 
 /** 列定义 */
