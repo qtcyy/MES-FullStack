@@ -142,12 +142,7 @@ public class SpFlowOperRelationController extends BaseController {
     @PostMapping("/delete")
     @ResponseBody
     public Result deleteByTableNameId(SpFlowDto req) throws Exception {
-        //先删除流程头表
-        iSpFlowService.removeById(req.getId());
-        //删除流程关系表
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("flow_id", req.getId());
-        iSpFlowOperRelationService.remove(queryWrapper);
+        iSpFlowOperRelationService.deleteFlowWithRelations(req.getId());
         return Result.success();
     }
 

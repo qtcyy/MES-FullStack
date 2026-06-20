@@ -41,4 +41,11 @@ public interface ISpFlowOperRelationService extends IService<SpFlowOperRelation>
      * @throws Exception 异常
      */
     List<SpOperVo> currentOperViewServer(String flowId) throws Exception;
+
+    /**
+     * 删除工艺路线头表 + 级联删其工序关系(同一事务)
+     *
+     * @param flowId 工艺路线ID
+     */
+    void deleteFlowWithRelations(String flowId);
 }
