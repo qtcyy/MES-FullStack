@@ -70,7 +70,7 @@ export function buildBomItemPayload(form: Partial<SpProductBomItem>): Partial<Sp
 export function validateBomItem(form: Partial<SpProductBomItem>): string | null {
   if (!form.materialCode || !form.materialCode.trim()) return '请选择物料'
   const q = Number(form.quantity)
-  if (!Number.isFinite(q) || q < 0.01) return '用量必须大于 0'
+  if (!Number.isFinite(q) || q <= 0) return '用量必须大于 0'
   return null
 }
 

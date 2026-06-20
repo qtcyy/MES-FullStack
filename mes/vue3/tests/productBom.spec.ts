@@ -119,6 +119,9 @@ describe('validateBomItem', () => {
   it('齐全通过', () => {
     expect(validateBomItem({ materialCode: 'M-1', quantity: 1.5 })).toBeNull()
   })
+  it('负数用量被拒', () => {
+    expect(validateBomItem({ materialCode: 'M-1', quantity: -1 })).toBe('用量必须大于 0')
+  })
 })
 
 describe('materielToItem', () => {
