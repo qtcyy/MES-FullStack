@@ -1,10 +1,9 @@
-import type { Observable } from 'rxjs'
+import { http } from '@/http/client'
 import type { PageResult } from '@/types/api'
 import type { WorkflowModel } from '@/types/workflow'
-import { ok, readList, writeList, paginate, genId, nowStr } from './mockStore'
 
-// 下周期真后端:POST /workflow/model/* (XML 体大,save/delete/publish 走 JSON)
-const KEY = 'wf_models'
+// 真后端:POST /workflow/model/*(page form 编码;XML 体大,save/delete/publish 走 JSON;取单个走 GET)
+const JSON_HEADERS = { headers: { 'Content-Type': 'application/json' } }
 
 export interface ModelPageParams {
   current: number
@@ -26,69 +25,27 @@ export interface ModelPublishDTO {
   categoryName: string
 }
 
-/** 模型分页(真后端 form 编码) */
-export function modelPage(params: ModelPageParams): Observable<PageResult<WorkflowModel>> {
-  let all = readList<WorkflowModel>(KEY)
-  if (params.name) all = all.filter((m) => m.name.includes(params.name!))
-  if (params.modelKey) all = all.filter((m) => m.modelKey.includes(params.modelKey!))
-  all = [...all].sort((a, b) => (b.updateTime ?? '').localeCompare(a.updateTime ?? ''))
-  return ok(paginate(all, params.current, params.size))
+/** 模型分页(form 编码) */
+export function modelPage(params: ModelPageParams) {
+  return http.post<PageResult<WorkflowModel>>('/workflow/model/page', params)
 }
 
-/** 取单个模型(含 bpmnXml;真后端 GET /workflow/model/{id}) */
-export function modelGet(id: string): Observable<WorkflowModel | undefined> {
-  return ok(readList<WorkflowModel>(KEY).find((m) => m.id === id))
+/** 取单个模型(含 bpmnXml;GET /workflow/model/{id}) */
+export function modelGet(id: string) {
+  return http.get<WorkflowModel>(`/workflow/model/${id}`)
 }
 
-/** 新建/保存设计(真后端 JSON;空 id 走新建,状态 DRAFT) */
-export function modelSave(dto: ModelSaveDTO): Observable<string> {
-  const all = readList<WorkflowModel>(KEY)
-  const ts = nowStr()
-  if (dto.id) {
-    const idx = all.findIndex((m) => m.id === dto.id)
-    if (idx >= 0) {
-      all[idx] = { ...all[idx], name: dto.name, modelKey: dto.modelKey, bpmnXml: dto.bpmnXml, updateTime: ts }
-    }
-    writeList(KEY, all)
-    return ok(dto.id)
-  }
-  const id = genId()
-  all.push({
-    id,
-    modelKey: dto.modelKey,
-    name: dto.name,
-    bpmnXml: dto.bpmnXml,
-    status: 'DRAFT',
-    version: 1,
-    createTime: ts,
-    updateTime: ts,
-  })
-  writeList(KEY, all)
-  return ok(id)
+/** 新建/保存设计(JSON;空 id 走新建,状态 DRAFT) */
+export function modelSave(dto: ModelSaveDTO) {
+  return http.post<string>('/workflow/model/save', dto, JSON_HEADERS)
 }
 
-/** 删除(真后端 JSON {id}) */
-export function modelDelete(id: string): Observable<void> {
-  writeList(
-    KEY,
-    readList<WorkflowModel>(KEY).filter((m) => m.id !== id),
-  )
-  return ok(undefined as unknown as void)
+/** 删除(JSON {id}) */
+export function modelDelete(id: string) {
+  return http.post<void>('/workflow/model/delete', { id }, JSON_HEADERS)
 }
 
-/** 发布到分类(真后端 JSON;置 PUBLISHED + 回填分类) */
-export function modelPublish(dto: ModelPublishDTO): Observable<void> {
-  const all = readList<WorkflowModel>(KEY)
-  const idx = all.findIndex((m) => m.id === dto.id)
-  if (idx >= 0) {
-    all[idx] = {
-      ...all[idx],
-      status: 'PUBLISHED',
-      categoryCode: dto.categoryCode,
-      categoryName: dto.categoryName,
-      updateTime: nowStr(),
-    }
-    writeList(KEY, all)
-  }
-  return ok(undefined as unknown as void)
+/** 发布到分类(JSON;置 PUBLISHED + 回填分类) */
+export function modelPublish(dto: ModelPublishDTO) {
+  return http.post<void>('/workflow/model/publish', dto, JSON_HEADERS)
 }
