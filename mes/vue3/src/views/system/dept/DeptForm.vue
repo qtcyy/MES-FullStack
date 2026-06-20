@@ -50,8 +50,8 @@ import type { Tree } from '@/utils/systemTree'
 
 const props = defineProps<{
   modelValue: boolean
-  /** null = 新增;非空 = 编辑 */
-  model: SysDepartment | null
+  /** null = 纯新增;Partial<SysDepartment>(有 id) = 编辑;Partial<SysDepartment>(无 id) = 新增子项 */
+  model: Partial<SysDepartment> | null
   /** 扁平部门列表(用于 collectSubtreeIds 排除自身及后代) */
   flatList: SysDepartment[]
   /** 部门树(已 buildTree,供 el-tree-select 展示) */
@@ -82,52 +82,53 @@ const form = reactive({
 
 // ─── 排除自身及后代的树选数据 ──────────────────────────────────────────────────
 /**
- * 为 el-tree-select 节点标记 disabled:编辑时禁用自身及全部后代,防止循环引用
- * 新增时无需排除,直接返回原始树
+ * 将原始树节点统一映射为 el-tree-select 可用节点:
+ * - deptName: 映射自 node.name,供 :props label='deptName' 使用
+ * - disabled: 若节点 id 在 excludeSet 中则禁选(编辑时用于排除自身及后代)
+ * - 新增时传空 Set,所有节点均可选
  */
-type DeptTreeNode = Tree<SysDepartment> & { disabled?: boolean; deptName: string; children?: DeptTreeNode[] }
+type DeptTreeNode = Tree<SysDepartment> & { disabled: boolean; deptName: string; children?: DeptTreeNode[] }
 
-function markDisabled(
+function buildDeptTreeNodes(
   nodes: Tree<SysDepartment>[],
-  excludeSet: Set<string>,
+  excludeSet: Set<string> = new Set<string>(),
 ): DeptTreeNode[] {
   return nodes.map((node) => ({
     ...node,
-    deptName: node.name,   // el-tree-select :props label='deptName',故在此映射
+    deptName: node.name,
     disabled: excludeSet.has(node.id),
-    children: node.children ? markDisabled(node.children, excludeSet) : undefined,
+    children: node.children ? buildDeptTreeNodes(node.children, excludeSet) : undefined,
   }))
 }
 
 const filteredDeptTree = computed<DeptTreeNode[]>(() => {
-  // 将 name 映射为 deptName 供 tree-select label 使用
-  function addLabel(nodes: Tree<SysDepartment>[]): DeptTreeNode[] {
-    return nodes.map((node) => ({
-      ...node,
-      deptName: node.name,
-      children: node.children ? addLabel(node.children) : undefined,
-    }))
+  if (!form.id) {
+    // 新增(含新增子项):无需排除,空 excludeSet
+    return buildDeptTreeNodes(props.deptTree)
   }
-
-  if (!form.id) return addLabel(props.deptTree)
-
-  // 编辑:从扁平 records 中收集自身+后代 id,标记 disabled
+  // 编辑:从扁平 records 中收集自身+后代 id,标记 disabled 防循环引用
   const excludeSet = collectSubtreeIds(props.flatList, form.id)
-  return markDisabled(props.deptTree, excludeSet)
+  return buildDeptTreeNodes(props.deptTree, excludeSet)
 })
 
 // ─── 监听 model 变化,同步表单 ─────────────────────────────────────────────────
+/**
+ * model 有三种情况:
+ * - null        → 纯新增:重置所有字段
+ * - { id }      → 编辑:填充全字段,isEdit = true
+ * - { parentId }(无 id) → 新增子项:预填 parentId,id=undefined,isEdit = false
+ */
 watch(
   () => props.model,
   (val) => {
     if (val) {
-      // 编辑:填充字段
-      form.id = val.id
+      // 编辑 或 新增子项:按实际字段填充(id 可能为 undefined)
+      form.id = val.id       // 编辑有值;新增子项为 undefined
       form.deptName = val.name ?? ''
       form.parentId = val.parentId && val.parentId !== '0' ? val.parentId : undefined
       form.sortNum = val.sortNum ?? 0
     } else {
-      // 新增:重置
+      // 纯新增:完全重置
       form.id = undefined
       form.deptName = ''
       form.parentId = undefined

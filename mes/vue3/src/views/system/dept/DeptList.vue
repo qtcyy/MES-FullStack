@@ -67,7 +67,7 @@ const columns: Column[] = [
 
 // ─── 弹窗状态 ─────────────────────────────────────────────────────────────────
 const dialogVisible = ref(false)
-const editingModel = ref<SysDepartment | null>(null)
+const editingModel = ref<Partial<SysDepartment> | null>(null)
 const submitLoading = ref(false)
 
 /** 打开新增 */
@@ -76,10 +76,9 @@ function openCreate() {
   dialogVisible.value = true
 }
 
-/** 打开新增子项:预置 parentId = 当前行 id */
+/** 打开新增子项:预置 parentId = 当前行 id,不带 id(语义明确为新增,非编辑) */
 function openCreateChild(row: Tree<SysDepartment>) {
   editingModel.value = {
-    id: '',
     name: '',
     parentId: row.id,
     sortNum: 0,
@@ -90,7 +89,7 @@ function openCreateChild(row: Tree<SysDepartment>) {
 /** 打开编辑:部门字段简单,无需 deptGetById 补全,直接使用列表行数据 */
 function openEdit(row: Tree<SysDepartment>) {
   // 从扁平 records 中找到原始对象(不含 children,避免表单混入树节点属性)
-  const found = flatRecords.value.find((d) => d.id === row.id)
+  const found = flatRecords.value.find((d) => d.id === row.id) as Partial<SysDepartment> | undefined
   if (!found) {
     ElMessage.warning('部门信息加载失败,请重试')
     return
@@ -116,6 +115,7 @@ async function handleFormSubmit(payload: Partial<SysDepartment>) {
 /**
  * 取消时 try/catch 静默处理(ElMessageBox.confirm 取消会 reject)
  * 删除后端软删,若有子部门业务层应有保护(与菜单同模式)
+ * 第二个 try/catch 捕获后端拒绝,响应拦截器已 toast 错误,此处吞掉防未捕获 rejection
  */
 async function handleDelete(row: Tree<SysDepartment>) {
   try {
@@ -127,8 +127,10 @@ async function handleDelete(row: Tree<SysDepartment>) {
   } catch {
     return
   }
-  await deptDelete(row.id)
-  ElMessage.success('删除成功')
-  run()
+  try {
+    await deptDelete(row.id)
+    ElMessage.success('删除成功')
+    run()
+  } catch { /* 响应拦截器已提示错误,此处吞掉防未捕获 rejection */ }
 }
 </script>

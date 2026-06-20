@@ -128,7 +128,7 @@ async function handleFormSubmit(payload: Partial<SysMenu>) {
 // ─── 删除 ─────────────────────────────────────────────────────────────────────
 /**
  * 删除菜单:后端有子菜单会抛错,响应拦截器已 ElMessage.error 展示"请先删除子菜单"
- * 前端无需额外判断,try/catch 仅用于"取消"静默处理
+ * 第二个 try/catch 捕获后端拒绝,吞掉防未捕获 rejection(不重复提示)
  */
 async function handleDelete(row: TreeVO<SysMenu>) {
   try {
@@ -140,9 +140,11 @@ async function handleDelete(row: TreeVO<SysMenu>) {
   } catch {
     return
   }
-  await menuDelete(row.id)
-  ElMessage.success('删除成功')
-  run()
+  try {
+    await menuDelete(row.id)
+    ElMessage.success('删除成功')
+    run()
+  } catch { /* 响应拦截器已提示错误,此处吞掉防未捕获 rejection */ }
 }
 
 // ─── 挂载时菜单树已由 useRequest immediate 拉取,无需额外 onMounted ──────────

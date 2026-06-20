@@ -180,8 +180,10 @@ async function handleDelete(row: SysUser) {
   } catch {
     return
   }
-  await userDelete(row.id)
-  ElMessage.success('删除成功')
-  run()
+  try {
+    await userDelete(row.id)
+    ElMessage.success('删除成功')
+    run()
+  } catch { /* 响应拦截器已提示错误,此处吞掉防未捕获 rejection */ }
 }
 </script>
