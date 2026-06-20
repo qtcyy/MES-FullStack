@@ -211,6 +211,7 @@ async function loadItems(nodeId: string) {
 }
 
 async function enterEdit(rootId: string) {
+  items.value = []
   editingRootId.value = rootId
   selectedNodeId.value = rootId
   await treeRun()
@@ -224,6 +225,7 @@ function exitEdit() {
 }
 function selectNode(id: string) {
   selectedNodeId.value = id
+  // fire-and-forget:节点切换极少高频,慢响应下 last-write-wins 可接受(作业场景已知局限)
   loadItems(id)
 }
 
@@ -279,7 +281,6 @@ async function handleNodeSubmit(dto: Partial<SpProductBom>) {
     nodeDialogVisible.value = false
     if (nodeMode.value === 'create-root') {
       // 新建根:刷新列表 + 进入编辑
-      await treeRun()
       await enterEdit(newId)
     } else {
       await refreshTree()
@@ -382,7 +383,6 @@ async function handleNewVersion() {
   try {
     const newRootId = await productBomNewVersion(editingRootId.value)
     ElMessage.success('已创建新版本')
-    await treeRun()
     await enterEdit(newRootId)
   } catch { /* 拦截器已提示 */ }
 }
