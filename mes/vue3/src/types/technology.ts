@@ -67,3 +67,56 @@ export interface TransferItem {
   primary: string       // 主显(工序描述)
   secondary?: string    // 次显(工序编码)
 }
+
+/** 产品 BOM 节点(对应 sp_product_bom) */
+export interface SpProductBom {
+  id: string
+  bomCode?: string                  // PBOM-XXX(后端生成)
+  productCode?: string              // 产品物料编码(仅根节点必填)
+  nodeName: string                  // 节点名称(必填)
+  parentId?: string                 // 父节点 id(空=根)
+  level?: number                    // 层级 0 产品 /1 半成品 /2 组件
+  version?: string                  // 版本号(默认 V1.0)
+  status?: 'draft' | 'locked'       // 草稿 / 已锁定
+  remark?: string
+  sortOrder?: number
+  lockedAt?: string
+  lockedBy?: string
+  createTime?: string
+  createUsername?: string
+  updateTime?: string
+  updateUsername?: string
+}
+
+/** /tree 返回的树形节点(含 children + itemCount,无 parentId/审计) */
+export interface BomTreeNode {
+  id: string
+  bomCode?: string
+  nodeName: string
+  productCode?: string
+  level?: number
+  version?: string
+  status?: 'draft' | 'locked'
+  remark?: string
+  sortOrder?: number
+  itemCount?: number
+  children?: BomTreeNode[]
+}
+
+/** 产品 BOM 行项目(对应 sp_product_bom_item) */
+export interface SpProductBomItem {
+  id?: string
+  bomId: string
+  itemType?: 'material' | 'bom_ref'
+  materialCode: string
+  materialDesc?: string
+  quantity: number
+  unit?: string
+  sortOrder?: number
+}
+
+/** 产品 BOM 分页请求 */
+export interface ProductBomPageReq extends PageReq {
+  productCodeLike?: string
+  nodeNameLike?: string
+}
