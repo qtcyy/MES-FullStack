@@ -45,6 +45,7 @@
       <el-row :gutter="16">
         <el-col :span="12">
           <el-form-item label="物料来源" prop="source">
+            <!-- source 无对应字典 type(DB 仅 material_type/ORDER_UNIT),故按设计硬编码自制/外购,非遗漏 -->
             <el-select v-model="form.source" placeholder="请选择来源" clearable style="width: 100%">
               <el-option label="自制" value="自制" />
               <el-option label="外购" value="外购" />
@@ -91,6 +92,8 @@ import { useDict } from '@/composables/useDict'
 import { buildMaterilePayload } from '@/utils/materile'
 import type { SpMaterile } from '@/types/basedata'
 
+// prop `model` 是「回填数据源」,沿用 1a 兄弟表单(UserForm/DeptForm)的 :model prop 约定。
+// 注意它与表单字段 `form.model`(物料型号,对应 SpMaterile.model)命名空间不同、无运行时冲突。
 const props = defineProps<{
   modelValue: boolean
   /** null = 新增;Partial(有 id) = 编辑 */
@@ -143,6 +146,8 @@ function resetForm() {
 watch(
   () => props.model,
   (val) => {
+    // 默认值兜底 + val 覆盖:先铺 leadTime/safetyStock/imageUrl 默认值,再用回填数据覆盖,
+    // 保证编辑态缺失这些字段时回落到默认。
     if (val) Object.assign(form, { leadTime: 1, safetyStock: 0, imageUrl: '', ...val })
     else resetForm()
   },
