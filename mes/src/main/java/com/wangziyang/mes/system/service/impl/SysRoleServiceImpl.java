@@ -10,6 +10,7 @@ import com.wangziyang.mes.system.entity.SysRole;
 import com.wangziyang.mes.system.entity.SysUserRole;
 import com.wangziyang.mes.system.enums.SysRoleEnum;
 import com.wangziyang.mes.system.mapper.SysRoleMapper;
+import com.wangziyang.mes.system.service.ISysRoleMenuService;
 import com.wangziyang.mes.system.service.ISysRoleService;
 import com.wangziyang.mes.system.service.ISysUserRoleService;
 import org.apache.commons.lang3.ArrayUtils;
@@ -39,6 +40,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Autowired
     private ISysUserRoleService sysUserRoleService;
 
+    @Autowired
+    private ISysRoleMenuService sysRoleMenuService;
+
     /**
      * 根据用户ID获取角色列表信息
      *
@@ -67,6 +71,20 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             result.add(roleDTO);
         }
         return result;
+    }
+
+    /**
+     * BUG-FIX: 新增或更新角色，并同步重建角色-菜单关系（在同一事务内）
+     * 原来 controller 直接分两步调用 saveOrUpdate + rebuild，两步不在同一事务，
+     * rebuild 失败时 saveOrUpdate 已提交，导致数据不一致。
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateWithMenus(SysRoleDTO record) throws Exception {
+        this.saveOrUpdate(record);
+        if (record.getSysMenuIds() != null) {
+            sysRoleMenuService.rebuild(record.getId(), record.getSysMenuIds());
+        }
     }
 
     /**

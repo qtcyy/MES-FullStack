@@ -77,10 +77,8 @@ public class SysRoleController extends BaseController {
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SysRoleDTO record) throws Exception {
-        sysRoleService.saveOrUpdate(record);
-        if (record.getSysMenuIds() != null) {
-            sysRoleMenuService.rebuild(record.getId(), record.getSysMenuIds());
-        }
+        // BUG-FIX: 原来两步操作不在同一事务，改为调用 service 层统一事务方法
+        sysRoleService.saveOrUpdateWithMenus(record);
         return Result.success(record.getId());
     }
 

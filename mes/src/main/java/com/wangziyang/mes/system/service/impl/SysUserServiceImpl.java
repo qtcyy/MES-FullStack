@@ -63,6 +63,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void update(SysUserDTO record) throws Exception {
+        // BUG-FIX: 编辑时密码处理
+        // 1. 密码为空 → 不改密码，从 record 中清除 password 字段（不写 null 到 DB）
+        // 2. 密码非空 → 对明文重新加盐后写入（只加一次，不能对已存密文再加盐）
+        if (record.getPassword() == null || record.getPassword().isEmpty()) {
+            record.setPassword(null);
+        } else {
+            String hashed = new Md5Hash(record.getPassword(), record.getUsername(), 3).toString();
+            record.setPassword(hashed);
+        }
         sysUserMapper.updateById(record);
         sysRoleService.rebuild(record);
     }
