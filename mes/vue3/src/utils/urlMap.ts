@@ -6,6 +6,7 @@ const URL_MAP: Record<string, string> = {
   '/admin/sys/menu/list-ui': '/system/menu',
   '/admin/sys/dict/list-ui': '/system/dict',
   '/admin/sys/department/list-ui': '/system/department',
+  '/basedata/materile/list-ui': '/basedata/materile',
 }
 
 /** 不可导航(#/空/javascript:)→ undefined;已知→映射;未知→原样 */

@@ -9,6 +9,7 @@ describe('toSpaRoute', () => {
     expect(toSpaRoute('/admin/sys/menu/list-ui')).toBe('/system/menu')
     expect(toSpaRoute('/admin/sys/department/list-ui')).toBe('/system/department')
     expect(toSpaRoute('/admin/welcome-ui')).toBe('/welcome')
+    expect(toSpaRoute('/basedata/materile/list-ui')).toBe('/basedata/materile')
   })
   it('未知 url 原样返回', () => {
     expect(toSpaRoute('/welcome')).toBe('/welcome')
