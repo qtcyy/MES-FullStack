@@ -3,7 +3,7 @@ export interface TreeVO<T = unknown> {
   id: string
   name: string
   /** 0=目录 1=菜单 2=按钮 */
-  type?: number
+  type?: string
   icon?: string
   url?: string
   pid?: string

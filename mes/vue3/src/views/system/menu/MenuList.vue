@@ -33,7 +33,7 @@
     <MenuForm
       v-model="dialogVisible"
       :model="editingModel"
-      :menu-tree="menuTreeData"
+      :menu-tree="menuTree"
       :loading="submitLoading"
       @submit="handleFormSubmit"
     />
@@ -58,14 +58,8 @@ const { data: treeData, loading, run } = useRequest(
   { immediate: true },
 )
 
-/** 树形数据(供 TreeTable 展示) */
+/** 树形数据(供 TreeTable 展示,同时供表单 el-tree-select 使用) */
 const menuTree = computed<TreeVO<SysMenu>[]>(() => treeData.value ?? [])
-
-/**
- * 保存当前菜单树数据供表单 el-tree-select 使用
- * 利用同一个请求返回值,无需额外拉取
- */
-const menuTreeData = computed<TreeVO<SysMenu>[]>(() => treeData.value ?? [])
 
 // ─── 表格列定义 ───────────────────────────────────────────────────────────────
 const columns: Column[] = [
@@ -100,8 +94,6 @@ function openCreateChild(row: TreeVO<SysMenu>) {
     permission: '',
     icon: '',
   }
-  // 清除 id 使表单进入新增模式
-  editingModel.value.id = ''
   dialogVisible.value = true
 }
 

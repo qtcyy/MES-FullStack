@@ -113,7 +113,7 @@ const form = reactive({
 // ─── 排除自身及后代的树选数据 ──────────────────────────────────────────────────
 /**
  * 将 TreeVO 树拍平为 HasIdParent 扁平数组供 collectSubtreeIds 使用
- * TreeVO.pid 对应父节点 id,拍平时转换为 parentId
+ * 通过 DFS 参数传递父 id,不依赖 node.pid
  */
 function flattenTreeVO(nodes: TreeVO<SysMenu>[]): HasIdParent[] {
   const result: HasIdParent[] = []
@@ -142,7 +142,7 @@ function markDisabled(nodes: TreeVO<SysMenu>[], excludeSet: Set<string>): MenuTr
 }
 
 const filteredMenuTree = computed<MenuTreeNode[]>(() => {
-  if (!isEdit.value || !form.id) return props.menuTree as MenuTreeNode[]
+  if (!form.id) return props.menuTree as MenuTreeNode[]
   const flat = flattenTreeVO(props.menuTree)
   const excludeSet = collectSubtreeIds(flat, form.id)
   return markDisabled(props.menuTree, excludeSet)
