@@ -18,7 +18,11 @@ export const bomFlowList = (rootId: string) =>
 export const bomFlowFlows = () =>
   http.get<SpFlow[]>('/technology/bom-flow/flows')
 
-/** 某工艺路线工序链预览(GET) */
+/**
+ * 某工艺路线工序链预览(GET)。
+ * 注:契约端点,当前页面未直接消费——工序链已随 `bomFlowList` 响应内联返回(opers 字段);
+ * 保留作完整 API 镜像,供将来独立查询场景复用。
+ */
 export const bomFlowOpers = (flowId: string) =>
   http.get<FlowOperItem[]>(`/technology/bom-flow/opers/${encodeURIComponent(flowId)}`)
 
