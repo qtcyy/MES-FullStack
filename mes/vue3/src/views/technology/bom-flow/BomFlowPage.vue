@@ -28,7 +28,7 @@
 
       <MasterDetailLayout :has-selection="!!selected">
         <template #master>
-          <TreeTable :data="treeData" :loading="listLoading" :columns="structColumns" :action-width="1">
+          <TreeTable :data="treeData" :loading="listLoading" :columns="structColumns">
             <template #col-nodeName="{ row }">
               <span
                 :class="selectedBomId === (row as BomFlowTreeNode).id ? 'bf-node-selected' : 'bf-node'"
