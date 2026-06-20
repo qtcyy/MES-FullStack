@@ -61,6 +61,18 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/basedata/materile/MaterileList.vue'),
         meta: { title: '物料维护', perm: 'materile:add' },
       },
+      {
+        path: 'technology/oper',
+        name: 'technology-oper',
+        component: () => import('@/views/technology/oper/OperList.vue'),
+        meta: { title: '工序定义', perm: 'oper:add' },
+      },
+      {
+        path: 'technology/flow',
+        name: 'technology-flow',
+        component: () => import('@/views/technology/flow/FlowList.vue'),
+        meta: { title: '工艺路线管理', perm: 'flow:add' },
+      },
     ],
   },
   { path: '/403', component: () => import('@/views/error/403.vue'), meta: { public: true, title: '403' } },
