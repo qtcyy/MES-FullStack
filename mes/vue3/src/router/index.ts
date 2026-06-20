@@ -25,6 +25,36 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '首页' },
       },
       // ↓ Cycle 1 起在此追加各模块子路由(path 对齐后端菜单 url)
+      {
+        path: 'system/user',
+        name: 'system-user',
+        component: () => import('@/views/system/user/UserList.vue'),
+        meta: { title: '用户管理', perm: 'user:add' /* 后端菜单权限粒度仅 <模块>:add,故视图/按钮门控复用之 */ },
+      },
+      {
+        path: 'system/role',
+        name: 'system-role',
+        component: () => import('@/views/system/role/RoleList.vue'),
+        meta: { title: '角色管理', perm: 'role:add' },
+      },
+      {
+        path: 'system/menu',
+        name: 'system-menu',
+        component: () => import('@/views/system/menu/MenuList.vue'),
+        meta: { title: '菜单管理', perm: 'menu:add' },
+      },
+      {
+        path: 'system/department',
+        name: 'system-department',
+        component: () => import('@/views/system/dept/DeptList.vue'),
+        meta: { title: '部门管理', perm: 'dept:add' },
+      },
+      {
+        path: 'system/dict',
+        name: 'system-dict',
+        component: () => import('@/views/system/dict/DictList.vue'),
+        meta: { title: '字典管理', perm: 'dict:add' },
+      },
     ],
   },
   { path: '/403', component: () => import('@/views/error/403.vue'), meta: { public: true, title: '403' } },

@@ -3,7 +3,7 @@ export interface TreeVO<T = unknown> {
   id: string
   name: string
   /** 0=目录 1=菜单 2=按钮 */
-  type?: number
+  type?: string
   icon?: string
   url?: string
   pid?: string
@@ -14,16 +14,23 @@ export interface TreeVO<T = unknown> {
   _payload?: T
 }
 
-/** 系统菜单实体 */
+/** 系统菜单实体(对齐后端 SysMenu.java) */
 export interface SysMenu {
   id: string
   code: string
   name: string
   url: string
   parentId: string
-  type: number
+  /** 0=目录 / 1=菜单 / 2=按钮 (后端存 String) */
+  type: string
   permission: string
   icon: string
+  /** 层级 */
+  grade?: string
+  /** 排序 */
+  sortNum?: number
+  /** 描述 */
+  descr?: string
 }
 
 /** 菜单树接口返回结构:menuInfo 按分组 key 组织 */

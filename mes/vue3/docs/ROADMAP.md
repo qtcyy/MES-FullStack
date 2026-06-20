@@ -155,8 +155,12 @@ mes/vue3/
 ### Cycle 0 — 基础设施（✅ 完成）
 脚手架依赖、Vite 配置（代理/按需/分包/别名）、请求层、类型、路由+守卫、Pinia 四 store、双主题、`AdminLayout`/`ScreenLayout`、通用组件、指令、组合式函数、登录页 + 鉴权闭环 + 菜单驱动侧栏 + 动态路由。
 
-### Cycle 1 — 核心业务闭环 + 三大亮点（☐ 本作业主交付）
+### Cycle 1 — 核心业务闭环 + 三大亮点（🚧 本作业主交付）
 系统管理 + 物料 + 工艺（BOM/工艺路线）+ 计划（工单/派工/甘特）+ 数字化大屏 + 3D 数字孪生 + AI 助手 + 工作流（分类/表单/定义/事件，非 BPMN 设计器部分）。
+
+> **Cycle 1 体量过大，按子周期 1a~1h 逐个推进**（每个一条 `feature/*` 分支 + 独立 spec→plan→实现→审查→合并）：1a 系统管理 ✅ / 1b 基础数据·物料 / 1c 工艺技术线 / 1d 计划·订单 / 1e 数字化大屏 / 1f 3D 数字孪生 / 1g AI 助手 / 1h 工作流配置。
+>
+> **✅ 1a 系统管理已完成（2026-06-20，分支 `feature/system`）**：用户/角色/菜单/字典/部门五页 CRUD。沉淀通用原语 `TreeTable`/`MasterDetailLayout` + `urlMap` 路由翻译 + `systemTree` 纯函数（TDD）。后端最小补齐：5 个删除端点（用户/角色/字典/部门软删 + 列表过滤 + 软删用户阻断登录；菜单物理删 + 子守卫 + role_menu 清理）+ 审查修正 add-or-update（用户编辑密码加盐、角色保存与菜单 rebuild 同事务）+ 字典菜单种子（id=108）。详见 `docs/specs|plans/2026-06-20-cycle1a-system-management*`。
 
 ### Cycle 2 — 库存 + 剩余基础数据 + 组织（☐）
 入库/出库/库存查询/手工入库；设备 / 设备编组 / 加工单元 / 仓库（库位）/ 零部件 / 班组（成员）。
@@ -178,11 +182,11 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 |---|---|---|---|
 | 登录 / 验证码 / 登出 | `/login` `/verification/code` `/logout` | C0 | ✅ |
 | 当前用户 / 菜单树 | `/admin/user/info` `/admin/list/index/menu/tree` | C0 | ✅ |
-| 用户管理 | `/admin/sys/user/page|get-by-id|add-or-update` | C1 | ☐ |
-| 角色管理（+菜单权限树） | `/admin/sys/role/page|add-or-update|tree/{roleId}` | C1 | ☐ |
-| 菜单管理（树） | `/admin/sys/menu/page|tree|add-or-update` | C1 | ☐ |
-| 字典管理 | `/admin/sys/dict/page|add-or-update` | C1 | ☐ |
-| 部门管理 | `/admin/sys/department/page|add-or-update` | C1 | ☐ |
+| 用户管理 | `/admin/sys/user/page|get-by-id|add-or-update|delete` | C1·1a | ✅ |
+| 角色管理（+菜单权限树） | `/admin/sys/role/page|add-or-update|tree/{roleId}|delete` | C1·1a | ✅ |
+| 菜单管理（树） | `/admin/sys/menu/page|tree|add-or-update|delete` | C1·1a | ✅ |
+| 字典管理（按 type 分组主从） | `/admin/sys/dict/page|add-or-update|delete` | C1·1a | ✅ |
+| 部门管理 | `/admin/sys/department/page|add-or-update|delete` | C1·1a | ✅ |
 | 班组管理（成员） | `/admin/sys/team/*` | C2 | ☐ |
 
 ### 9.2 基础数据 basedata
@@ -261,5 +265,7 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 - ✅ 质量门禁全绿：`typecheck` 0 错误、`test` 8/8 通过、`build` 成功（vue/element 分包）、dev server 正常启动（665ms）。
 - ✅ Git：`develop` + `feature/infra` 分支，约 20 个语义化 emoji 提交。
 - ⏳ 待你启动后端（9090）后做浏览器联调冒烟：`admin/123` 登录 → 菜单树侧栏 → 主题切换持久化 → 刷新保持登录 → 退出拦截。
-- ☐ 其余全部模块：待开发（Cycle 1 起）。
-- **下一步**：合并 `feature/infra` → `develop`；后端联调冒烟；启动 Cycle 1（核心业务闭环 + 三大亮点）实现计划。
+- ✅ **子周期 1a 系统管理完成（2026-06-20，分支 `feature/system` → `develop`）**：五页 CRUD + 后端 5 删除端点/审查修正/字典菜单种子。前端门禁全绿（`typecheck` 0 / `test` 26 / `build` ✓ / `lint` 0 err）；后端守卫测试 15 全绿、`mvn compile` BUILD SUCCESS（JDK11）。subagent 驱动逐任务两阶段审查 + opus 终审（揪出并修复角色权限树回填级联、菜单 grade NOT NULL、字典按 type 分组三处）。
+- ⏳ **1a 待人工确认**：需启动后端（9090）+ 执行 `scripts/sql/dict-menu-seed.sql`（字典菜单）后浏览器端到端冒烟（`admin/123` 登录 → 系统管理五项 → 各页 CRUD + 角色权限树勾选 round-trip + 字典两级 + 菜单/部门树）。
+- ☐ 其余子周期：1b 物料 / 1c 工艺 / 1d 订单 / 1e 大屏 / 1f 3D / 1g AI / 1h 工作流，及 Cycle 2+。
+- **下一步**：push `develop`；1a 浏览器冒烟确认；启动子周期 1b（基础数据·物料）。

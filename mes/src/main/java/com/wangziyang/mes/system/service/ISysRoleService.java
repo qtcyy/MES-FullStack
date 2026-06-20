@@ -34,4 +34,20 @@ public interface ISysRoleService extends IService<SysRole> {
      * @throws Exception 异常
      */
     void rebuild(SysUserDTO sysUserDTO) throws Exception;
+
+    /**
+     * 新增或更新角色，并同步重建角色-菜单关系（在同一事务内）
+     *
+     * @param record 角色DTO（含 sysMenuIds）
+     * @throws Exception 异常
+     */
+    void saveOrUpdateWithMenus(SysRoleDTO record) throws Exception;
+
+    /**
+     * 软删除角色（is_deleted = '1'）
+     *
+     * @param id 角色ID
+     * @return 是否成功
+     */
+    boolean softDelete(String id);
 }

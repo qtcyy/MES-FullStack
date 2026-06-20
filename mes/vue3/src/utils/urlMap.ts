@@ -1,0 +1,15 @@
+/** 后端 FreeMarker *-list-ui → 干净 SPA 路由 */
+const URL_MAP: Record<string, string> = {
+  '/admin/welcome-ui': '/welcome',
+  '/admin/sys/user/list-ui': '/system/user',
+  '/admin/sys/role/list-ui': '/system/role',
+  '/admin/sys/menu/list-ui': '/system/menu',
+  '/admin/sys/dict/list-ui': '/system/dict',
+  '/admin/sys/department/list-ui': '/system/department',
+}
+
+/** 不可导航(#/空/javascript:)→ undefined;已知→映射;未知→原样 */
+export function toSpaRoute(url?: string): string | undefined {
+  if (!url || url === '#' || url.trim() === '' || url.startsWith('javascript:')) return undefined
+  return URL_MAP[url] ?? url
+}

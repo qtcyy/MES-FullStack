@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wangziyang.mes.common.util.TreeUtil;
 import com.wangziyang.mes.system.dto.SysMenuDTO;
 import com.wangziyang.mes.system.entity.SysMenu;
+import com.wangziyang.mes.system.entity.SysRoleMenu;
 import com.wangziyang.mes.system.mapper.SysMenuMapper;
+import com.wangziyang.mes.system.mapper.SysRoleMenuMapper;
 import com.wangziyang.mes.system.service.ISysMenuService;
 import com.wangziyang.mes.system.vo.TreeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -26,6 +29,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Autowired
     private SysMenuMapper sysMenuMapper;
+
+    @Autowired
+    private SysRoleMenuMapper sysRoleMenuMapper;
 
     /**
      * 根据角色id查询菜单列表
@@ -152,5 +158,30 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             menus.add(tree);
         }
         return TreeUtil.buildList(menus, "0");
+    }
+
+    /**
+     * 物理删除菜单:
+     * 1. id 非空校验
+     * 2. 子守卫:存在子菜单则拒绝删除
+     * 3. 清理 sp_sys_role_menu 关联
+     * 4. 物理删除本条记录
+     *
+     * @param id 菜单ID
+     * @return 是否删除成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deletePhysical(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new RuntimeException("id 不能为空");
+        }
+        int childCount = this.count(new QueryWrapper<SysMenu>().eq("parent_id", id));
+        if (childCount > 0) {
+            throw new RuntimeException("请先删除子菜单");
+        }
+        // 清理角色-菜单关联
+        sysRoleMenuMapper.delete(new QueryWrapper<SysRoleMenu>().eq("menu_id", id));
+        return this.removeById(id);
     }
 }

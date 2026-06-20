@@ -1,5 +1,6 @@
 package com.wangziyang.mes.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wangziyang.mes.system.dto.SysMenuDTO;
 import com.wangziyang.mes.system.dto.SysRoleDTO;
@@ -62,6 +63,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void update(SysUserDTO record) throws Exception {
+        // BUG-FIX: 编辑时密码处理
+        // 1. 密码为空 → 不改密码，从 record 中清除 password 字段（不写 null 到 DB）
+        // 2. 密码非空 → 对明文重新加盐后写入（只加一次，不能对已存密文再加盐）
+        if (record.getPassword() == null || record.getPassword().isEmpty()) {
+            record.setPassword(null);
+        } else {
+            String hashed = new Md5Hash(record.getPassword(), record.getUsername(), 3).toString();
+            record.setPassword(hashed);
+        }
         sysUserMapper.updateById(record);
         sysRoleService.rebuild(record);
     }
@@ -83,6 +93,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
         }
         return result;
+    }
+
+    /**
+     * 软删除用户（is_deleted = '1'）
+     *
+     * @param id 用户ID
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean softDelete(String id) {
+        if (id == null || id.trim().isEmpty()) throw new RuntimeException("id 不能为空");
+        UpdateWrapper<SysUser> uw = new UpdateWrapper<>();
+        uw.eq("id", id).set("is_deleted", "1");
+        return this.update(uw);
     }
 
 }
