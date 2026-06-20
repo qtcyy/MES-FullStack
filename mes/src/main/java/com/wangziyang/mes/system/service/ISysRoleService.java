@@ -34,4 +34,12 @@ public interface ISysRoleService extends IService<SysRole> {
      * @throws Exception 异常
      */
     void rebuild(SysUserDTO sysUserDTO) throws Exception;
+
+    /**
+     * 软删除角色（is_deleted = '1'）
+     *
+     * @param id 角色ID
+     * @return 是否成功
+     */
+    boolean softDelete(String id);
 }

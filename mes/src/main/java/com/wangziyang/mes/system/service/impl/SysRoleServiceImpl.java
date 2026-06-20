@@ -1,6 +1,7 @@
 package com.wangziyang.mes.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wangziyang.mes.common.enums.CommonEnum;
 import com.wangziyang.mes.system.dto.SysRoleDTO;
@@ -66,6 +67,21 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             result.add(roleDTO);
         }
         return result;
+    }
+
+    /**
+     * 软删除角色（is_deleted = '1'）
+     *
+     * @param id 角色ID
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean softDelete(String id) {
+        if (id == null || id.trim().isEmpty()) throw new RuntimeException("id 不能为空");
+        UpdateWrapper<SysRole> uw = new UpdateWrapper<>();
+        uw.eq("id", id).set("is_deleted", "1");
+        return this.update(uw);
     }
 
     /**

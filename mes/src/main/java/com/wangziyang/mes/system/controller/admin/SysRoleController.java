@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -51,6 +52,7 @@ public class SysRoleController extends BaseController {
     @ResponseBody
     public Result page(SysRolePageReq req) {
         QueryWrapper qw = new QueryWrapper();
+        qw.ne("is_deleted", "1");
         qw.orderByDesc(req.getOrderBy());
         IPage result = sysRoleService.page(req, qw);
         return Result.success(result);
@@ -80,6 +82,13 @@ public class SysRoleController extends BaseController {
             sysRoleMenuService.rebuild(record.getId(), record.getSysMenuIds());
         }
         return Result.success(record.getId());
+    }
+
+    @PostMapping("/delete")
+    @ResponseBody
+    public Result<String> delete(@RequestParam String id) {
+        sysRoleService.softDelete(id);
+        return Result.success(id);
     }
 
     @GetMapping("/tree/{roleId}")

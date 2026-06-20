@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -52,6 +53,7 @@ public class SysUserController extends BaseController {
     @ResponseBody
     public Result page(SysUserPageReq req) throws Exception {
         QueryWrapper qw = new QueryWrapper();
+        qw.ne("is_deleted", "1");
         if (StringUtils.isNotEmpty(req.getNameLike())) {
             qw.likeRight("name", req.getNameLike());
         }
@@ -90,5 +92,12 @@ public class SysUserController extends BaseController {
             sysUserService.update(record);
         }
         return Result.success(record.getId());
+    }
+
+    @PostMapping("/delete")
+    @ResponseBody
+    public Result<String> delete(@RequestParam String id) {
+        sysUserService.softDelete(id);
+        return Result.success(id);
     }
 }

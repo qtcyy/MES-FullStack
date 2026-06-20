@@ -1,6 +1,7 @@
 package com.wangziyang.mes.system.controller.admin;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
@@ -20,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -50,7 +52,9 @@ public class SysDictController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     public Result page(SysDictPageReq req) {
-        IPage result = sysDictService.page(req);
+        QueryWrapper<SysDict> qw = new QueryWrapper<>();
+        qw.ne("is_deleted", "1");
+        IPage result = sysDictService.page(req, qw);
         return Result.success(result);
     }
 
@@ -75,5 +79,12 @@ public class SysDictController extends BaseController {
     public Result addOrUpdate(SysDict record) {
         sysDictService.saveOrUpdate(record);
         return Result.success(record.getId());
+    }
+
+    @PostMapping("/delete")
+    @ResponseBody
+    public Result<String> delete(@RequestParam String id) {
+        sysDictService.softDelete(id);
+        return Result.success(id);
     }
 }

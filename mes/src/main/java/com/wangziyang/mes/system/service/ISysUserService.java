@@ -38,4 +38,12 @@ public interface ISysUserService extends IService<SysUser> {
      * @throws Exception 异常
      */
     SysUserDTO getUserAndRoleAndMenuByUsername(String username) throws Exception;
+
+    /**
+     * 软删除用户（is_deleted = '1'）
+     *
+     * @param id 用户ID
+     * @return 是否成功
+     */
+    boolean softDelete(String id);
 }
