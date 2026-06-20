@@ -98,7 +98,9 @@ watch(
   ([val, visible]) => {
     if (!visible) return
     if (props.mode === 'edit' && val) {
-      Object.assign(form, { sortOrder: 0, ...val })
+      resetForm()
+      Object.assign(form, val)
+      if (form.sortOrder == null) form.sortOrder = 0
     } else {
       resetForm()
     }
