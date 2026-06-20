@@ -43,6 +43,12 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/system/menu/MenuList.vue'),
         meta: { title: '菜单管理', perm: 'menu:add' },
       },
+      {
+        path: 'system/department',
+        name: 'system-department',
+        component: () => import('@/views/system/dept/DeptList.vue'),
+        meta: { title: '部门管理', perm: 'dept:add' },
+      },
     ],
   },
   { path: '/403', component: () => import('@/views/error/403.vue'), meta: { public: true, title: '403' } },
