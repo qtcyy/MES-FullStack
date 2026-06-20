@@ -32,6 +32,14 @@ public class SpProductBomController extends BaseController {
     @Autowired
     private ISpMaterileService iSpMaterileService;
 
+    /**
+     * 可作为 BOM 根节点的物料类型。
+     * 1b 物料字典 material_type 的 value 为 FG(成品)/PG(半成品);
+     * 兼容历史中文脏数据 "产品"/"半成品"。
+     */
+    private static final java.util.Set<String> PRODUCT_MAT_TYPES =
+            new java.util.HashSet<>(java.util.Arrays.asList("FG", "PG", "产品", "半成品"));
+
     @PostMapping("/page")
     @ResponseBody
     public Result page(SpProductBomPageReq req) {
@@ -105,8 +113,8 @@ public class SpProductBomController extends BaseController {
                 QueryWrapper<SpMaterile> mq = new QueryWrapper<>();
                 mq.eq("materiel", record.getProductCode());
                 SpMaterile mat = iSpMaterileService.getOne(mq);
-                if (mat == null || !"产品".equals(mat.getMatType())) {
-                    return Result.failure("BOM 根节点必须对应产品物料（物料类型为\"产品\"）");
+                if (mat == null || !PRODUCT_MAT_TYPES.contains(mat.getMatType())) {
+                    return Result.failure("BOM 根节点必须对应成品/半成品物料（物料类型 FG/PG）");
                 }
             }
         }
@@ -226,7 +234,7 @@ public class SpProductBomController extends BaseController {
     @ResponseBody
     public Result getProducts() {
         QueryWrapper<SpMaterile> qw = new QueryWrapper<>();
-        qw.eq("mat_type", "产品").ne("is_deleted", "1");
+        qw.in("mat_type", PRODUCT_MAT_TYPES).ne("is_deleted", "1");
         return Result.success(iSpMaterileService.list(qw));
     }
 }

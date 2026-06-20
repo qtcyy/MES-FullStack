@@ -60,9 +60,33 @@ public class SpProductBomServiceImpl extends ServiceImpl<SpProductBomMapper, SpP
         newRoot.setStatus("draft");
         save(newRoot);
 
+        // 复制根节点自身的行项目(此前遗漏导致根节点物料清单丢失)
+        copyItems(oldRoot.getId(), newRootId);
+
         copyChildren(oldRoot.getId(), newRootId, newVer);
 
         return newRoot;
+    }
+
+    /**
+     * 复制某 BOM 节点的全部行项目到新节点(生成新 id、重映射 bomId)。
+     */
+    private void copyItems(String oldBomId, String newBomId) {
+        QueryWrapper<SpProductBomItem> itemQw = new QueryWrapper<>();
+        itemQw.eq("bom_id", oldBomId);
+        List<SpProductBomItem> items = spProductBomItemService.list(itemQw);
+        for (SpProductBomItem item : items) {
+            SpProductBomItem newItem = new SpProductBomItem();
+            newItem.setId(UUID.randomUUID().toString().replace("-", ""));
+            newItem.setBomId(newBomId);
+            newItem.setItemType(item.getItemType());
+            newItem.setMaterialCode(item.getMaterialCode());
+            newItem.setMaterialDesc(item.getMaterialDesc());
+            newItem.setQuantity(item.getQuantity());
+            newItem.setUnit(item.getUnit());
+            newItem.setSortOrder(item.getSortOrder());
+            spProductBomItemService.save(newItem);
+        }
     }
 
     private void copyChildren(String oldParentId, String newParentId, String newVer) {
@@ -76,21 +100,7 @@ public class SpProductBomServiceImpl extends ServiceImpl<SpProductBomMapper, SpP
             newChild.setBomCode(generateBomCode());
             save(newChild);
 
-            QueryWrapper<SpProductBomItem> itemQw = new QueryWrapper<>();
-            itemQw.eq("bom_id", child.getId());
-            List<SpProductBomItem> items = spProductBomItemService.list(itemQw);
-            for (SpProductBomItem item : items) {
-                SpProductBomItem newItem = new SpProductBomItem();
-                newItem.setId(UUID.randomUUID().toString().replace("-", ""));
-                newItem.setBomId(newChildId);
-                newItem.setItemType(item.getItemType());
-                newItem.setMaterialCode(item.getMaterialCode());
-                newItem.setMaterialDesc(item.getMaterialDesc());
-                newItem.setQuantity(item.getQuantity());
-                newItem.setUnit(item.getUnit());
-                newItem.setSortOrder(item.getSortOrder());
-                spProductBomItemService.save(newItem);
-            }
+            copyItems(child.getId(), newChildId);
 
             copyChildren(child.getId(), newChildId, newVer);
         }
