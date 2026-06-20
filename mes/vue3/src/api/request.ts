@@ -2,11 +2,13 @@ import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axio
 import { ElMessage } from 'element-plus'
 import type { Result } from '@/types/api'
 
-/** 把平铺对象编码为 application/x-www-form-urlencoded(跳过 undefined/null) */
+/** 把平铺对象编码为 application/x-www-form-urlencoded(跳过 undefined/null;数组→重复键) */
 export function toFormUrlEncoded(obj: Record<string, unknown>): string {
   const sp = new URLSearchParams()
   Object.entries(obj).forEach(([k, v]) => {
-    if (v !== undefined && v !== null) sp.append(k, String(v))
+    if (v === undefined || v === null) return
+    if (Array.isArray(v)) v.forEach((it) => { if (it !== undefined && it !== null) sp.append(k, String(it)) })
+    else sp.append(k, String(v))
   })
   return sp.toString()
 }
