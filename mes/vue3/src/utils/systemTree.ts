@@ -70,13 +70,16 @@ export function buildUserPayload(form: SysUserDTO, isEdit: boolean): SysUserDTO 
   return out
 }
 
-/** 字典两级拆分:类型(parentId==='0')+ 按类型 id 分组的项 */
-export function partitionDict<T extends HasIdParent>(rows: T[]): { types: T[]; itemsByType: Record<string, T[]> } {
-  const types: T[] = []
+/** 按 type 字段把字典行分组:types=去重类型(含计数),itemsByType[type]=该类型下的行 */
+export function partitionDict<T extends { type?: string }>(rows: T[]): {
+  types: Array<{ type: string; count: number }>
+  itemsByType: Record<string, T[]>
+} {
   const itemsByType: Record<string, T[]> = {}
-  rows.forEach((r) => {
-    if (r.parentId === '0') types.push(r)
-    else (itemsByType[r.parentId] ??= []).push(r)
-  })
+  for (const r of rows) {
+    const key = r.type ?? ''
+    ;(itemsByType[key] ??= []).push(r)
+  }
+  const types = Object.keys(itemsByType).map((type) => ({ type, count: itemsByType[type].length }))
   return { types, itemsByType }
 }

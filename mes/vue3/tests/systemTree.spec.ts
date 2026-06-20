@@ -38,15 +38,53 @@ describe('buildUserPayload', () => {
   })
 })
 describe('partitionDict', () => {
-  it('拆出类型(parentId=0)与按类型分组的项', () => {
+  it('按 type 字段分组:贴合真实 sp_sys_dict seed 数据(parent_id=空串)', () => {
+    // 真实数据:所有行 parent_id='""'(空串),按 type 字段分组
     const rows = [
-      { id: 't1', parentId: '0', name: '性别' },
-      { id: 'i1', parentId: 't1', name: '男' },
-      { id: 'i2', parentId: 't1', name: '女' },
+      { id: '1', parentId: '""', name: '成品',  value: 'FG',  type: 'material_type' },
+      { id: '2', parentId: '""', name: '半成品', value: 'PG',  type: 'material_type' },
+      { id: '3', parentId: '""', name: '个',     value: 'PCS', type: 'ORDER_UNIT' },
+      { id: '4', parentId: '""', name: '箱',     value: 'BOX', type: 'ORDER_UNIT' },
     ]
     const { types, itemsByType } = partitionDict(rows)
-    expect(types.map((t) => t.id)).toEqual(['t1'])
-    expect(itemsByType['t1']).toHaveLength(2)
+    // 两个去重类型
+    expect(types).toHaveLength(2)
+    // types 包含 type 字符串和 count
+    const mt = types.find((t) => t.type === 'material_type')
+    expect(mt).toBeDefined()
+    expect(mt!.count).toBe(2)
+    const ou = types.find((t) => t.type === 'ORDER_UNIT')
+    expect(ou).toBeDefined()
+    expect(ou!.count).toBe(2)
+    // itemsByType 按 type 分组正确
+    expect(itemsByType['material_type']).toHaveLength(2)
+    expect(itemsByType['ORDER_UNIT']).toHaveLength(2)
+    expect(itemsByType['material_type'].map((r) => r.value)).toEqual(['FG', 'PG'])
+  })
+
+  it('单一 type 分组', () => {
+    const rows = [
+      { id: '1', parentId: '""', name: '男', value: 'M', type: 'sex' },
+      { id: '2', parentId: '""', name: '女', value: 'F', type: 'sex' },
+    ]
+    const { types, itemsByType } = partitionDict(rows)
+    expect(types).toHaveLength(1)
+    expect(types[0].type).toBe('sex')
+    expect(types[0].count).toBe(2)
+    expect(itemsByType['sex']).toHaveLength(2)
+  })
+
+  it('空数组返回空结果', () => {
+    const { types, itemsByType } = partitionDict([])
+    expect(types).toHaveLength(0)
+    expect(Object.keys(itemsByType)).toHaveLength(0)
+  })
+
+  it('type 缺失时归入空串 key', () => {
+    const rows = [{ id: '1', parentId: '""', name: '无类型' }]
+    const { types, itemsByType } = partitionDict(rows)
+    expect(types[0].type).toBe('')
+    expect(itemsByType['']).toHaveLength(1)
   })
 })
 
