@@ -1,10 +1,17 @@
 <template>
   <div class="image-upload">
     <div v-if="modelValue" class="image-upload__preview">
-      <el-image :src="modelValue" fit="cover" class="image-upload__img" :preview-src-list="[modelValue]" />
+      <el-image
+        :src="modelValue"
+        alt="物料图片"
+        fit="cover"
+        class="image-upload__img"
+        :preview-src-list="[modelValue]"
+      />
       <el-button
         v-if="!disabled"
         class="image-upload__remove"
+        aria-label="移除图片"
         :icon="Close"
         circle
         size="small"
@@ -35,9 +42,14 @@ import type { UploadRequestOptions } from 'element-plus'
 import { materileUploadImage } from '@/api/basedata/materile'
 
 // 通用图片上传:props 入 / emit 出,零业务耦合
-withDefaults(
-  defineProps<{ modelValue?: string; disabled?: boolean }>(),
-  { modelValue: '', disabled: false },
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string
+    disabled?: boolean
+    /** 上传函数(注入),默认上传到物料端点;其它模块可传各自上传 API 复用本组件 */
+    uploadFn?: (file: File) => Promise<{ url: string }>
+  }>(),
+  { modelValue: '', disabled: false, uploadFn: materileUploadImage },
 )
 const emit = defineEmits<{ 'update:modelValue': [string] }>()
 
@@ -56,11 +68,11 @@ function beforeUpload(file: File): boolean {
   return true
 }
 
-/** 自定义上传:调 materile/upload-image,取回 url 回填 */
+/** 自定义上传:调注入的 uploadFn,取回 url 回填 */
 async function doUpload(opt: UploadRequestOptions): Promise<void> {
   uploading.value = true
   try {
-    const res = await materileUploadImage(opt.file as File)
+    const res = await props.uploadFn(opt.file as File)
     emit('update:modelValue', res.url)
     ElMessage.success('上传成功')
   } catch {
