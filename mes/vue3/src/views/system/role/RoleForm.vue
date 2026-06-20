@@ -49,7 +49,7 @@ import type { ElTree } from 'element-plus'
 import FormDialog from '@/components/FormDialog.vue'
 import type { SysRoleDTO } from '@/types/system'
 import type { TreeVO, SysMenu } from '@/types/menu'
-import { mergeCheckedMenuIds } from '@/utils/systemTree'
+import { mergeCheckedMenuIds, collectParentIds } from '@/utils/systemTree'
 
 const props = defineProps<{
   modelValue: boolean
@@ -103,6 +103,13 @@ watch(
 
 /**
  * 权限树勾选回填:
+ * - 只将叶子节点 id(非父节点)传给 setCheckedKeys
+ * - 父节点的全选/半选状态由 el-tree 根据子节点自动派生
+ * - 这样可避免:父节点 id 被当作"完全勾选"→级联勾上该父下全部子节点→权限放大
+ *
+ * 示例:若角色仅有 [p1, c1, c2] 中的 c1,
+ *   回填 [c1]→ p1 自动半选,c2 不被选中; 保存仍是 checked=[c1] + halfChecked=[p1]
+ *
  * - 监听 checkedIds 与弹窗打开(modelValue=true)联动
  * - 使用 nextTick 确保 el-tree 节点已渲染后再调用 setCheckedKeys
  * - destroy-on-close 下弹窗重开后 treeRef 已重建,需 watch modelValue 触发回填
@@ -112,7 +119,10 @@ watch(
   ([visible]) => {
     if (!visible) return
     nextTick(() => {
-      treeRef.value?.setCheckedKeys(props.checkedIds)
+      // 只设叶子 id:过滤掉父节点 id,父节点的勾选/半选由 el-tree 自动派生
+      const parentIds = collectParentIds(props.menuTree)
+      const leafOnlyIds = props.checkedIds.filter((id) => !parentIds.has(id))
+      treeRef.value?.setCheckedKeys(leafOnlyIds)
     })
   },
   { immediate: true },

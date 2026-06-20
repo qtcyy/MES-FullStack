@@ -187,9 +187,51 @@ const rules: FormRules = {
   menuName: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
 }
 
+// ─── grade 计算 ───────────────────────────────────────────────────────────────
+/**
+ * 拍平 TreeVO 树为 { id, grade } 映射,供 grade 计算使用。
+ * grade 来自节点的 _payload(原始 SysMenu),TreeVO 本身不保证携带 grade。
+ */
+function buildGradeMap(nodes: TreeVO<SysMenu>[]): Map<string, string> {
+  const map = new Map<string, string>()
+  function dfs(list: TreeVO<SysMenu>[]) {
+    for (const node of list) {
+      const g = (node as TreeVO<SysMenu> & { grade?: string }).grade
+        ?? (node._payload as SysMenu | undefined)?.grade
+      if (g) map.set(node.id, g)
+      if (node.children?.length) dfs(node.children)
+    }
+  }
+  dfs(nodes)
+  return map
+}
+
+/**
+ * 计算当前菜单的 grade:
+ * - 顶级(parentId 为空/'0') → '1'
+ * - 编辑时已有 grade → 沿用(不破坏既有值)
+ * - 有上级 → 从 gradeMap 找父 grade + 1;找不到时兜底 '2'
+ */
+function computeGrade(gradeMap: Map<string, string>): string {
+  // 编辑时沿用既有 grade
+  if (form.id && props.model?.grade) return props.model.grade
+  // 顶级菜单
+  if (!form.parentId || form.parentId === '0') return '1'
+  // 有父节点:父 grade + 1
+  const parentGrade = gradeMap.get(form.parentId)
+  if (parentGrade) return String(Number(parentGrade) + 1)
+  // 找不到父 grade 时兜底
+  return '2'
+}
+
 // ─── 提交 ─────────────────────────────────────────────────────────────────────
 async function handleSubmit() {
   await formRef.value?.validate()
+
+  // 计算 grade(sp_sys_menu.grade 是 NOT NULL 无默认值,必须提供)
+  const gradeMap = buildGradeMap(props.menuTree)
+  const grade = computeGrade(gradeMap)
+
   // 映射回后端字段名
   const payload: Partial<SysMenu> = {
     code: form.menuCode,
@@ -201,6 +243,7 @@ async function handleSubmit() {
     icon: form.icon,
     sortNum: form.sortNum,
     descr: form.descr,
+    grade,
   }
   if (form.id) payload.id = form.id
   emit('submit', payload)

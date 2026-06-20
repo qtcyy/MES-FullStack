@@ -37,6 +37,32 @@ export function mergeCheckedMenuIds(checked: string[], halfChecked: string[]): s
   return [...new Set([...checked, ...halfChecked])]
 }
 
+/**
+ * 收集树中所有"有子节点"的节点 id(非叶子/父节点 id)。
+ *
+ * 用于角色权限树回填:setCheckedKeys 只传叶子 id,
+ * 让 el-tree 自动派生父节点的全选/半选状态,避免级联误勾其余子节点。
+ *
+ * @param tree - TreeVO 树(任意深度)
+ * @returns 所有拥有 children 的节点 id 集合
+ */
+export function collectParentIds<T>(
+  tree: Array<{ id: string; children?: T[] }>,
+): Set<string> {
+  const result = new Set<string>()
+  function dfs(nodes: Array<{ id: string; children?: T[] }>) {
+    for (const node of nodes) {
+      if (node.children && node.children.length > 0) {
+        result.add(node.id)
+        // children 元素本身也可能有 children,需要递归
+        dfs(node.children as Array<{ id: string; children?: T[] }>)
+      }
+    }
+  }
+  dfs(tree)
+  return result
+}
+
 /** 用户表单提交裁剪:编辑且密码空→剔除 password */
 export function buildUserPayload(form: SysUserDTO, isEdit: boolean): SysUserDTO {
   const out = { ...form }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildTree, collectSubtreeIds, mergeCheckedMenuIds, buildUserPayload, partitionDict } from '@/utils/systemTree'
+import { buildTree, collectSubtreeIds, mergeCheckedMenuIds, buildUserPayload, partitionDict, collectParentIds } from '@/utils/systemTree'
 
 describe('buildTree', () => {
   it('平铺→树(rootId 默认 0)', () => {
@@ -47,5 +47,64 @@ describe('partitionDict', () => {
     const { types, itemsByType } = partitionDict(rows)
     expect(types.map((t) => t.id)).toEqual(['t1'])
     expect(itemsByType['t1']).toHaveLength(2)
+  })
+})
+
+describe('collectParentIds', () => {
+  it('父节点 id 被收集,叶子节点 id 不被收集', () => {
+    const tree = [
+      {
+        id: 'p1',
+        children: [
+          { id: 'c1', children: [] },
+          { id: 'c2' },
+        ],
+      },
+      { id: 'p2', children: [] },
+    ]
+    const parents = collectParentIds(tree)
+    // p1 有非空 children → 是父节点
+    expect(parents.has('p1')).toBe(true)
+    // c1 children 为空数组 → 不是父节点
+    expect(parents.has('c1')).toBe(false)
+    // c2 无 children → 不是父节点
+    expect(parents.has('c2')).toBe(false)
+    // p2 children 为空数组 → 不是父节点
+    expect(parents.has('p2')).toBe(false)
+  })
+
+  it('多层嵌套:中间层父节点全部被收集', () => {
+    const tree = [
+      {
+        id: 'root',
+        children: [
+          {
+            id: 'mid',
+            children: [
+              { id: 'leaf1' },
+              { id: 'leaf2' },
+            ],
+          },
+        ],
+      },
+    ]
+    const parents = collectParentIds(tree)
+    // root 和 mid 都是父节点
+    expect(parents.has('root')).toBe(true)
+    expect(parents.has('mid')).toBe(true)
+    // leaf1/leaf2 是叶子
+    expect(parents.has('leaf1')).toBe(false)
+    expect(parents.has('leaf2')).toBe(false)
+    // 共 2 个父节点
+    expect(parents.size).toBe(2)
+  })
+
+  it('空树返回空集合', () => {
+    expect(collectParentIds([]).size).toBe(0)
+  })
+
+  it('只含叶子节点(无 children)返回空集合', () => {
+    const tree = [{ id: 'a' }, { id: 'b' }]
+    expect(collectParentIds(tree).size).toBe(0)
   })
 })
