@@ -120,3 +120,45 @@ export interface ProductBomPageReq extends PageReq {
   productCodeLike?: string
   nodeNameLike?: string
 }
+
+/** 工艺路线-工序关系(对应 sp_flow_oper_relation,本页只读预览用其中几列) */
+export interface SpFlowOperRelation {
+  id: string
+  flowId?: string
+  operId?: string
+  oper?: string          // 工序编码(后端存 oper 列)
+  sortNum?: number       // 执行顺序
+  operType?: string      // 'firstOper' | 'lastOper' | 其它
+}
+
+/** 工序预览项(后端 list/opers 端点 opers 数组元素) */
+export interface FlowOperItem {
+  relation: SpFlowOperRelation
+  oper?: SpOper | null   // join 出的工序详情(operDesc 等)
+}
+
+/** BOM-工艺绑定行(对应 sp_bom_flow) */
+export interface SpBomFlow {
+  id: string
+  bomId: string
+  flowId: string
+  status?: 'draft' | 'locked'
+  remark?: string
+  sortOrder?: number
+}
+
+/** list/{rootId} 返回的扁平节点项(无绑定时仅 bomNode) */
+export interface BomFlowNodeVO {
+  bomNode: SpProductBom
+  bomFlow?: SpBomFlow | null
+  flow?: SpFlow | null
+  opers?: FlowOperItem[]
+}
+
+/** 前端构建的树节点:展平 bomNode 到顶层(供 TreeTable row-key/列),挂 flow/opers/children */
+export interface BomFlowTreeNode extends SpProductBom {
+  bomFlow?: SpBomFlow | null
+  flow?: SpFlow | null
+  opers?: FlowOperItem[]
+  children: BomFlowTreeNode[]
+}
