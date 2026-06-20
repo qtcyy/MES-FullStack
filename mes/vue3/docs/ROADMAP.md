@@ -158,7 +158,7 @@ mes/vue3/
 ### Cycle 1 — 核心业务闭环 + 三大亮点（🚧 本作业主交付）
 系统管理 + 物料 + 工艺（BOM/工艺路线）+ 计划（工单/派工/甘特）+ 数字化大屏 + 3D 数字孪生 + AI 助手 + 工作流（分类/表单/定义/事件，非 BPMN 设计器部分）。
 
-> **Cycle 1 体量过大，按子周期 1a~1h 逐个推进**（每个一条 `feature/*` 分支 + 独立 spec→plan→实现→审查→合并）：1a 系统管理 ✅ / 1b 基础数据·物料 ✅ / 1c 工艺技术线（**1c-1 工艺路线 ✅** / 1c-2 产品 BOM / 1c-3 BOM-工艺绑定）/ 1d 计划·订单 / 1e 数字化大屏 / 1f 3D 数字孪生 / 1g AI 助手 / 1h 工作流配置。
+> **Cycle 1 体量过大，按子周期 1a~1h 逐个推进**（每个一条 `feature/*` 分支 + 独立 spec→plan→实现→审查→合并）：1a 系统管理 ✅ / 1b 基础数据·物料 ✅ / 1c 工艺技术线（**1c-1 工艺路线 ✅** / **1c-2 产品 BOM ✅** / 1c-3 BOM-工艺绑定）/ 1d 计划·订单 / 1e 数字化大屏 / 1f 3D 数字孪生 / 1g AI 助手 / 1h 工作流配置。
 >
 > **✅ 1a 系统管理已完成（2026-06-20，分支 `feature/system`）**：用户/角色/菜单/字典/部门五页 CRUD。沉淀通用原语 `TreeTable`/`MasterDetailLayout` + `urlMap` 路由翻译 + `systemTree` 纯函数（TDD）。后端最小补齐：5 个删除端点（用户/角色/字典/部门软删 + 列表过滤 + 软删用户阻断登录；菜单物理删 + 子守卫 + role_menu 清理）+ 审查修正 add-or-update（用户编辑密码加盐、角色保存与菜单 rebuild 同事务）+ 字典菜单种子（id=108）。详见 `docs/specs|plans/2026-06-20-cycle1a-system-management*`。
 >
@@ -204,7 +204,7 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 ### 9.3 工艺 technology
 | 功能 | 关键后端接口 | 周期 | 状态 |
 |---|---|---|---|
-| 产品 BOM（树/版本/锁定/子项） | `/technology/product-bom/*` | C1 | ☐ |
+| 产品 BOM（树/版本/锁定/子项） | `/technology/product-bom/*` | C1·1c-2 | ✅ |
 | 工艺路线（流程+工序+关系，穿梭） | `/basedata/flow/*` `/basedata/sp-oper/*` `/basedata/flow/process/*` | C1·1c-1 | ✅ |
 | BOM-工艺绑定 | `/technology/bom-flow/*` | C1 | ☐ |
 | 工序内容（设备/文档/上传） | `/technology/process-content/*` | C3 | ☐ |
@@ -272,6 +272,7 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 - ✅ **子周期 1b 基础数据·物料完成（2026-06-20，分支 `feature/basedata-materile` → 待合 `develop`）**：物料维护单页 + 字典下拉助手。沉淀 `ImageUpload`/`useDict` + `utils/materile` 纯函数（TDD）。后端 `SpMaterileController` 三处审查修正（page 软删过滤/delete 软删/getCodePrefix 字典前缀）。前端门禁全绿（typecheck 0 / test 36 / lint 0 err / build ✓）+ 后端 `mvn compile` BUILD SUCCESS。subagent 驱动逐任务两阶段审查 + opus 终审 **Ready to merge**。
 - ⏳ **1b 待人工确认**：启动后端（9090）后浏览器（:4200）冒烟——`admin/123` 登录 → 物料维护 → 搜索/分页 → 新增（字典下拉 + 图片上传 + 自动编码）→ 编辑 → 软删消失。
 - ✅ **子周期 1c-1 工艺路线完成（2026-06-20，分支 `feature/technology-flow` → 待合 `develop`）**：工序定义页（列表 搜索/分页 + 新增/编辑弹窗 校验[制造周期>工时]/加工单元下拉）+ 工艺路线管理页（列表 工序链渲染 + 有序穿梭框编辑弹窗 候选池/编辑回填/校验[≥2 工序]/级联删确认）。沉淀通用原语 `OrderedTransfer.vue`（有序穿梭框：搜索/上下移/移除/首末道标记/链预览/a11y，1c-3 可复用）+ `utils/technology` 纯函数（buildOperPayload/validateOper/operToTransferItem/excludeSelected/moveItem/toSpOperVoList/buildFlowPayload/validateFlow，TDD 20 例）。**后端两处最小修正（已审查）**：① 工艺路线删除事务化（`deleteFlowWithRelations` 加 `@Transactional`，头表+关系同事务）② 工序删除引用守卫（被任一路线 oper_id/per/next 引用则拒删，防孤儿/断链）+ Mockito 守卫单测 2 例（JUnit4，`Result extends HashMap`、MP3.1.2 count 返回 int）。**菜单 151 工艺路线管理 DB 已存在**；新增 `scripts/sql/oper-menu-seed.sql`（工序定义菜单 id=153，**需手动跑**）+ urlMap 2 条 + router 2 路由。门禁全绿（typecheck 0 / test 56 / lint 0 err / build ✓）+ 后端 `mvn compile` BUILD SUCCESS + 守卫单测 2 绿。subagent 驱动逐任务两阶段审查 + opus 终审。spec/plan：`docs/specs|plans/2026-06-20-cycle1c1-technology-flow*`。
-- ⏳ **1c-1 待人工确认**：启动后端（9090）+ 执行 `scripts/sql/oper-menu-seed.sql` 后浏览器（:4200）冒烟——`admin/123` 登录 → 工艺管理 → 工序定义 CRUD（周期>工时校验、自动编码 OPR-XXX、被引用拒删）→ 工艺路线 新建（穿梭框选≥2 工序、上下移、链预览、保存）→ 编辑回填 → 删除级联。
-- ☐ 其余子周期：1c-2 产品 BOM / 1c-3 BOM-工艺绑定 / 1d 订单 / 1e 大屏 / 1f 3D / 1g AI / 1h 工作流，及 Cycle 2+。
-- **下一步**：合并 1c-1 到 `develop`；1a/1b/1c-1 浏览器冒烟确认；启动子周期 1c-2（产品 BOM）。
+- ✅ **子周期 1c-2 产品 BOM 完成（2026-06-20，分支 `feature/product-bom` → `develop` 已 `--no-ff` 合并）**：单页双态——浏览态（列表/树视图切换 + 新建根 + 级联删除）↔ 编辑态（主从：左结构树点选 + 右节点信息卡/物料行表 + 锁定整树/创建新版本）。对接后端**已存在**的 `/technology/product-bom/*`（11 端点：page/tree/save/delete/lock/new-version/items/item-save/item-delete/products）。沉淀 `utils/productBom` 纯函数（pickBomSubtree/findBomNode/canWriteBom/buildBomNodePayload/validateBomNode/buildBomItemPayload/validateBomItem/materielToItem，TDD 23 例）+ 4 个视图组件（ProductBomList/BomNodeDetail/BomNodeForm/BomItemForm）。**后端审查修 2 个真 bug**：① `/products` 与根节点校验硬编码中文「产品」→ 放宽白名单 {FG,PG,产品,半成品}（对齐 1b 字典 value，实连 DB 证 mat_type 真实值含 FG）② `createNewVersion` 漏复制根节点自身行项目 → 抽 `copyItems` 根节点也复制 + Mockito 守卫单测 7 例。**新增 `scripts/sql/product-bom-menu-seed.sql`（菜单 id=154「产品BOM管理」，父 15，需手动跑）** + urlMap 1 条 + router 1 路由。门禁全绿（typecheck 0 / test 79 / lint 0 err / build ✓）+ 后端 `mvn compile` BUILD SUCCESS + 守卫单测 7 绿。subagent 驱动逐任务两阶段审查 + opus 终审 **Ready to merge**。spec/plan：`docs/specs|plans/2026-06-20-cycle1c2-product-bom*`。
+- ⏳ **1c-1 / 1c-2 待人工确认**：启动后端（9090）+ 执行 `scripts/sql/oper-menu-seed.sql`、`scripts/sql/product-bom-menu-seed.sql`、`scripts/sql/product-bom.sql`（建表）后浏览器（:4200）冒烟——`admin/123` 登录 → 工艺管理 → 工序定义/工艺路线（1c-1）+ 产品BOM管理（1c-2：新建根选产品→加子节点→加物料行→锁定整树→创建新版本→删除级联）。
+- ☐ 其余子周期：1c-3 BOM-工艺绑定 / 1d 订单 / 1e 大屏 / 1f 3D / 1g AI / 1h 工作流，及 Cycle 2+。
+- **下一步**：1a/1b/1c-1/1c-2 浏览器冒烟确认；启动子周期 1c-3（BOM-工艺绑定，复用 `OrderedTransfer` + 产品 BOM 树）。
