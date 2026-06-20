@@ -15,13 +15,13 @@ export default defineConfig(({ mode }) => {
       // 自动按需引入 Vue/Router/Pinia/VueUse 的 API
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
-        resolvers: [ElementPlusResolver()],
+        resolvers: [ElementPlusResolver({ importStyle: false })],
         dts: 'src/types/auto-imports.d.ts',
         eslintrc: { enabled: true },
       }),
       // 自动按需引入 Element Plus 组件(tree-shaking)
       Components({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [ElementPlusResolver({ importStyle: false })],
         dts: 'src/types/components.d.ts',
       }),
     ],
