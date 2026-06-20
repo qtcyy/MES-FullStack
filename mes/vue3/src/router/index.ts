@@ -55,6 +55,12 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/system/dict/DictList.vue'),
         meta: { title: '字典管理', perm: 'dict:add' },
       },
+      {
+        path: 'basedata/materile',
+        name: 'basedata-materile',
+        component: () => import('@/views/basedata/materile/MaterileList.vue'),
+        meta: { title: '物料维护', perm: 'materile:add' },
+      },
     ],
   },
   { path: '/403', component: () => import('@/views/error/403.vue'), meta: { public: true, title: '403' } },

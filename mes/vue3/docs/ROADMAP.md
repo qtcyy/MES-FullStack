@@ -161,6 +161,8 @@ mes/vue3/
 > **Cycle 1 体量过大，按子周期 1a~1h 逐个推进**（每个一条 `feature/*` 分支 + 独立 spec→plan→实现→审查→合并）：1a 系统管理 ✅ / 1b 基础数据·物料 / 1c 工艺技术线 / 1d 计划·订单 / 1e 数字化大屏 / 1f 3D 数字孪生 / 1g AI 助手 / 1h 工作流配置。
 >
 > **✅ 1a 系统管理已完成（2026-06-20，分支 `feature/system`）**：用户/角色/菜单/字典/部门五页 CRUD。沉淀通用原语 `TreeTable`/`MasterDetailLayout` + `urlMap` 路由翻译 + `systemTree` 纯函数（TDD）。后端最小补齐：5 个删除端点（用户/角色/字典/部门软删 + 列表过滤 + 软删用户阻断登录；菜单物理删 + 子守卫 + role_menu 清理）+ 审查修正 add-or-update（用户编辑密码加盐、角色保存与菜单 rebuild 同事务）+ 字典菜单种子（id=108）。详见 `docs/specs|plans/2026-06-20-cycle1a-system-management*`。
+>
+> **✅ 1b 基础数据·物料已完成（2026-06-20，分支 `feature/basedata-materile`）**：物料维护单页（列表 搜索/分页/图片列/字典 label + 新增/编辑弹窗 动态字典下拉/校验/图片上传 + 软删）+ 字典下拉助手。沉淀通用原语 `ImageUpload`（上传函数 prop 注入，真正可复用 + a11y）/ `useDict`（按 type 取字典 + 模块级 Promise 缓存 + 降级）+ `utils/materile` 纯函数（buildMaterilePayload/resolveDictLabel/toDictOptions，TDD 10 例）。**动态字典走真实 DB**（material_type=成品/半成品 FG/PG、ORDER_UNIT=个/箱 PCS/BOX）。后端最小修正 `SpMaterileController`：page 加 `is_deleted` 软删过滤 + create_time 排序、delete 由物理删改 UpdateWrapper 软删、getCodePrefix 补字典 value(FG/PG) 前缀映射。**菜单 131 DB 已存在，零种子 SQL**；urlMap 加 `/basedata/materile/list-ui`→`/basedata/materile`。工艺路线 flowId 绑定本周期不做（依赖 1c）。详见 `docs/specs|plans/2026-06-20-cycle1b-basedata-materile*`。**backlog**：图片管线 object-key 重签 + 遗留 image_url（过期预签名/相对路径）迁移；`/basedata/dict/list` 未过滤 is_deleted；自动编码并发竞态；source 字典化。
 
 ### Cycle 2 — 库存 + 剩余基础数据 + 组织（☐）
 入库/出库/库存查询/手工入库；设备 / 设备编组 / 加工单元 / 仓库（库位）/ 零部件 / 班组（成员）。
@@ -192,8 +194,8 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 ### 9.2 基础数据 basedata
 | 功能 | 关键后端接口 | 周期 | 状态 |
 |---|---|---|---|
-| 物料维护（+图片上传） | `/basedata/materile/page|add-or-update|upload-image|delete` | C1 | ☐ |
-| 字典下拉助手 | `/basedata/dict/list/{type}` | C1 | ☐ |
+| 物料维护（+图片上传） | `/basedata/materile/page|add-or-update|upload-image|delete` | C1·1b | ✅ |
+| 字典下拉助手 | `/basedata/dict/list/{type}` | C1·1b | ✅ |
 | 设备 / 设备编组 | `/basedata/device/*` `/basedata/device-group/*` | C2 | ☐ |
 | 加工单元 / 仓库（库位） | `/basedata/process-unit/*` `/basedata/warehouse/*` | C2 | ☐ |
 | 零部件 | `/basedata/component/*` | C2 | ☐ |
@@ -267,5 +269,7 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 - ⏳ 待你启动后端（9090）后做浏览器联调冒烟：`admin/123` 登录 → 菜单树侧栏 → 主题切换持久化 → 刷新保持登录 → 退出拦截。
 - ✅ **子周期 1a 系统管理完成（2026-06-20，分支 `feature/system` → `develop`）**：五页 CRUD + 后端 5 删除端点/审查修正/字典菜单种子。前端门禁全绿（`typecheck` 0 / `test` 26 / `build` ✓ / `lint` 0 err）；后端守卫测试 15 全绿、`mvn compile` BUILD SUCCESS（JDK11）。subagent 驱动逐任务两阶段审查 + opus 终审（揪出并修复角色权限树回填级联、菜单 grade NOT NULL、字典按 type 分组三处）。
 - ⏳ **1a 待人工确认**：需启动后端（9090）+ 执行 `scripts/sql/dict-menu-seed.sql`（字典菜单）后浏览器端到端冒烟（`admin/123` 登录 → 系统管理五项 → 各页 CRUD + 角色权限树勾选 round-trip + 字典两级 + 菜单/部门树）。
-- ☐ 其余子周期：1b 物料 / 1c 工艺 / 1d 订单 / 1e 大屏 / 1f 3D / 1g AI / 1h 工作流，及 Cycle 2+。
-- **下一步**：push `develop`；1a 浏览器冒烟确认；启动子周期 1b（基础数据·物料）。
+- ✅ **子周期 1b 基础数据·物料完成（2026-06-20，分支 `feature/basedata-materile` → 待合 `develop`）**：物料维护单页 + 字典下拉助手。沉淀 `ImageUpload`/`useDict` + `utils/materile` 纯函数（TDD）。后端 `SpMaterileController` 三处审查修正（page 软删过滤/delete 软删/getCodePrefix 字典前缀）。前端门禁全绿（typecheck 0 / test 36 / lint 0 err / build ✓）+ 后端 `mvn compile` BUILD SUCCESS。subagent 驱动逐任务两阶段审查 + opus 终审 **Ready to merge**。
+- ⏳ **1b 待人工确认**：启动后端（9090）后浏览器（:4200）冒烟——`admin/123` 登录 → 物料维护 → 搜索/分页 → 新增（字典下拉 + 图片上传 + 自动编码）→ 编辑 → 软删消失。
+- ☐ 其余子周期：1c 工艺 / 1d 订单 / 1e 大屏 / 1f 3D / 1g AI / 1h 工作流，及 Cycle 2+。
+- **下一步**：合并 1b 到 `develop` 并 push；1a/1b 浏览器冒烟确认；启动子周期 1c（工艺技术线）。
