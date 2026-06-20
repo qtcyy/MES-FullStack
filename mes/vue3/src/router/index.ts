@@ -25,6 +25,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '首页' },
       },
       // ↓ Cycle 1 起在此追加各模块子路由(path 对齐后端菜单 url)
+      {
+        path: 'system/user',
+        name: 'system-user',
+        component: () => import('@/views/system/user/UserList.vue'),
+        meta: { title: '用户管理', perm: 'user:add' },
+      },
     ],
   },
   { path: '/403', component: () => import('@/views/error/403.vue'), meta: { public: true, title: '403' } },
