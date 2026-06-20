@@ -3,10 +3,13 @@ package com.wangziyang.mes.system;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wangziyang.mes.system.mapper.SysDepartmentMapper;
 import com.wangziyang.mes.system.mapper.SysDictMapper;
+import com.wangziyang.mes.system.mapper.SysMenuMapper;
 import com.wangziyang.mes.system.mapper.SysRoleMapper;
+import com.wangziyang.mes.system.mapper.SysRoleMenuMapper;
 import com.wangziyang.mes.system.mapper.SysUserMapper;
 import com.wangziyang.mes.system.service.impl.SysDepartmentServiceImpl;
 import com.wangziyang.mes.system.service.impl.SysDictServiceImpl;
+import com.wangziyang.mes.system.service.impl.SysMenuServiceImpl;
 import com.wangziyang.mes.system.service.impl.SysRoleServiceImpl;
 import com.wangziyang.mes.system.service.impl.SysUserServiceImpl;
 import org.junit.Test;
@@ -26,6 +29,16 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SysDeleteGuardTest {
+
+    // --- Menu ---
+    @Mock
+    private SysMenuMapper sysMenuMapper;
+
+    @Mock
+    private SysRoleMenuMapper sysRoleMenuMapper;
+
+    @InjectMocks
+    private SysMenuServiceImpl sysMenuService;
 
     // --- User ---
     @Mock
@@ -151,5 +164,28 @@ public class SysDeleteGuardTest {
         String sql = cap.getValue().getSqlSet();
         assertThat(sql).contains("is_deleted");
         assertThat(sql).contains("1");
+    }
+
+    // =========================================================
+    // A2: Menu physical delete — child guard
+    // =========================================================
+
+    @Test
+    public void deleteMenu_withChildren_throws() {
+        // inject baseMapper (parent class field in ServiceImpl)
+        ReflectionTestUtils.setField(sysMenuService, "baseMapper", sysMenuMapper);
+        ReflectionTestUtils.setField(sysMenuService, "sysRoleMenuMapper", sysRoleMenuMapper);
+        // 模拟该菜单下有 2 个子菜单
+        when(sysMenuMapper.selectCount(any())).thenReturn(2);
+
+        assertThatThrownBy(() -> sysMenuService.deletePhysical("M1"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("子菜单");
+    }
+
+    @Test
+    public void deleteMenu_nullId_throws() {
+        assertThatThrownBy(() -> sysMenuService.deletePhysical(null))
+                .isInstanceOf(RuntimeException.class);
     }
 }
