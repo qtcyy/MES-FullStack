@@ -10,6 +10,7 @@
         最后更新 {{ lastUpdatedText }}
       </span>
       <el-button :loading="loading" size="small" @click="emit('refresh')">刷新</el-button>
+      <el-button v-if="showFullscreen" size="small" @click="emit('fullscreen')">全屏</el-button>
       <el-button size="small" @click="emit('back')">返回后台</el-button>
     </div>
   </header>
@@ -18,8 +19,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-const props = defineProps<{ title: string; lastUpdated?: number | null; loading?: boolean }>()
-const emit = defineEmits<{ refresh: []; back: [] }>()
+const props = defineProps<{ title: string; lastUpdated?: number | null; loading?: boolean; showFullscreen?: boolean }>()
+const emit = defineEmits<{ refresh: []; back: []; fullscreen: [] }>()
 
 const now = ref(Date.now())
 let timer: ReturnType<typeof setInterval> | undefined

@@ -17,6 +17,9 @@ describe('toSpaRoute', () => {
   it('数字化智慧大屏映射到干净路由', () => {
     expect(toSpaRoute('/digitization/plan/plan-ui')).toBe('/digitization/dashboard')
   })
+  it('3D 数字孪生映射到干净路由', () => {
+    expect(toSpaRoute('/digital/simulation/list-ui')).toBe('/digitization/simulation')
+  })
   it('不可导航 → undefined', () => {
     expect(toSpaRoute('#')).toBeUndefined()
     expect(toSpaRoute('')).toBeUndefined()

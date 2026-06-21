@@ -117,6 +117,18 @@ export const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: '/digitization/simulation',
+    component: () => import('@/layouts/ScreenLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'digitization-simulation',
+        component: () => import('@/views/digitization/simulation/Simulation3DPage.vue'),
+        meta: { title: '数字仿真3D仓库', perm: 'warehouse:add' },
+      },
+    ],
+  },
   { path: '/403', component: () => import('@/views/error/403.vue'), meta: { public: true, title: '403' } },
   { path: '/500', component: () => import('@/views/error/500.vue'), meta: { public: true, title: '500' } },
   {
