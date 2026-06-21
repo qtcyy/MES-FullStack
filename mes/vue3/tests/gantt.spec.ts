@@ -20,6 +20,10 @@ describe('parseDay', () => {
     expect(d.getDate()).toBe(21)
   })
   it('空值返回 null', () => { expect(parseDay(undefined)).toBeNull(); expect(parseDay('')).toBeNull() })
+  it('月份/日越界返回 null', () => {
+    expect(parseDay('2026-13-01')).toBeNull()
+    expect(parseDay('2026-06-32')).toBeNull()
+  })
 })
 
 describe('daysBetween', () => {
@@ -39,6 +43,9 @@ describe('getDisplayStatus', () => {
   })
   it('未开工=notStarted', () => {
     expect(getDisplayStatus(task({ planStartTime: '2026-06-22', planEndTime: '2026-06-25' }), now)).toBe('notStarted')
+  })
+  it('已开工且今日恰为截止日=inProgress(当天不算逾期)', () => {
+    expect(getDisplayStatus(task({ actualStartTime: '2026-06-10', planEndTime: '2026-06-21' }), now)).toBe('inProgress')
   })
 })
 

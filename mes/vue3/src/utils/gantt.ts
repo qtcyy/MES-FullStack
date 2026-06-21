@@ -10,6 +10,7 @@ export function parseDay(s?: string | null): number | null {
   if (m.length !== 3) return null
   const [y, mo, d] = m.map(Number)
   if (!y || !mo || !d) return null
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null
   return new Date(y, mo - 1, d).getTime()
 }
 
@@ -19,6 +20,10 @@ export function floorDay(ms: number): number {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
 }
 
+/**
+ * 两个时间戳相差的整天数（端点差，非跨度）。
+ * 注意：同一天返回 0；渲染条宽度需用 (daysBetween(start,end) + 1) 才是占用天数。
+ */
 export function daysBetween(a: number, b: number): number {
   return Math.round((floorDay(b) - floorDay(a)) / DAY_MS)
 }
@@ -30,6 +35,7 @@ export function getDisplayStatus(task: GanttTask, nowMs: number): DisplayStatus 
   if (task.actualEndTime) return 'completed'
   if (task.actualStartTime) {
     const planEnd = parseDay(task.planEndTime)
+    // 截止日当天不算逾期：仅当"今日零点"严格晚于"计划结束日零点"（即次日起）才判逾期
     if (planEnd !== null && nowMs > planEnd) return 'overdue'
     return 'inProgress'
   }
