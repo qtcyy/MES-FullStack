@@ -36,7 +36,12 @@
         LEFT JOIN sp_oper p ON p.id = d.oper_id
         LEFT JOIN sp_team t ON t.id = d.team_id
         LEFT JOIN sp_sys_user u ON u.id = d.user_id
-        WHERE d.oper_id IS NOT NULL
+        <!--
+          订单级派工(assignWorker)创建的记录 oper_id 为 NULL,曾用 WHERE d.oper_id IS NOT NULL
+          过滤会把这些记录全部排除,导致甘特图对正常派工后的工单空白。改为 1=1 兜底,
+          使订单级 + 工序级派工记录都进入甘特聚合。
+        -->
+        WHERE 1 = 1
         <if test="req.orderCode != null and req.orderCode != ''">
             AND o.order_code LIKE CONCAT('%', #{req.orderCode}, '%')
         </if>

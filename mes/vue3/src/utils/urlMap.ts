@@ -11,6 +11,9 @@ const URL_MAP: Record<string, string> = {
   '/basedata/sp-oper/list-ui': '/technology/oper',
   '/technology/product-bom/list-ui': '/technology/product-bom',
   '/technology/bom-flow/list-ui': '/technology/bom-flow',
+  '/order/release/list-ui': '/order/release',
+  '/order/dispatch': '/order/dispatch',
+  '/order/gantt': '/order/gantt',
 }
 
 /** 不可导航(#/空/javascript:)→ undefined;已知→映射;未知→原样 */

@@ -4,7 +4,10 @@
 
     <TableSkeleton v-if="loading && !data.length" :rows="pager.size" />
 
-    <el-table v-else v-loading="loading" :data="data" :row-key="rowKey" stripe v-auto-animate @row-click="(row: T) => emit('row-click', row)">
+    <el-table v-else v-loading="loading" :data="data" :row-key="rowKey" stripe v-auto-animate
+      @row-click="(row: T) => emit('row-click', row)"
+      @selection-change="(rows: T[]) => emit('selection-change', rows)">
+      <el-table-column v-if="selectable" type="selection" width="46" :reserve-selection="true" />
       <el-table-column
         v-for="c in columns"
         :key="c.prop"
@@ -60,13 +63,15 @@ withDefaults(
     pager: { current: number; size: number; total: number }
     rowKey?: string
     actionWidth?: number | string
+    selectable?: boolean
   }>(),
-  { loading: false, rowKey: 'id', actionWidth: 180 },
+  { loading: false, rowKey: 'id', actionWidth: 180, selectable: false },
 )
 const emit = defineEmits<{
   'page-change': [number]
   'size-change': [number]
   'row-click': [T]
+  'selection-change': [T[]]
 }>()
 </script>
 
