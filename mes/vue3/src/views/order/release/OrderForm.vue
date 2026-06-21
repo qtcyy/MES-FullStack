@@ -7,15 +7,15 @@
     @update:model-value="(v) => emit('update:modelValue', v)"
     @submit="handleSubmit"
   >
-    <el-form :model="form" label-width="96px">
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="96px">
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="工单编号">
+          <el-form-item label="工单编号" prop="orderCode">
             <el-input v-model="form.orderCode" placeholder="请输入工单编号" clearable />
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="工单类型">
+          <el-form-item label="工单类型" prop="orderType">
             <el-select v-model="form.orderType" placeholder="请选择" clearable style="width: 100%">
               <el-option label="量产 (P)" value="P" />
               <el-option label="验证 (A)" value="A" />
@@ -27,7 +27,7 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="物料">
+          <el-form-item label="物料" prop="materiel">
             <el-select
               v-model="form.materiel"
               placeholder="请选择物料"
@@ -46,7 +46,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="数量">
+          <el-form-item label="数量" prop="qty">
             <el-input-number
               v-model="form.qty"
               :min="1"
@@ -101,8 +101,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, computed, watch } from 'vue'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import FormDialog from '@/components/FormDialog.vue'
 import { useRequest } from '@/composables/useRequest'
 import { materilePage } from '@/api/basedata/materile'
@@ -110,6 +110,7 @@ import { flowList } from '@/api/technology/flow'
 import { buildOrderPayload, validateOrder } from '@/utils/order'
 import type { SpOrder } from '@/types/order'
 import type { SpMaterile } from '@/types/basedata'
+import type { SpFlow } from '@/types/technology'
 
 const props = defineProps<{
   modelValue: boolean
@@ -123,6 +124,7 @@ const emit = defineEmits<{
   submit: [Partial<SpOrder>]
 }>()
 
+const formRef = ref<FormInstance>()
 const isEdit = computed(() => !!props.model?.id)
 const form = reactive<Partial<SpOrder>>({})
 
@@ -131,31 +133,34 @@ const { data: matPage } = useRequest(() => materilePage({ current: 1, size: 200 
 const materials = computed<SpMaterile[]>(() => matPage.value?.records ?? [])
 
 // 工艺路线下拉(全量 GET)
-const { data: flows } = useRequest(() => flowList(), { immediate: true, initialData: [] })
+const { data: flowData } = useRequest(() => flowList(), { immediate: true, initialData: [] })
+const flows = computed<SpFlow[]>(() => flowData.value ?? [])
 
 watch(
-  () => props.modelValue,
-  (open) => {
-    if (open) {
-      const m = props.model ?? {}
-      Object.keys(form).forEach((k) => delete (form as Record<string, unknown>)[k])
-      Object.assign(form, { qty: 1, ...m })
-    }
+  () => props.model,
+  (m) => {
+    Object.keys(form).forEach((k) => delete (form as Record<string, unknown>)[k])
+    Object.assign(form, { qty: 1, ...(m ?? {}) })
   },
   { immediate: true },
 )
+
+const rules: FormRules = {
+  orderCode: [{ required: true, message: '请输入工单编号', trigger: 'blur' }],
+  orderType: [{ required: true, message: '请选择工单类型', trigger: 'change' }],
+  materiel: [{ required: true, message: '请选择物料', trigger: 'change' }],
+  qty: [{ required: true, message: '数量须为正整数', trigger: 'change' }],
+}
 
 function onMaterielChange(code: string) {
   const hit = materials.value.find((m) => m.materiel === code)
   if (hit) form.materielDesc = hit.materielDesc
 }
 
-function handleSubmit() {
+async function handleSubmit() {
+  await formRef.value?.validate()
   const err = validateOrder(form)
-  if (err) {
-    ElMessage.warning(err)
-    return
-  }
+  if (err) { ElMessage.warning(err); return }
   emit('submit', buildOrderPayload(form))
 }
 </script>
