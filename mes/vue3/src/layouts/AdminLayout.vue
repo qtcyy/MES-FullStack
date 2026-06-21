@@ -23,6 +23,8 @@
         </router-view>
       </el-main>
     </el-container>
+
+    <AiAssistant />
   </el-container>
 </template>
 
@@ -30,6 +32,7 @@
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 import AppSidebar from './components/AppSidebar.vue'
+import AiAssistant from '@/components/ai/AiAssistant.vue'
 import AppHeader from './components/AppHeader.vue'
 import AppTabs from './components/AppTabs.vue'
 import { useAppStore } from '@/stores/app'
