@@ -1,8 +1,10 @@
 package com.wangziyang.mes.digitization.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangziyang.mes.basedata.entity.SpDevice;
 import com.wangziyang.mes.basedata.mapper.SpDeviceMapper;
 import com.wangziyang.mes.basedata.mapper.SpMaterileMapper;
+import com.wangziyang.mes.basedata.entity.SpMaterile;
 import com.wangziyang.mes.digitization.dto.DashboardKpiVO;
 import com.wangziyang.mes.digitization.dto.DashboardOverviewVO;
 import com.wangziyang.mes.digitization.dto.MonthlyTrendVO;
@@ -55,8 +57,8 @@ public class DashboardServiceImpl implements IDashboardService {
 
         DashboardKpiVO kpi = new DashboardKpiVO();
         long orderCount = spOrderMapper.selectCount(null);
-        long deviceCount = spDeviceMapper.selectCount(null);
-        long materielCount = spMaterileMapper.selectCount(null);
+        long deviceCount = spDeviceMapper.selectCount(new QueryWrapper<SpDevice>().ne("is_deleted", "1"));
+        long materielCount = spMaterileMapper.selectCount(new QueryWrapper<SpMaterile>().ne("is_deleted", "1"));
         long flowCount = spFlowMapper.selectCount(null);
         kpi.setOrderCount(orderCount);
         kpi.setDeviceCount(deviceCount);
@@ -67,7 +69,7 @@ public class DashboardServiceImpl implements IDashboardService {
         List<SpOrder> orders = spOrderMapper.selectList(null);
         vo.setOrderStatus(orderStatusDist(orders));
         vo.setOrderType(orderTypeDist(orders));
-        vo.setDeviceStatus(deviceStatusDist(spDeviceMapper.selectList(null)));
+        vo.setDeviceStatus(deviceStatusDist(spDeviceMapper.selectList(new QueryWrapper<SpDevice>().ne("is_deleted", "1"))));
         vo.setMonthlyTrend(fillTrailing12Months(dashboardMapper.selectMonthlyTrend(), YearMonth.now()));
         return vo;
     }

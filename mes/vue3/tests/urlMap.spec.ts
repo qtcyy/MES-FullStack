@@ -14,6 +14,9 @@ describe('toSpaRoute', () => {
   it('未知 url 原样返回', () => {
     expect(toSpaRoute('/welcome')).toBe('/welcome')
   })
+  it('数字化智慧大屏映射到干净路由', () => {
+    expect(toSpaRoute('/digitization/plan/plan-ui')).toBe('/digitization/dashboard')
+  })
   it('不可导航 → undefined', () => {
     expect(toSpaRoute('#')).toBeUndefined()
     expect(toSpaRoute('')).toBeUndefined()

@@ -14,6 +14,7 @@ const URL_MAP: Record<string, string> = {
   '/order/release/list-ui': '/order/release',
   '/order/dispatch': '/order/dispatch',
   '/order/gantt': '/order/gantt',
+  '/digitization/plan/plan-ui': '/digitization/dashboard',
 }
 
 /** 不可导航(#/空/javascript:)→ undefined;已知→映射;未知→原样 */
