@@ -1,6 +1,8 @@
 package com.wangziyang.mes.digitization.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangziyang.mes.basedata.entity.SpDevice;
+import com.wangziyang.mes.basedata.entity.SpMaterile;
 import com.wangziyang.mes.basedata.mapper.SpDeviceMapper;
 import com.wangziyang.mes.basedata.mapper.SpMaterileMapper;
 import com.wangziyang.mes.digitization.dto.DashboardOverviewVO;
@@ -12,6 +14,7 @@ import com.wangziyang.mes.order.mapper.SpOrderMapper;
 import com.wangziyang.mes.technology.mapper.SpFlowMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -23,6 +26,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -139,11 +145,11 @@ public class DashboardServiceImplTest {
     @Test
     public void overview_assembles_kpi_and_12_months() {
         when(spOrderMapper.selectCount(null)).thenReturn(128);
-        when(spDeviceMapper.selectCount(null)).thenReturn(36);
-        when(spMaterileMapper.selectCount(null)).thenReturn(256);
+        when(spDeviceMapper.selectCount(any())).thenReturn(36);
+        when(spMaterileMapper.selectCount(any())).thenReturn(256);
         when(spFlowMapper.selectCount(null)).thenReturn(18);
         when(spOrderMapper.selectList(null)).thenReturn(Arrays.asList(order(2, "P")));
-        when(spDeviceMapper.selectList(null)).thenReturn(Arrays.asList(device("1")));
+        when(spDeviceMapper.selectList(any())).thenReturn(Arrays.asList(device("1")));
         when(dashboardMapper.selectMonthlyTrend()).thenReturn(new ArrayList<MonthlyTrendVO>());
 
         DashboardOverviewVO vo = service.overview();
@@ -156,5 +162,69 @@ public class DashboardServiceImplTest {
         assertEquals(1L, find(vo.getOrderStatus(), "进行中").getValue());
         assertEquals(1L, find(vo.getDeviceStatus(), "运行中").getValue());
         assertEquals(1L, find(vo.getOrderType(), "批量").getValue());
+    }
+
+    // ---------- 软删过滤守卫:device/materiel 必须携带 is_deleted 过滤 ----------
+    @Test
+    @SuppressWarnings("unchecked")
+    public void overview_deviceCount_filters_soft_deleted() {
+        when(spOrderMapper.selectCount(null)).thenReturn(0);
+        when(spFlowMapper.selectCount(null)).thenReturn(0);
+        when(spOrderMapper.selectList(null)).thenReturn(new ArrayList<SpOrder>());
+        when(dashboardMapper.selectMonthlyTrend()).thenReturn(new ArrayList<MonthlyTrendVO>());
+
+        ArgumentCaptor<QueryWrapper<SpDevice>> captor = ArgumentCaptor.forClass(QueryWrapper.class);
+        when(spDeviceMapper.selectCount(captor.capture())).thenReturn(0);
+        when(spDeviceMapper.selectList(any())).thenReturn(new ArrayList<SpDevice>());
+        when(spMaterileMapper.selectCount(any())).thenReturn(0);
+
+        service.overview();
+
+        QueryWrapper<SpDevice> wrapper = captor.getValue();
+        assertNotNull("deviceCount 必须传非 null QueryWrapper", wrapper);
+        assertTrue("deviceCount QueryWrapper 必须包含 is_deleted 过滤",
+                wrapper.getSqlSegment() != null && wrapper.getSqlSegment().contains("is_deleted"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void overview_materielCount_filters_soft_deleted() {
+        when(spOrderMapper.selectCount(null)).thenReturn(0);
+        when(spFlowMapper.selectCount(null)).thenReturn(0);
+        when(spOrderMapper.selectList(null)).thenReturn(new ArrayList<SpOrder>());
+        when(dashboardMapper.selectMonthlyTrend()).thenReturn(new ArrayList<MonthlyTrendVO>());
+        when(spDeviceMapper.selectCount(any())).thenReturn(0);
+        when(spDeviceMapper.selectList(any())).thenReturn(new ArrayList<SpDevice>());
+
+        ArgumentCaptor<QueryWrapper<SpMaterile>> captor = ArgumentCaptor.forClass(QueryWrapper.class);
+        when(spMaterileMapper.selectCount(captor.capture())).thenReturn(0);
+
+        service.overview();
+
+        QueryWrapper<SpMaterile> wrapper = captor.getValue();
+        assertNotNull("materielCount 必须传非 null QueryWrapper", wrapper);
+        assertTrue("materielCount QueryWrapper 必须包含 is_deleted 过滤",
+                wrapper.getSqlSegment() != null && wrapper.getSqlSegment().contains("is_deleted"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void overview_deviceStatus_filters_soft_deleted() {
+        when(spOrderMapper.selectCount(null)).thenReturn(0);
+        when(spFlowMapper.selectCount(null)).thenReturn(0);
+        when(spOrderMapper.selectList(null)).thenReturn(new ArrayList<SpOrder>());
+        when(dashboardMapper.selectMonthlyTrend()).thenReturn(new ArrayList<MonthlyTrendVO>());
+        when(spDeviceMapper.selectCount(any())).thenReturn(0);
+        when(spMaterileMapper.selectCount(any())).thenReturn(0);
+
+        ArgumentCaptor<QueryWrapper<SpDevice>> captor = ArgumentCaptor.forClass(QueryWrapper.class);
+        when(spDeviceMapper.selectList(captor.capture())).thenReturn(new ArrayList<SpDevice>());
+
+        service.overview();
+
+        QueryWrapper<SpDevice> wrapper = captor.getValue();
+        assertNotNull("deviceStatus selectList 必须传非 null QueryWrapper", wrapper);
+        assertTrue("deviceStatus QueryWrapper 必须包含 is_deleted 过滤",
+                wrapper.getSqlSegment() != null && wrapper.getSqlSegment().contains("is_deleted"));
     }
 }
