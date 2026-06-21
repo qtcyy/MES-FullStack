@@ -158,7 +158,7 @@ mes/vue3/
 ### Cycle 1 — 核心业务闭环 + 三大亮点（🚧 本作业主交付）
 系统管理 + 物料 + 工艺（BOM/工艺路线）+ 计划（工单/派工/甘特）+ 数字化大屏 + 3D 数字孪生 + AI 助手 + 工作流（分类/表单/定义/事件，非 BPMN 设计器部分）。
 
-> **Cycle 1 体量过大，按子周期 1a~1h 逐个推进**（每个一条 `feature/*` 分支 + 独立 spec→plan→实现→审查→合并）：1a 系统管理 ✅ / 1b 基础数据·物料 ✅ / 1c 工艺技术线（**1c-1 工艺路线 ✅** / **1c-2 产品 BOM ✅** / **1c-3 BOM-工艺绑定 ✅**，工艺技术线收尾）/ 1d 计划·订单 / 1e 数字化大屏 / 1f 3D 数字孪生 / 1g AI 助手 / 1h 工作流配置。
+> **Cycle 1 体量过大，按子周期 1a~1h 逐个推进**（每个一条 `feature/*` 分支 + 独立 spec→plan→实现→审查→合并）：1a 系统管理 ✅ / 1b 基础数据·物料 ✅ / 1c 工艺技术线（**1c-1 工艺路线 ✅** / **1c-2 产品 BOM ✅** / **1c-3 BOM-工艺绑定 ✅**，工艺技术线收尾）/ **1d 计划·订单/派工/甘特 ✅** / 1e 数字化大屏 / 1f 3D 数字孪生 / 1g AI 助手 / 1h 工作流配置。
 >
 > **✅ 1a 系统管理已完成（2026-06-20，分支 `feature/system`）**：用户/角色/菜单/字典/部门五页 CRUD。沉淀通用原语 `TreeTable`/`MasterDetailLayout` + `urlMap` 路由翻译 + `systemTree` 纯函数（TDD）。后端最小补齐：5 个删除端点（用户/角色/字典/部门软删 + 列表过滤 + 软删用户阻断登录；菜单物理删 + 子守卫 + role_menu 清理）+ 审查修正 add-or-update（用户编辑密码加盐、角色保存与菜单 rebuild 同事务）+ 字典菜单种子（id=108）。详见 `docs/specs|plans/2026-06-20-cycle1a-system-management*`。
 >
@@ -215,9 +215,9 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 ### 9.4 计划 order
 | 功能 | 关键后端接口 | 周期 | 状态 |
 |---|---|---|---|
-| 工单下达（CRUD） | `/order/release/page|get-by-id|add-or-update|delete` | C1 | ☐ |
-| 派工 | `/order/dispatch/*` | C1 | ☐ |
-| 甘特排程（拖拽/开工完工/进度） | `/order/gantt/*` | C1 | ☐ |
+| 工单下达（CRUD） | `/order/release/page|get-by-id|add-or-update|delete` | C1·1d | ✅ |
+| 派工 | `/order/dispatch/*` | C1·1d | ✅ |
+| 甘特排程（拖拽/开工完工/进度） | `/order/gantt/*` | C1·1d | ✅ |
 
 ### 9.5 库存 inventory
 | 功能 | 关键后端接口 | 周期 | 状态 |
@@ -278,5 +278,7 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 - ⏳ **1c-1 / 1c-2 待人工确认**：启动后端（9090）+ 执行 `scripts/sql/oper-menu-seed.sql`、`scripts/sql/product-bom-menu-seed.sql`、`scripts/sql/product-bom.sql`（建表）后浏览器（:4200）冒烟——`admin/123` 登录 → 工艺管理 → 工序定义/工艺路线（1c-1）+ 产品BOM管理（1c-2：新建根选产品→加子节点→加物料行→锁定整树→创建新版本→删除级联）。
 - ✅ **子周期 1c-3 BOM-工艺绑定完成（2026-06-20，分支 `feature/bom-flow` → 待合 `develop`）**：单页双态（浏览选产品根 ↔ 编辑态主从:树点选+单选路线绑/换/解+只读工序链预览+锁定整树工艺）。对接后端已存在 7 端点零新增。**放弃 OrderedTransfer**（`sp_bom_flow` 唯一约束+bind 即换绑，有序穿梭框契约不匹配）；不接 update-remark。沉淀 `utils/bomFlow`（TDD 15 例）+ 3 组件。后端审查无暴露 bug（getTreeByRootId 确认含根）+ 守卫单测 6 绿。门禁全绿（typecheck 0 / test 94 / lint 0 err / build ✓）。subagent 驱动逐任务两阶段审查 + 终审 Ready to merge。新增 `scripts/sql/bom-flow-menu-seed.sql`（菜单 id=155，需手动跑）。
 - ⏳ **1c-3 待人工确认**：启动后端（9090）+ 执行 `scripts/sql/bom-flow-menu-seed.sql`（+ 1c-2 的 `product-bom.sql` 建表与数据）后浏览器（:4200）冒烟——`admin/123` 登录 → 工艺管理 → BOM工艺绑定 → 选产品根 → 进入绑定 → 左树点节点 → 绑定工艺路线（下拉选 + 备注）→ 右侧工序链预览出现 → 换绑 → 解绑 → 回 1c-2 锁 BOM 结构 → 回本页「锁定工艺」→ 全部绑定变只读。
-- ☐ 其余子周期：1d 订单 / 1e 大屏 / 1f 3D / 1g AI / 1h 工作流，及 Cycle 2+。
-- **下一步**：1a~1c-3 浏览器冒烟确认；启动子周期 1d（计划·订单/派工/甘特）。
+- ✅ **子周期 1d 计划·订单/派工/甘特完成（2026-06-21，分支 `feature/order-planning` → 待合 `develop`）**：三屏一分支——**工单下达**（列表 搜索/分页 + 新增编辑弹窗 物料带描述/工艺路线下拉/计划起止 + 删除）、**员工作业派工**（待派工多选 + 班组级联作业员派工弹窗，`DataTable` 加可选 `selectable` 多选列）、**生产甘特排程**（自研 CSS/div 甘特，双视角 资源/订单 + 计划vs实际双条 + 状态色 + 今日红线 + 拖拽改期 平移/缩放 + 执行回填 开工/进度/完工/纠时）。对接后端**已存在**的 15 端点。沉淀 `utils/order`（buildOrderPayload/validateOrder/orderTypeLabel/orderStatusMeta/buildDispatchPayload/validateDispatch）+ `utils/gantt`（parseDay/daysBetween/getDisplayStatus/computeRange/enumerateDays/timeToX/pxToDays/shiftPlanByDays/groupByResource/groupByOrder，TDD 20 例）+ `DataTable` selectable 增强。**后端审查（按每周期必审）抓到并修 1 个主链路真 bug**：`SpOrderDispatchMapper.xml` 的 `selectGanttTasks` 含 `WHERE d.oper_id IS NOT NULL`，而正常派工（`assignWorker` 创建的订单级派工 oper_id 为 NULL）会被全部过滤 → 派工后甘特永远空白；改为 `WHERE 1=1` + Mockito 守卫单测（派工批量 + operId NULL 回归）。前端门禁全绿（typecheck 0 / test 131 / lint 0 err / build ✓）+ 后端 `Cycle1dBackendTest`+`SpGanttServiceImplTest` 18 绿。subagent 驱动逐任务两阶段审查（揪出并修复：工单表单缺 el-form 行内校验、甘特纯函数 parseDay 越界 guard + overdue 边界锁定、甘特图 pointercancel/卸载清理健壮性）。spec/plan：`docs/specs|plans/2026-06-21-cycle1d-order-planning*`。**1d-backlog**：① 甘特全量拉取+客户端过滤（未用后端 orderCode/teamId 过滤参数，demo 规模无碍）② GanttPage activeTask 变 null 时抽屉未防御性关闭 ③ 派工 `pageOrdersForDispatch` N+1 查询 ④ 时间字段 String compareTo 依赖固定格式。
+- ⏳ **1d 待人工确认**：启动后端（9090）+ DB 已执行 `scripts/sql/dispatch-management.sql`（建 sp_order_dispatch + 菜单122）、`scripts/sql/gantt-migration.sql`（加 oper_id/progress 列 + 菜单123）、可选 `scripts/sql/gantt-mock-seed.sql`（演示数据）后浏览器（:4200，`admin/123`）冒烟——计划管理 → 工单下达（新建/编辑/删除）→ 员工作业派工（勾选→班组级联作业员→派工后从待派工消失）→ 生产甘特图（双视角切换 + 拖拽改期 + 悬停/抽屉回填 开工→进度→完工→纠时）。
+- ☐ 其余子周期：1e 大屏 / 1f 3D / 1g AI / 1h 工作流，及 Cycle 2+。
+- **下一步**：1a~1d 浏览器冒烟确认；启动子周期 1e（数字化大屏）。
