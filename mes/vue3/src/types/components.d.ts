@@ -11,6 +11,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AiAssistant: typeof import('./../components/ai/AiAssistant.vue')['default']
+    AiChatDrawer: typeof import('./../components/ai/AiChatDrawer.vue')['default']
+    AiFab: typeof import('./../components/ai/AiFab.vue')['default']
+    AiMessage: typeof import('./../components/ai/AiMessage.vue')['default']
+    AiToolSteps: typeof import('./../components/ai/AiToolSteps.vue')['default']
     DataTable: typeof import('./../components/DataTable.vue')['default']
     EChart: typeof import('./../components/EChart.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
