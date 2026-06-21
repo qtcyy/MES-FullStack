@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onUnmounted } from 'vue'
 import {
   computeRange, enumerateDays, timeToX, parseDay, floorDay, daysBetween,
   getDisplayStatus, pxToDays, shiftPlanByDays,
@@ -85,6 +85,16 @@ const dragId = ref<string | null>(null)
 const dragMode = ref<DragMode>('move')
 const dragDelta = ref(0)
 let startX = 0
+let activeEl: HTMLElement | null = null
+
+function detachMove() {
+  activeEl?.removeEventListener('pointermove', onMove)
+  activeEl = null
+}
+function resetDrag() {
+  dragId.value = null
+  dragDelta.value = 0
+}
 
 function effective(t: GanttTask): GanttTask {
   if (dragId.value === t.id && dragDelta.value !== 0) {
@@ -122,22 +132,29 @@ function onPointerDown(e: PointerEvent, t: GanttTask) {
   dragId.value = t.id
   dragDelta.value = 0
   startX = e.clientX
+  activeEl = el
   el.setPointerCapture(e.pointerId)
   el.addEventListener('pointermove', onMove)
-  el.addEventListener('pointerup', (ev) => onUp(ev, t, el), { once: true })
+  el.addEventListener('pointerup', (ev) => onUp(ev, t), { once: true })
+  el.addEventListener('pointercancel', onCancel, { once: true })
 }
 function onMove(e: PointerEvent) {
   dragDelta.value = pxToDays(e.clientX - startX, dayW)
 }
-function onUp(_e: PointerEvent, t: GanttTask, el: HTMLElement) {
-  el.removeEventListener('pointermove', onMove)
+function onCancel() {
+  detachMove()
+  resetDrag()
+}
+function onUp(_e: PointerEvent, t: GanttTask) {
+  detachMove()
   const delta = dragDelta.value
   const mode = dragMode.value
-  dragId.value = null
-  dragDelta.value = 0
+  resetDrag()
   if (delta === 0) { emit('task-click', t); return }
   emit('reschedule', t, shiftPlanByDays(t, delta, mode))
 }
+
+onUnmounted(() => detachMove())
 </script>
 
 <style scoped>
@@ -146,7 +163,7 @@ function onUp(_e: PointerEvent, t: GanttTask, el: HTMLElement) {
 .gantt__day { width: var(--day-w); flex: 0 0 var(--day-w); text-align: center; color: var(--el-text-color-secondary); padding: 4px 0; }
 .gantt__body { position: relative; }
 .gantt__today { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--el-color-danger); z-index: 2; }
-.gantt__group { display: flex; align-items: center; gap: 8px; height: 30px; padding-left: 8px; background: var(--el-fill-color-light); font-weight: 600; position: sticky; left: 0; }
+.gantt__group { display: flex; align-items: center; gap: 8px; height: 30px; padding-left: 8px; background: var(--el-fill-color-light); font-weight: 600; position: sticky; left: 0; z-index: 2; }
 .gantt__row { display: flex; height: 40px; border-bottom: 1px solid var(--el-border-color-lighter); }
 .gantt__row-label { width: var(--label-w); flex: 0 0 var(--label-w); padding: 4px 8px; position: sticky; left: 0; background: var(--el-bg-color); z-index: 1; border-right: 1px solid var(--el-border-color-lighter); }
 .gantt__row-label small { color: var(--el-text-color-secondary); }
