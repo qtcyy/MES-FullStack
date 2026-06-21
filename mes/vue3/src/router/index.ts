@@ -105,6 +105,18 @@ export const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: '/digitization/dashboard',
+    component: () => import('@/layouts/ScreenLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'digitization-dashboard',
+        component: () => import('@/views/digitization/dashboard/PlanDashboard.vue'),
+        meta: { title: '智慧大屏', perm: 'user:add' },
+      },
+    ],
+  },
   { path: '/403', component: () => import('@/views/error/403.vue'), meta: { public: true, title: '403' } },
   { path: '/500', component: () => import('@/views/error/500.vue'), meta: { public: true, title: '500' } },
   {
