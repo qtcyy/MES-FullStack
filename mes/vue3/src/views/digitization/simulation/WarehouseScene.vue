@@ -200,6 +200,8 @@ watch(
   () => {
     if (!scene) return
     clearBoxes()
+    // 重建前 hoveredMesh 已在 clearBoxes 置空,通知父级清掉残留的悬停标签
+    emit('hover', null)
     buildBoxes()
   },
 )
