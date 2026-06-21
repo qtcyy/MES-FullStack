@@ -18,6 +18,12 @@ describe('renderMarkdown', () => {
     expect(html).toContain('&lt;script&gt;')
   })
 
+  it('链接带 target=_blank 与 rel=noopener noreferrer', () => {
+    const html = renderMarkdown('[x](https://example.com)')
+    expect(html).toContain('target="_blank"')
+    expect(html).toContain('rel="noopener noreferrer"')
+  })
+
   it('空输入返回空串不报错', () => {
     expect(renderMarkdown('')).toBe('')
     // @ts-expect-error 故意传 undefined

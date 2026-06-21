@@ -39,9 +39,10 @@ export function useAiChat() {
     sending.value = true
     controller = new AbortController()
 
-    // 历史：用户消息 + 已有内容的助手消息（排除当前空占位）
+    // 历史：用户消息 + 已有内容的助手消息（排除当前空占位与失败消息）
+    // 失败消息的 content 是错误文案（如「网络连接失败」），回传会污染 LLM 上下文
     const history: AiMessageInput[] = messages.value
-      .filter((m) => m.role === 'user' || (m.role === 'assistant' && m.content))
+      .filter((m) => m.role === 'user' || (m.role === 'assistant' && m.content && m.status !== 'error'))
       .map((m) => ({ role: m.role, content: m.content }))
 
     await streamChat(
