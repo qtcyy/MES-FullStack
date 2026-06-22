@@ -47,6 +47,9 @@ async function load() {
   }
 }
 
+// 重挂载不变量:父组件须以 :key="group.id" 强制按编组重挂载本组件,
+// 因此不存在组件内 groupId 切换竞态。若未来重构移除该 key,会让 load()
+// 内的并行拉取重新引入“后写覆盖”(last-write-wins)竞态。
 watch(() => props.groupId, load, { immediate: true })
 
 async function save() {
@@ -63,10 +66,12 @@ async function save() {
       await deviceGroupItemsRemove(props.groupId, id)
     }
     ElMessage.success('成员保存成功')
-    await load()
   } catch {
     /* 响应拦截器已提示 */
   } finally {
+    // 无论成功还是部分失败,都从服务端真值重新对账 selected/originalMemberIds,
+    // 避免顺序删除中途抛错时 UI 仍残留乐观态(load() 自行管理 loading 标志)
+    await load()
     saving.value = false
   }
 }
