@@ -180,7 +180,7 @@ const handleDelete = async (row: ManagerDataRow) => {
     return
   }
   try {
-    await managerDataDelete(selected.value!.tableName, row.id)
+    await managerDataDelete(selected.value!.tableName, selected.value!.id!, row.id)
     ElMessage.success('删除成功')
     loadRows()
   } catch {
