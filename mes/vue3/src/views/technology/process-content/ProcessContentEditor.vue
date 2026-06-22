@@ -267,7 +267,8 @@ watch(
     form.inspectionRequiredBool = inspectionToBool(c?.inspectionRequired)
     contentImageUrls.value = [...props.detail.contentImageUrls]
     inspectionImageUrls.value = [...props.detail.inspectionImageUrls]
-    activeTab.value = 'main'
+    // 不在此重置 activeTab:切节点时父级 :key=bomId 整体重挂(activeTab 自然回 main),
+    // 保存后静默 reload 同节点则保留当前 Tab。
   },
   { immediate: true, deep: true },
 )

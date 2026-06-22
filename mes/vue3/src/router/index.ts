@@ -135,6 +135,7 @@ export const routes: RouteRecordRaw[] = [
         path: 'technology/process-content',
         name: 'technology-process-content',
         component: () => import('@/views/technology/process-content/ProcessContentPage.vue'),
+        meta: { title: '工艺内容编制', perm: 'process-content:list' },
       },
       {
         path: 'order/release',

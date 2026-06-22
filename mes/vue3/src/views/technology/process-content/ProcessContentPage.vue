@@ -166,8 +166,22 @@ const selectNode = async (bomId: string) => {
 }
 
 // ─── 重载选中节点(保存/完成/子表操作后)+ 同步左树徽标 ────
+// 静默刷新:不清空 detail(避免编辑器卸载重挂、Tab 跳回主信息),仅就地更新;共用 selToken 防与切节点竞态
 const reloadNode = async () => {
-  if (selectedBomId.value) await selectNode(selectedBomId.value)
+  const bomId = selectedBomId.value
+  if (!bomId) {
+    loadTree()
+    return
+  }
+  const token = ++selToken
+  try {
+    const [d, items] = await Promise.all([pcGet(bomId), pcBomItems(bomId)])
+    if (token !== selToken) return
+    detail.value = d
+    bomItems.value = items
+  } catch {
+    /* 响应拦截器已提示;保留原 detail */
+  }
   loadTree()
 }
 
