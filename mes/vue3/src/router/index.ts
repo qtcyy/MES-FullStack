@@ -62,6 +62,24 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '物料维护', perm: 'materile:add' },
       },
       {
+        path: 'basedata/device',
+        name: 'basedata-device',
+        component: () => import('@/views/basedata/device/DeviceList.vue'),
+        meta: { title: '设备维护', perm: 'device:add' },
+      },
+      {
+        path: 'basedata/component',
+        name: 'basedata-component',
+        component: () => import('@/views/basedata/component/ComponentList.vue'),
+        meta: { title: '零部件维护', perm: 'component:add' },
+      },
+      {
+        path: 'basedata/device-group',
+        name: 'basedata-device-group',
+        component: () => import('@/views/basedata/device-group/DeviceGroupPage.vue'),
+        meta: { title: '设备编组', perm: 'device:add' },
+      },
+      {
         path: 'technology/oper',
         name: 'technology-oper',
         component: () => import('@/views/technology/oper/OperList.vue'),
