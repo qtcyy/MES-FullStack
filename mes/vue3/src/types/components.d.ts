@@ -12,7 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AiAssistant: typeof import('./../components/ai/AiAssistant.vue')['default']
-    AiChatDrawer: typeof import('./../components/ai/AiChatDrawer.vue')['default']
+    AiChatWindow: typeof import('./../components/ai/AiChatWindow.vue')['default']
     AiFab: typeof import('./../components/ai/AiFab.vue')['default']
     AiMessage: typeof import('./../components/ai/AiMessage.vue')['default']
     AiToolSteps: typeof import('./../components/ai/AiToolSteps.vue')['default']
