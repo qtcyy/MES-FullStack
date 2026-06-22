@@ -98,6 +98,16 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '加工单元', perm: 'process-unit:add' },
       },
       {
+        path: 'basedata/manager',
+        name: 'basedata-manager',
+        component: () => import('@/views/basedata/manager/ManagerList.vue'),
+      },
+      {
+        path: 'basedata/manager-item',
+        name: 'basedata-manager-item',
+        component: () => import('@/views/basedata/manager-item/ManagerDataPage.vue'),
+      },
+      {
         path: 'technology/oper',
         name: 'technology-oper',
         component: () => import('@/views/technology/oper/OperList.vue'),
