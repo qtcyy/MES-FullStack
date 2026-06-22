@@ -53,15 +53,17 @@ const rules: FormRules = {
   name: [{ required: true, message: '请输入设备名称', trigger: 'blur' }],
 }
 
+// 监听打开沿:每次打开都按 props.model 重置,避免连续「新增」(model 恒为 null)残留上次输入
 watch(
-  () => props.model,
-  (val) => {
-    form.id = val?.id
-    form.name = val?.name ?? ''
-    form.quantity = val?.quantity ?? 1
-    form.remark = val?.remark ?? ''
+  () => props.modelValue,
+  (open) => {
+    if (!open) return
+    form.id = props.model?.id
+    form.name = props.model?.name ?? ''
+    form.quantity = props.model?.quantity ?? 1
+    form.remark = props.model?.remark ?? ''
+    formRef.value?.clearValidate()
   },
-  { immediate: true },
 )
 
 async function onSubmit() {

@@ -109,7 +109,11 @@
                   @click="openEquip(row as SpProcessEquipment)"
                   >编辑</el-button
                 >
-                <el-button type="danger" link size="small" @click="emit('equipment-delete', row.id)"
+                <el-button
+                  type="danger"
+                  link
+                  size="small"
+                  @click="onEquipDelete(row as SpProcessEquipment)"
                   >删除</el-button
                 >
               </template>
@@ -142,7 +146,11 @@
             </el-table-column>
             <el-table-column v-if="editable" label="操作" width="100" fixed="right">
               <template #default="{ row }">
-                <el-button type="danger" link size="small" @click="emit('document-delete', row.id)"
+                <el-button
+                  type="danger"
+                  link
+                  size="small"
+                  @click="onDocDelete(row as SpProcessDocumentVO)"
                   >删除</el-button
                 >
               </template>
@@ -168,7 +176,7 @@
     <EquipmentForm
       v-model="equipDialog"
       :model="editingEquip"
-      :loading="equipLoading"
+      :loading="equipSaving"
       @submit="onEquipSubmit"
     />
   </div>
@@ -176,12 +184,19 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Upload } from '@element-plus/icons-vue'
 import type { UploadRequestOptions } from 'element-plus'
 import MultiImageUpload from '@/components/MultiImageUpload.vue'
 import EquipmentForm from './EquipmentForm.vue'
-import { pcUploadImage, pcUploadDocument } from '@/api/technology/processContent'
+import {
+  pcUploadImage,
+  pcUploadDocument,
+  pcEquipmentSave,
+  pcEquipmentDelete,
+  pcDocumentSave,
+  pcDocumentDelete,
+} from '@/api/technology/processContent'
 import {
   parseCsvKeys,
   inspectionToBool,
@@ -195,6 +210,7 @@ import type {
   ProcessContentDetail,
   SpProcessContent,
   SpProcessEquipment,
+  SpProcessDocumentVO,
   SpProductBomItem,
 } from '@/types/technology'
 
@@ -203,15 +219,11 @@ const props = defineProps<{
   detail: ProcessContentDetail
   bomItems: SpProductBomItem[]
   saving?: boolean
-  equipLoading?: boolean
 }>()
 const emit = defineEmits<{
   save: [SpProcessContent]
   complete: [string]
-  'equipment-save': [SpProcessEquipment]
-  'equipment-delete': [string]
-  'document-save': [{ contentId: string; name: string; filePath: string }]
-  'document-delete': [string]
+  reload: []
 }>()
 
 const activeTab = ref('main')
@@ -270,34 +282,91 @@ const onSave = () => {
 }
 const onComplete = () => emit('complete', contentId.value!)
 
-// 设备
+// 设备:子资源 CRUD 直接调用 API,成功才关弹窗 + 触发父级 reload(失败保留输入)
 const equipDialog = ref(false)
+const equipSaving = ref(false)
 const editingEquip = ref<SpProcessEquipment | null>(null)
 const openEquip = (row: SpProcessEquipment | null) => {
   editingEquip.value = row
   equipDialog.value = true
 }
-const onEquipSubmit = (f: { id?: string; name: string; quantity?: number; remark?: string }) => {
-  emit('equipment-save', buildEquipmentPayload(f, contentId.value!))
-  equipDialog.value = false
+const onEquipSubmit = async (f: {
+  id?: string
+  name: string
+  quantity?: number
+  remark?: string
+}) => {
+  equipSaving.value = true
+  try {
+    await pcEquipmentSave(buildEquipmentPayload(f, contentId.value!))
+    equipDialog.value = false
+    emit('reload')
+  } catch {
+    /* 拦截器已提示,保持弹窗开、保留输入 */
+  } finally {
+    equipSaving.value = false
+  }
+}
+const onEquipDelete = async (row: SpProcessEquipment) => {
+  try {
+    await ElMessageBox.confirm(`确认删除设备「${row.name}」?`, '提示', {
+      type: 'warning',
+      confirmButtonText: '确认删除',
+      cancelButtonText: '取消',
+    })
+  } catch {
+    return
+  }
+  try {
+    await pcEquipmentDelete(row.id!)
+    ElMessage.success('删除成功')
+    emit('reload')
+  } catch {
+    /* 拦截器已提示 */
+  }
 }
 
-// 文档上传(自定义上传,对齐 MultiImageUpload 的 http-request 模式)
+// 文档:上传 → 拿 key 直接保存记录 → reload(自定义上传,对齐 MultiImageUpload 的 http-request 模式)
 const docUploading = ref(false)
+const MAX_DOC_SIZE = 20 * 1024 * 1024 // 20MB
 const doDocUpload = async (opt: UploadRequestOptions): Promise<void> => {
   const file = opt.file as File
   if (file.type !== 'application/pdf') {
     ElMessage.warning('只能上传 PDF 文件')
     return
   }
+  if (file.size > MAX_DOC_SIZE) {
+    ElMessage.warning('文档大小不能超过 20MB')
+    return
+  }
   docUploading.value = true
   try {
     const { key, name } = await pcUploadDocument(file)
-    emit('document-save', { contentId: contentId.value!, name, filePath: key })
+    await pcDocumentSave({ contentId: contentId.value!, name, filePath: key })
+    ElMessage.success('上传成功')
+    emit('reload')
   } catch {
     /* 响应拦截器已提示,吞掉防未捕获 rejection */
   } finally {
     docUploading.value = false
+  }
+}
+const onDocDelete = async (row: SpProcessDocumentVO) => {
+  try {
+    await ElMessageBox.confirm(`确认删除文档「${row.name}」?`, '提示', {
+      type: 'warning',
+      confirmButtonText: '确认删除',
+      cancelButtonText: '取消',
+    })
+  } catch {
+    return
+  }
+  try {
+    await pcDocumentDelete(row.id)
+    ElMessage.success('删除成功')
+    emit('reload')
+  } catch {
+    /* 拦截器已提示 */
   }
 }
 </script>
