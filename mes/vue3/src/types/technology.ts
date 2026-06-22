@@ -162,3 +162,56 @@ export interface BomFlowTreeNode extends SpProductBom {
   opers?: FlowOperItem[]
   children: BomFlowTreeNode[]
 }
+
+// ============ 工艺内容编制(Cycle 3c-1)============
+export interface SpProcessContent {
+  id?: string
+  bomId: string
+  flowId?: string
+  mainInfo?: string
+  content?: string
+  contentImages?: string // 逗号连接的对象 key 列表
+  requirements?: string
+  inspectionRequired?: string // '0' | '1'
+  inspectionImages?: string // 逗号连接的对象 key 列表
+  notes?: string
+  status?: string // 'draft' | 'completed'
+}
+
+export interface SpProcessEquipment {
+  id?: string
+  contentId: string
+  name: string
+  quantity?: number
+  remark?: string
+}
+
+export interface SpProcessDocumentVO {
+  id: string
+  contentId: string
+  name: string
+  filePath: string
+  fileUrl?: string // 后端 get 重签
+}
+
+/** /get/{bomId} 响应 */
+export interface ProcessContentDetail {
+  content: SpProcessContent | null
+  equipment: SpProcessEquipment[]
+  documents: SpProcessDocumentVO[]
+  contentImageUrls: string[]
+  inspectionImageUrls: string[]
+}
+
+/** /list/{rootId} 行 */
+export interface ProcessContentListItem {
+  bomNode: SpProductBom
+  content: SpProcessContent | null
+}
+
+/** 左树节点:BOM 节点字段 + 编制状态 + children */
+export interface ProcessContentTreeNode extends SpProductBom {
+  content: SpProcessContent | null
+  contentStatus: string | null // null=未编制 / 'draft' / 'completed'
+  children: ProcessContentTreeNode[]
+}
