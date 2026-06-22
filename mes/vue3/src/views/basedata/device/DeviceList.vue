@@ -50,7 +50,6 @@ import DeviceForm from './DeviceForm.vue'
 import { useRequest } from '@/composables/useRequest'
 import { usePagination } from '@/composables/usePagination'
 import { devicePage, deviceAddOrUpdate, deviceDelete } from '@/api/basedata/device'
-import { validateDevice, buildDevicePayload } from '@/utils/device'
 import type { SpDevice } from '@/types/basedata'
 
 const { pager, setTotal, reset } = usePagination()
@@ -111,14 +110,9 @@ function handleReset() {
 }
 
 async function handleFormSubmit(dto: Partial<SpDevice>) {
-  const errs = validateDevice(dto)
-  if (errs.length) {
-    ElMessage.warning(errs[0])
-    return
-  }
   submitLoading.value = true
   try {
-    await deviceAddOrUpdate(buildDevicePayload(dto))
+    await deviceAddOrUpdate(dto)
     ElMessage.success('保存成功')
     dialogVisible.value = false
     run()
