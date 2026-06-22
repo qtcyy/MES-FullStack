@@ -56,6 +56,11 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '字典管理', perm: 'dict:add' },
       },
       {
+        path: 'system/team',
+        component: () => import('@/views/system/team/TeamPage.vue'),
+        meta: { title: '班组员工定义', perm: 'team:add' },
+      },
+      {
         path: 'basedata/materile',
         name: 'basedata-materile',
         component: () => import('@/views/basedata/materile/MaterileList.vue'),
