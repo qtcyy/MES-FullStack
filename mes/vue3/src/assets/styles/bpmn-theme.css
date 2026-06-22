@@ -1,0 +1,90 @@
+/* BPMN 设计器外壳主题:跟随 Element Plus 亮/暗变量。
+   节点语义配色需 CustomRenderer(本周期不做),这里只管画布外壳/标签/错误态。 */
+
+/* 点阵网格背景 */
+.djs-container {
+  background-color: var(--el-bg-color);
+  background-image: radial-gradient(var(--el-border-color) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* 调色板:卡片化 */
+.djs-palette {
+  border: 1px solid var(--el-border-color) !important;
+  border-radius: 8px !important;
+  background: var(--el-bg-color-overlay) !important;
+  box-shadow: var(--el-box-shadow-light) !important;
+  overflow: hidden;
+}
+.djs-palette .entry {
+  color: var(--el-text-color-secondary) !important;
+  border-radius: 6px;
+  margin: 2px;
+  transition: background-color 0.12s, color 0.12s;
+}
+.djs-palette .entry:hover {
+  background: var(--el-fill-color) !important;
+  color: var(--el-text-color-primary) !important;
+}
+.djs-palette .separator {
+  border-bottom: 1px solid var(--el-border-color) !important;
+  margin: 4px 6px !important;
+}
+
+/* 上下文菜单:卡片化 */
+.djs-context-pad .entry {
+  border-radius: 6px !important;
+  box-shadow: var(--el-box-shadow-light) !important;
+  background: var(--el-bg-color-overlay) !important;
+  color: var(--el-text-color-secondary) !important;
+  border: 1px solid var(--el-border-color) !important;
+}
+.djs-context-pad .entry:hover {
+  background: var(--el-fill-color) !important;
+  color: var(--el-text-color-primary) !important;
+}
+
+/* 选中 / hover 态 */
+.djs-element.selected .djs-outline {
+  stroke: var(--el-color-primary) !important;
+  stroke-width: 2px !important;
+}
+.djs-element.hover .djs-outline {
+  stroke: var(--el-color-primary-light-3) !important;
+}
+
+/* 暗色画布下标签文字提亮 */
+.dark .djs-label,
+.dark text.djs-label,
+.dark .djs-element text {
+  fill: #e6e9ef;
+}
+
+/* 检查定义未通过:问题节点红色描边 + 脉冲 */
+.djs-element.bpmn-error .djs-visual > :nth-child(1) {
+  stroke: var(--el-color-danger) !important;
+  stroke-width: 2.5px !important;
+}
+.djs-element.bpmn-error {
+  animation: bpmn-error-pulse 1.1s ease-in-out infinite;
+}
+@keyframes bpmn-error-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* 小地图卡片化 */
+.djs-minimap {
+  border: 1px solid var(--el-border-color) !important;
+  border-radius: 8px !important;
+  background: var(--el-bg-color-overlay) !important;
+  box-shadow: var(--el-box-shadow-light) !important;
+  overflow: hidden;
+}
+.djs-minimap .toggle {
+  background: var(--el-fill-color-light) !important;
+  color: var(--el-text-color-secondary) !important;
+}
+.djs-minimap .map {
+  background: var(--el-bg-color) !important;
+}
