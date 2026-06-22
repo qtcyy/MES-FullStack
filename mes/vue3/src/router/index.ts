@@ -121,6 +121,30 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/workflow/definition/DefinitionList.vue'),
         meta: { title: '流程定义管理', perm: 'workflow:definition:list' },
       },
+      {
+        path: 'inventory/receipt',
+        name: 'inventory-receipt',
+        component: () => import('@/views/inventory/ReceiptPage.vue'),
+        meta: { title: '计划入库确认', perm: 'inventory:inbound' },
+      },
+      {
+        path: 'inventory/query',
+        name: 'inventory-query',
+        component: () => import('@/views/inventory/InventoryQueryPage.vue'),
+        meta: { title: '库存明细查询', perm: 'inventory:query' },
+      },
+      {
+        path: 'inventory/outbound',
+        name: 'inventory-outbound',
+        component: () => import('@/views/inventory/OutboundPage.vue'),
+        meta: { title: '配套出库确认', perm: 'inventory:outbound' },
+      },
+      {
+        path: 'inventory/manual-inbound',
+        name: 'inventory-manual-inbound',
+        component: () => import('@/views/inventory/ManualInboundPage.vue'),
+        meta: { title: '手动入库', perm: 'inventory:inbound' },
+      },
     ],
   },
   {

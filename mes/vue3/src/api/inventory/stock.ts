@@ -1,7 +1,11 @@
 import { http } from '@/api/request'
 import type { IPage } from '@/types/system'
-import type { SpInventory } from '@/types/inventory'
+import type { SpInventory, InventoryPageParams, ManualInboundDTO } from '@/types/inventory'
 
-/** 库存分页(form);size 拉大兜底取全量,3D 场景用 */
-export const pageInventory = (params: { current: number; size: number }) =>
+/** 库存台账分页(form;端点 /inventory/page) */
+export const pageInventory = (params: InventoryPageParams) =>
   http.post<IPage<SpInventory>>('/inventory/page', params)
+
+/** 手动入库(JSON 体) */
+export const manualInbound = (dto: ManualInboundDTO) =>
+  http.post<void>('/inventory/manual-inbound', dto, true)
