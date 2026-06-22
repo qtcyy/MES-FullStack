@@ -80,6 +80,18 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '设备编组', perm: 'device:add' },
       },
       {
+        path: 'basedata/warehouse',
+        name: 'basedata-warehouse',
+        component: () => import('@/views/basedata/warehouse/WarehousePage.vue'),
+        meta: { title: '仓库管理', perm: 'warehouse:add' },
+      },
+      {
+        path: 'basedata/process-unit',
+        name: 'basedata-process-unit',
+        component: () => import('@/views/basedata/process-unit/ProcessUnitList.vue'),
+        meta: { title: '加工单元', perm: 'process-unit:add' },
+      },
+      {
         path: 'technology/oper',
         name: 'technology-oper',
         component: () => import('@/views/technology/oper/OperList.vue'),

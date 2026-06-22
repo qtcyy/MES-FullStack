@@ -10,6 +10,8 @@ const URL_MAP: Record<string, string> = {
   '/basedata/device/list-ui': '/basedata/device',
   '/basedata/component/list-ui': '/basedata/component',
   '/basedata/device-group/list-ui': '/basedata/device-group',
+  '/basedata/warehouse/list-ui': '/basedata/warehouse',
+  '/basedata/process-unit/list-ui': '/basedata/process-unit',
   '/basedata/flow/process/list-ui': '/technology/flow',
   '/basedata/sp-oper/list-ui': '/technology/oper',
   '/technology/product-bom/list-ui': '/technology/product-bom',
