@@ -7,6 +7,7 @@ import {
   canEditContent,
   validateContent,
   buildContentPayload,
+  buildEquipmentPayload,
   buildTreeFromList,
 } from '@/utils/processContent'
 import type { ProcessContentListItem, SpProcessContent } from '@/types/technology'
@@ -111,5 +112,19 @@ describe('buildTreeFromList', () => {
     expect(tree[0].children.map((c) => c.id)).toEqual(['2', '3'])
     expect(tree[0].children[0].contentStatus).toBeNull()
     expect(tree[0].children[1].contentStatus).toBe('completed')
+  })
+})
+
+describe('buildEquipmentPayload', () => {
+  it('挂 contentId、trim、quantity 默认 1、新增不带 id', () => {
+    const out = buildEquipmentPayload({ name: ' 车床 ', remark: ' r ' }, 'C1')
+    expect(out).toEqual({ contentId: 'C1', name: '车床', quantity: 1, remark: 'r' })
+    expect(out.id).toBeUndefined()
+  })
+  it('编辑带 id、保留 quantity', () => {
+    const out = buildEquipmentPayload({ id: 'E9', name: '钻床', quantity: 3 }, 'C1')
+    expect(out.id).toBe('E9')
+    expect(out.quantity).toBe(3)
+    expect(out.remark).toBe('')
   })
 })

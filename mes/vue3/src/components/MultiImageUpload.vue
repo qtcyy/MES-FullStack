@@ -3,7 +3,7 @@
     <div class="multi-image-upload__grid">
       <div
         v-for="(url, i) in urls"
-        :key="modelValue[i] ?? i"
+        :key="modelValue[i]"
         class="multi-image-upload__item"
       >
         <el-image
