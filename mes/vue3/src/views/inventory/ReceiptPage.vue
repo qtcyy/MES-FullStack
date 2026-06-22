@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import PageContainer from '@/components/PageContainer.vue'
 import MasterDetailLayout from '@/components/MasterDetailLayout.vue'
 import DataTable, { type Column } from '@/components/DataTable.vue'
@@ -58,6 +58,8 @@ const { data: items, loading: itemsLoading, run: runItems } = useRequest(receipt
 
 const postOpen = ref(false)
 const activeItem = ref<SpWarehouseReceiptItem | null>(null)
+// 弹窗关闭后清空当前明细引用,避免关闭动画期间渲染陈旧数据
+watch(postOpen, (open) => { if (!open) activeItem.value = null })
 
 function load() {
   runPage({ current: current.value, size: size.value, receiptCode: q.receiptCode || undefined })
