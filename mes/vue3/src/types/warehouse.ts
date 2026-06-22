@@ -1,3 +1,5 @@
+import type { PageReq } from '@/types/system'
+
 /** 库位(对应后端 sp_warehouse_location) */
 export interface SpWarehouseLocation {
   id: string
@@ -24,4 +26,10 @@ export interface SpWarehouse {
   deleted?: string
   createTime?: string
   updateTime?: string
+}
+
+/** 仓库分页请求 */
+export interface WarehousePageReq extends PageReq {
+  code?: string
+  name?: string
 }
