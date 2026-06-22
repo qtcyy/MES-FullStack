@@ -40,3 +40,44 @@ export interface SpSysDict {
   descr?: string
   sortNum?: number
 }
+
+/** 设备(sp_device) */
+export interface SpDevice {
+  id?: string
+  code?: string
+  name?: string
+  type?: string
+  model?: string
+  specs?: string
+  location?: string
+  status?: string
+  descr?: string
+}
+export interface DevicePageReq extends PageReq {
+  code?: string
+  name?: string
+}
+
+/** 零部件(sp_component) */
+export interface SpComponent {
+  id?: string
+  code?: string
+  name?: string
+  descr?: string
+}
+export interface ComponentPageReq extends PageReq {
+  code?: string
+  name?: string
+}
+
+/** 设备编组(sp_device_group) */
+export interface SpDeviceGroup {
+  id?: string
+  code?: string
+  name?: string
+  descr?: string
+}
+export interface DeviceGroupPageReq extends PageReq {
+  code?: string
+  name?: string
+}
