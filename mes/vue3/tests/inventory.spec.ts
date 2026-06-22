@@ -24,6 +24,7 @@ describe('outboundStatusMeta', () => {
   it('pending', () => expect(outboundStatusMeta('pending')).toEqual({ label: '待确认', tag: 'warning' }))
   it('partial → 部分出库', () => expect(outboundStatusMeta('partial')).toEqual({ label: '部分出库', tag: 'primary' }))
   it('completed', () => expect(outboundStatusMeta('completed')).toEqual({ label: '已完成', tag: 'success' }))
+  it('空 → 占位符/info', () => expect(outboundStatusMeta(undefined)).toEqual({ label: '—', tag: 'info' }))
 })
 
 describe('postStatusMeta', () => {
