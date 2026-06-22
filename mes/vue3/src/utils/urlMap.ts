@@ -16,6 +16,10 @@ const URL_MAP: Record<string, string> = {
   '/order/gantt': '/order/gantt',
   '/digitization/plan/plan-ui': '/digitization/dashboard',
   '/digital/simulation/list-ui': '/digitization/simulation',
+  '/workflow/category/list-ui': '/workflow/category',
+  '/workflow/form/list-ui': '/workflow/form',
+  '/workflow/definition/list-ui': '/workflow/definition',
+  // 注:'/workflow/model/list-ui'(菜单 192 流程模型设计)本周期不做,Cycle 3 补 bpmn-js 设计器
 }
 
 /** 不可导航(#/空/javascript:)→ undefined;已知→映射;未知→原样 */

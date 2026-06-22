@@ -103,6 +103,24 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/order/gantt/GanttPage.vue'),
         meta: { title: '生产甘特图', perm: 'order:gantt' },
       },
+      {
+        path: 'workflow/category',
+        name: 'workflow-category',
+        component: () => import('@/views/workflow/category/CategoryList.vue'),
+        meta: { title: '流程分类管理', perm: 'workflow:category:list' },
+      },
+      {
+        path: 'workflow/form',
+        name: 'workflow-form',
+        component: () => import('@/views/workflow/form/FormList.vue'),
+        meta: { title: '流程表单管理', perm: 'workflow:form:list' },
+      },
+      {
+        path: 'workflow/definition',
+        name: 'workflow-definition',
+        component: () => import('@/views/workflow/definition/DefinitionList.vue'),
+        meta: { title: '流程定义管理', perm: 'workflow:definition:list' },
+      },
     ],
   },
   {
