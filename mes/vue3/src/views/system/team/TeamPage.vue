@@ -1,16 +1,7 @@
 <template>
-  <PageContainer>
+  <PageContainer title="班组员工定义">
     <MasterDetailLayout :has-selection="!!selected?.id">
       <template #master>
-        <SearchForm :model="search" @search="handleSearch" @reset="handleReset">
-          <el-form-item label="单元代码">
-            <el-input v-model="search.code" placeholder="请输入单元代码" clearable />
-          </el-form-item>
-          <el-form-item label="单元名称">
-            <el-input v-model="search.name" placeholder="请输入单元名称" clearable />
-          </el-form-item>
-        </SearchForm>
-
         <DataTable
           :data="tableData"
           :loading="loading"
@@ -21,33 +12,36 @@
           @size-change="handleSizeChange"
         >
           <template #toolbar>
-            <el-button v-permission="'process-unit:add'" type="primary" :icon="Plus" @click="openCreate">
-              新增
-            </el-button>
+            <el-input v-model="search.code" placeholder="班组代码" clearable class="qbox" @keyup.enter="handleSearch" />
+            <el-input v-model="search.name" placeholder="班组名称" clearable class="qbox" @keyup.enter="handleSearch" />
+            <el-button type="primary" @click="handleSearch">搜索</el-button>
+            <el-button @click="handleReset">重置</el-button>
+            <el-button v-permission="'team:add'" type="primary" :icon="Plus" @click="openCreate">新增</el-button>
           </template>
 
-          <template #col-hasLineWarehouse="{ row }">
-            <el-tag :type="(row as SpProcessUnit).hasLineWarehouse === '1' ? 'success' : 'info'" effect="plain">
-              {{ (row as SpProcessUnit).hasLineWarehouse === '1' ? '是' : '否' }}
-            </el-tag>
+          <template #col-shift="{ row }">
+            {{ shiftText(row as SpTeamDTO) }}
+          </template>
+          <template #col-workdays="{ row }">
+            {{ workdaysLabel((row as SpTeamDTO).workdays) }}
           </template>
 
           <template #actions="{ row }">
-            <el-button type="primary" link size="small" @click.stop="openEdit(row as SpProcessUnit)">编辑</el-button>
-            <el-button type="danger" link size="small" @click.stop="handleDelete(row as SpProcessUnit)">删除</el-button>
+            <el-button type="primary" link size="small" @click.stop="openEdit(row as SpTeamDTO)">编辑</el-button>
+            <el-button type="danger" link size="small" @click.stop="handleDelete(row as SpTeamDTO)">删除</el-button>
           </template>
         </DataTable>
       </template>
 
       <template #detail>
-        <ProcessUnitTeams v-if="selected?.id" :key="selected.id" :unit-id="selected.id" />
+        <TeamMembers v-if="selected?.id" :key="selected.id" :team-id="selected.id" />
       </template>
       <template #detail-empty>
-        <el-empty description="请选择左侧加工单元以维护关联班组" />
+        <el-empty description="请选择左侧班组以维护成员" />
       </template>
     </MasterDetailLayout>
 
-    <ProcessUnitFormDialog
+    <TeamForm
       v-model="dialogVisible"
       :model="editingModel"
       :loading="submitLoading"
@@ -62,31 +56,31 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import PageContainer from '@/components/PageContainer.vue'
 import MasterDetailLayout from '@/components/MasterDetailLayout.vue'
-import SearchForm from '@/components/SearchForm.vue'
 import DataTable, { type Column } from '@/components/DataTable.vue'
-import ProcessUnitFormDialog from './ProcessUnitFormDialog.vue'
-import ProcessUnitTeams from './ProcessUnitTeams.vue'
+import TeamForm from './TeamForm.vue'
+import TeamMembers from './TeamMembers.vue'
 import { useRequest } from '@/composables/useRequest'
 import { usePagination } from '@/composables/usePagination'
-import { processUnitPage, processUnitAddOrUpdate, processUnitDelete } from '@/api/basedata/processUnit'
-import type { SpProcessUnit } from '@/types/processUnit'
+import { teamPage, teamAddOrUpdate, teamDelete } from '@/api/system/team'
+import { workdaysLabel } from '@/utils/team'
+import type { SpTeam, SpTeamDTO } from '@/types/team'
 
 const { pager, setTotal, reset } = usePagination()
 const search = reactive({ code: '', name: '' })
-const selected = ref<SpProcessUnit | null>(null)
+const selected = ref<SpTeamDTO | null>(null)
 
 const { data: pageData, loading, run } = useRequest(
-  () => processUnitPage({ current: pager.current, size: pager.size, ...search }),
+  () => teamPage({ current: pager.current, size: pager.size, ...search }),
   { immediate: true },
 )
 
-const tableData = computed<SpProcessUnit[]>(() => {
+const tableData = computed<SpTeamDTO[]>(() => {
   const result = pageData.value
   if (result) setTotal(result.total)
   return result?.records ?? []
 })
 
-// 列表刷新后,选中单元若已不在行集中,清空选中避免陈旧引用
+// 列表刷新后,选中班组若已不在行集中,清空选中避免陈旧引用
 watch(tableData, (rows) => {
   if (selected.value && !rows.some((r) => r.id === selected.value!.id)) {
     selected.value = null
@@ -94,24 +88,30 @@ watch(tableData, (rows) => {
 })
 
 const columns: Column[] = [
-  { prop: 'code', label: '单元代码', width: 140 },
-  { prop: 'name', label: '单元名称', minWidth: 160 },
-  { prop: 'type', label: '类型', minWidth: 120 },
-  { prop: 'hasLineWarehouse', label: '线边库', width: 90 },
+  { prop: 'code', label: '班组代码', width: 120 },
+  { prop: 'name', label: '班组名称', minWidth: 140 },
+  { prop: 'shift', label: '上下班', width: 130 },
+  { prop: 'workdays', label: '工作日', minWidth: 160 },
+  { prop: 'userCount', label: '成员数', width: 90 },
 ]
 
+function shiftText(row: SpTeamDTO): string {
+  if (!row.startTime && !row.endTime) return '-'
+  return `${row.startTime ?? '--'} ~ ${row.endTime ?? '--'}`
+}
+
 const dialogVisible = ref(false)
-const editingModel = ref<Partial<SpProcessUnit> | null>(null)
+const editingModel = ref<Partial<SpTeamDTO> | null>(null)
 const submitLoading = ref(false)
 
-function select(row: SpProcessUnit) {
+function select(row: SpTeamDTO) {
   selected.value = row
 }
 function openCreate() {
   editingModel.value = null
   dialogVisible.value = true
 }
-function openEdit(row: SpProcessUnit) {
+function openEdit(row: SpTeamDTO) {
   editingModel.value = { ...row }
   dialogVisible.value = true
 }
@@ -136,10 +136,10 @@ function handleReset() {
   run()
 }
 
-async function handleFormSubmit(dto: Partial<SpProcessUnit>) {
+async function handleFormSubmit(dto: Partial<SpTeam>) {
   submitLoading.value = true
   try {
-    await processUnitAddOrUpdate(dto)
+    await teamAddOrUpdate(dto)
     ElMessage.success('保存成功')
     dialogVisible.value = false
     run()
@@ -148,9 +148,9 @@ async function handleFormSubmit(dto: Partial<SpProcessUnit>) {
   }
 }
 
-async function handleDelete(row: SpProcessUnit) {
+async function handleDelete(row: SpTeamDTO) {
   try {
-    await ElMessageBox.confirm(`确认删除加工单元「${row.name}」?`, '提示', {
+    await ElMessageBox.confirm(`确认删除班组「${row.name}」?`, '提示', {
       type: 'warning',
       confirmButtonText: '确认删除',
       cancelButtonText: '取消',
@@ -159,10 +159,14 @@ async function handleDelete(row: SpProcessUnit) {
     return
   }
   try {
-    await processUnitDelete(row.id!)
+    await teamDelete(row.id!)
     ElMessage.success('删除成功')
     if (selected.value?.id === row.id) selected.value = null
     run()
   } catch { /* 响应拦截器已提示 */ }
 }
 </script>
+
+<style scoped>
+.qbox { width: 150px; }
+</style>
