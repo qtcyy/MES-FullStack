@@ -135,10 +135,11 @@ async function handleFormSubmit(dto: Partial<SpWarehouse>) {
     ElMessage.success('保存成功')
     dialogVisible.value = false
     const editedId = dto.id
-    run()
-    // 若编辑的是当前选中仓库，维度可能变化 → 用提交值刷新引用，触发库位面板(:key)重挂
+    await run()
+    // 用刷新后列表中的服务端真实记录更新选中,触发库位面板(:key)按真实维度重挂
     if (editedId && selected.value?.id === editedId) {
-      selected.value = { ...(selected.value as SpWarehouse), ...(dto as SpWarehouse) }
+      const refreshed = tableData.value.find((r) => r.id === editedId)
+      if (refreshed) selected.value = refreshed
     }
   } finally {
     submitLoading.value = false
