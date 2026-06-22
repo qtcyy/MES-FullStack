@@ -57,6 +57,7 @@ export const routes: RouteRecordRaw[] = [
       },
       {
         path: 'system/team',
+        name: 'system-team',
         component: () => import('@/views/system/team/TeamPage.vue'),
         meta: { title: '班组员工定义', perm: 'team:add' },
       },
