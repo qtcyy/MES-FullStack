@@ -102,7 +102,7 @@ function move(idx: number, dir: -1 | 1) {
 </script>
 
 <style scoped>
-.ot { display: flex; gap: var(--sp-4); }
+.ot { display: flex; gap: var(--sp-4); width: 100%; }
 .ot__col { flex: 1; min-width: 0; border: 1px solid var(--el-border-color); border-radius: 6px; padding: var(--sp-3); display: flex; flex-direction: column; }
 .ot__head { display: flex; align-items: center; justify-content: space-between; font-weight: 600; margin-bottom: var(--sp-2); }
 .ot__search { margin-bottom: var(--sp-2); }
