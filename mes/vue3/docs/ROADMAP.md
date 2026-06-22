@@ -158,7 +158,7 @@ mes/vue3/
 ### Cycle 1 — 核心业务闭环 + 三大亮点（🚧 本作业主交付）
 系统管理 + 物料 + 工艺（BOM/工艺路线）+ 计划（工单/派工/甘特）+ 数字化大屏 + 3D 数字孪生 + AI 助手 + 工作流（分类/表单/定义/事件，非 BPMN 设计器部分）。
 
-> **Cycle 1 体量过大，按子周期 1a~1h 逐个推进**（每个一条 `feature/*` 分支 + 独立 spec→plan→实现→审查→合并）：1a 系统管理 ✅ / 1b 基础数据·物料 ✅ / 1c 工艺技术线（**1c-1 工艺路线 ✅** / **1c-2 产品 BOM ✅** / **1c-3 BOM-工艺绑定 ✅**，工艺技术线收尾）/ **1d 计划·订单/派工/甘特 ✅** / 1e 数字化大屏 / 1f 3D 数字孪生 / 1g AI 助手 / 1h 工作流配置。
+> **Cycle 1 体量过大，按子周期 1a~1h 逐个推进**（每个一条 `feature/*` 分支 + 独立 spec→plan→实现→审查→合并）：1a 系统管理 ✅ / 1b 基础数据·物料 ✅ / 1c 工艺技术线（**1c-1 工艺路线 ✅** / **1c-2 产品 BOM ✅** / **1c-3 BOM-工艺绑定 ✅**，工艺技术线收尾）/ **1d 计划·订单/派工/甘特 ✅** / **1e 数字化大屏 ✅** / **1f 3D 数字孪生 ✅** / **1g AI 助手 ✅** / **1h 工作流配置 ✅（Cycle 1 收官）**。
 >
 > **✅ 1a 系统管理已完成（2026-06-20，分支 `feature/system`）**：用户/角色/菜单/字典/部门五页 CRUD。沉淀通用原语 `TreeTable`/`MasterDetailLayout` + `urlMap` 路由翻译 + `systemTree` 纯函数（TDD）。后端最小补齐：5 个删除端点（用户/角色/字典/部门软删 + 列表过滤 + 软删用户阻断登录；菜单物理删 + 子守卫 + role_menu 清理）+ 审查修正 add-or-update（用户编辑密码加盐、角色保存与菜单 rebuild 同事务）+ 字典菜单种子（id=108）。详见 `docs/specs|plans/2026-06-20-cycle1a-system-management*`。
 >
@@ -240,10 +240,10 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 ### 9.8 工作流 workflow
 | 功能 | 关键后端接口 | 周期 | 状态 |
 |---|---|---|---|
-| 流程分类 | `/workflow/category/*` | C1 | ☐ |
-| 流程表单 | `/workflow/form/*` | C1 | ☐ |
-| 流程定义（启停/关联表单） | `/workflow/definition/*` | C1 | ☐ |
-| 流程事件规则 | `/workflow/event/*` | C1 | ☐ |
+| 流程分类 | `/workflow/category/*` | C1·1h | ✅ |
+| 流程表单 | `/workflow/form/*` | C1·1h | ✅ |
+| 流程定义（启停/关联表单） | `/workflow/definition/*` | C1·1h | ✅ |
+| 流程事件规则 | `/workflow/event/*` | C1·1h | ✅ |
 | BPMN 模型设计器（bpmn-js） | `/workflow/model/*` | C3 | ☐ |
 
 ### 9.9 全局
@@ -280,5 +280,6 @@ Lighthouse/DevTools 性能分析报告、分包与缓存调优、CDN、动画与
 - ⏳ **1c-3 待人工确认**：启动后端（9090）+ 执行 `scripts/sql/bom-flow-menu-seed.sql`（+ 1c-2 的 `product-bom.sql` 建表与数据）后浏览器（:4200）冒烟——`admin/123` 登录 → 工艺管理 → BOM工艺绑定 → 选产品根 → 进入绑定 → 左树点节点 → 绑定工艺路线（下拉选 + 备注）→ 右侧工序链预览出现 → 换绑 → 解绑 → 回 1c-2 锁 BOM 结构 → 回本页「锁定工艺」→ 全部绑定变只读。
 - ✅ **子周期 1d 计划·订单/派工/甘特完成（2026-06-21，分支 `feature/order-planning` → 待合 `develop`）**：三屏一分支——**工单下达**（列表 搜索/分页 + 新增编辑弹窗 物料带描述/工艺路线下拉/计划起止 + 删除）、**员工作业派工**（待派工多选 + 班组级联作业员派工弹窗，`DataTable` 加可选 `selectable` 多选列）、**生产甘特排程**（自研 CSS/div 甘特，双视角 资源/订单 + 计划vs实际双条 + 状态色 + 今日红线 + 拖拽改期 平移/缩放 + 执行回填 开工/进度/完工/纠时）。对接后端**已存在**的 15 端点。沉淀 `utils/order`（buildOrderPayload/validateOrder/orderTypeLabel/orderStatusMeta/buildDispatchPayload/validateDispatch）+ `utils/gantt`（parseDay/daysBetween/getDisplayStatus/computeRange/enumerateDays/timeToX/pxToDays/shiftPlanByDays/groupByResource/groupByOrder，TDD 20 例）+ `DataTable` selectable 增强。**后端审查（按每周期必审）抓到并修 1 个主链路真 bug**：`SpOrderDispatchMapper.xml` 的 `selectGanttTasks` 含 `WHERE d.oper_id IS NOT NULL`，而正常派工（`assignWorker` 创建的订单级派工 oper_id 为 NULL）会被全部过滤 → 派工后甘特永远空白；改为 `WHERE 1=1` + Mockito 守卫单测（派工批量 + operId NULL 回归）。前端门禁全绿（typecheck 0 / test 131 / lint 0 err / build ✓）+ 后端 `Cycle1dBackendTest`+`SpGanttServiceImplTest` 18 绿。subagent 驱动逐任务两阶段审查（揪出并修复：工单表单缺 el-form 行内校验、甘特纯函数 parseDay 越界 guard + overdue 边界锁定、甘特图 pointercancel/卸载清理健壮性）。spec/plan：`docs/specs|plans/2026-06-21-cycle1d-order-planning*`。**1d-backlog**：① 甘特全量拉取+客户端过滤（未用后端 orderCode/teamId 过滤参数，demo 规模无碍）② GanttPage activeTask 变 null 时抽屉未防御性关闭 ③ 派工 `pageOrdersForDispatch` N+1 查询 ④ 时间字段 String compareTo 依赖固定格式。
 - ⏳ **1d 待人工确认**：启动后端（9090）+ DB 已执行 `scripts/sql/dispatch-management.sql`（建 sp_order_dispatch + 菜单122）、`scripts/sql/gantt-migration.sql`（加 oper_id/progress 列 + 菜单123）、可选 `scripts/sql/gantt-mock-seed.sql`（演示数据）后浏览器（:4200，`admin/123`）冒烟——计划管理 → 工单下达（新建/编辑/删除）→ 员工作业派工（勾选→班组级联作业员→派工后从待派工消失）→ 生产甘特图（双视角切换 + 拖拽改期 + 悬停/抽屉回填 开工→进度→完工→纠时）。
-- ☐ 其余子周期：1e 大屏 / 1f 3D / 1g AI / 1h 工作流，及 Cycle 2+。
-- **下一步**：1a~1d 浏览器冒烟确认；启动子周期 1e（数字化大屏）。
+- ✅ **子周期 1h 工作流配置完成（2026-06-22，分支 `feature/workflow-config`，从 `develop` 切）——Cycle 1 收官**：四个配置页一次性交付——**流程分类管理**（`/workflow/category` 标准 CRUD，code 唯一、编辑禁改 code）、**流程表单管理**（`/workflow/form` 三段表单 基本/地址脚本/选项 + 跳过相同处理人开关，formKey 字母开头唯一）、**流程定义管理**（`/workflow/definition` 启停 / 关联表单弹窗 / 事件规则弹窗，**无增删**——定义由模型发布派生）、**流程事件规则**（嵌定义页弹窗：编辑器+列表，SET_AUDIT_STATUS/SCRIPT 两类动作 + 「填入示例」三条）。对接后端**已存在**的 12 端点（category 4 + form 4 + definition 3 + event 3），**零后端改动**。沉淀 `utils/workflow` 纯函数（validateCategory/validateForm/validateEventRule/build*Payload/triggerLabel/actionLabel/auditStatusLabel/sampleEventRules + TRIGGER/ACTION/AUDIT_STATUS_OPTIONS，**TDD 26 例**）+ `types/workflow.ts` + `api/workflow/{category,form,definition,event}.ts` + 8 视图组件。**关键契约坑（已处理）**：① 事件规则字段 API 暴露名是 **`trigger`**（后端 Java 字段 `triggerType` + `@JsonProperty("trigger")` 避 SQL 保留字），前端类型/payload/读取一律用 `trigger`；seed SQL 用 DB 列名 `trigger_type`。② 编码 form vs JSON：page/list/add-or-update 走 form，所有 delete + definition set-enabled/set-form + 全部 event 端点走 JSON（`http.post(url,data,true)`）。③ set-form 选「未关联」传 `null`（后端 `UpdateWrapper.set("form_key", null)` 真正清除）。**菜单零新增**——191/192/193/194 种子已存在，仅加 urlMap 3 条 + router 3 路由（菜单 192「流程模型设计」本周期不映射，留 Cycle 3 bpmn-js 设计器）。**新增 `scripts/sql/workflow-demo-seed.sql`**（幂等：2 分类 / 2 已发布模型 + 对应定义 [id=model.id] / 1 表单 / 2 事件规则）——因 BPMN 设计器在 Cycle 3，定义数据靠 seed 预置供演示。**后端审查（按每周期必审）结论零 bug 零改动**：category/form add-or-update 唯一性用 `.ne(...id...)` 排除自身（编辑不误判）、definition set-form null 经 UpdateWrapper 真正清除、event `trigger` 保留字修复在位、save 双分支 + 缺省值正确——mes-new 2n 已端到端验证同份后端代码。门禁全绿（typecheck 0 / **test 221**[+26 workflow] / lint 0 err[5 既有 warn] / build ✓）。spec/plan：`docs/specs|plans/2026-06-22-cycle1h-workflow-config*`。**1h-backlog（非阻塞）**：① formKey/code 提交前未预查唯一性（靠后端校验 + toast，可选增强）② BPMN 模型设计页 + 发布动作留 Cycle 3 ③ 运行时（实例/任务/审批/事件触发）留将来周期 ④ businessType 固定 ORDER_APPROVAL。**人工 :4200 冒烟待确认**：需后端 9090 + DB 跑 `workflow-config-tables.sql`（建表）+ `workflow-flow-config.sql`/`workflow-form-event-config.sql`（菜单）+ `workflow-demo-seed.sql`（演示数据），`admin/123` 登录 → 流程配置工具 → 分类 CRUD / 表单 CRUD / 定义 启停·关联表单·配事件（含填入示例）。
+- ☐ 其余周期：Cycle 2（库存 + 剩余基础数据 + 组织）/ Cycle 3（工作流设计器 + 动态主数据 + 工艺深化）/ Cycle 4（性能/打磨/测试）。
+- **下一步**：1a~1h 浏览器冒烟确认；`feature/workflow-config` `--no-ff` 合 `develop`（Cycle 1 收官）；启动 Cycle 2。
