@@ -94,10 +94,16 @@ const handleSubmit = async (dto: SpTableManagerDto) => {
   }
 }
 const handleDelete = async (row: SpTableManager) => {
-  await ElMessageBox.confirm(`确认删除动态表「${row.tableName}」及其字段配置?`, '提示', { type: 'warning' })
-  await managerDelete(row.id!)
-  ElMessage.success('删除成功')
-  load()
+  try {
+    await ElMessageBox.confirm(`确认删除动态表「${row.tableName}」及其字段配置?`, '提示', { type: 'warning' })
+  } catch {
+    return // 用户取消
+  }
+  try {
+    await managerDelete(row.id!)
+    ElMessage.success('删除成功')
+    load()
+  } catch { /* 响应拦截器已提示 */ }
 }
 </script>
 

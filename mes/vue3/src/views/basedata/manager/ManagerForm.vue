@@ -1,5 +1,12 @@
 <template>
-  <FormDialog v-model="visible" :title="model?.id ? '编辑动态表' : '新建动态表'" width="760px" :loading="loading" @submit="onSubmit">
+  <FormDialog
+    :model-value="modelValue"
+    :title="model?.id ? '编辑动态表' : '新建动态表'"
+    width="760px"
+    :loading="loading"
+    @update:model-value="(v: boolean) => emit('update:modelValue', v)"
+    @submit="onSubmit"
+  >
     <el-form :model="header" label-width="90px">
       <el-form-item label="表名" required>
         <el-input v-model="header.tableName" placeholder="物理表名,如 sp_demo" :disabled="!!model?.id" />
@@ -26,9 +33,9 @@
       </el-table-column>
       <el-table-column label="操作" width="150">
         <template #default="{ $index }">
-          <el-button link size="small" :disabled="$index === 0" @click="rows = moveRow(rows, $index, 'up')">上移</el-button>
-          <el-button link size="small" :disabled="$index === rows.length - 1" @click="rows = moveRow(rows, $index, 'down')">下移</el-button>
-          <el-button link type="danger" size="small" @click="rows.splice($index, 1)">删除</el-button>
+          <el-button link size="small" :disabled="$index === 0" @click="moveUp($index)">上移</el-button>
+          <el-button link size="small" :disabled="$index === rows.length - 1" @click="moveDown($index)">下移</el-button>
+          <el-button link type="danger" size="small" @click="removeRow($index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -47,26 +54,32 @@ import type { SpTableManager, SpTableManagerItem, SpTableManagerDto } from '@/ty
 const props = defineProps<{ modelValue: boolean; model: SpTableManager | null; loading?: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [boolean]; submit: [SpTableManagerDto] }>()
 
-const visible = ref(props.modelValue)
-watch(() => props.modelValue, (v) => (visible.value = v))
-watch(visible, (v) => emit('update:modelValue', v))
-
 const header = reactive<SpTableManager>({ tableName: '', tableDesc: '' })
 const rows = ref<SpTableManagerItem[]>([])
 
 const addRow = () => rows.value.push({ field: '', fieldDesc: '', mustFill: '0' })
+const moveUp = (index: number) => (rows.value = moveRow(rows.value, index, 'up'))
+const moveDown = (index: number) => (rows.value = moveRow(rows.value, index, 'down'))
+const removeRow = (index: number) => rows.value.splice(index, 1)
 
+// 守卫:每次打开自增 token,await 返回后比对,过期结果丢弃,防快速切换编辑不同行的竞态
+let loadToken = 0
 watch(
   () => props.modelValue,
   async (open) => {
     if (!open) return
     header.tableName = props.model?.tableName ?? ''
     header.tableDesc = props.model?.tableDesc ?? ''
-    if (props.model?.id) {
-      const items = await managerItemsByTableNameId(props.model.id)
+    rows.value = [] // 先清空,避免 await 期间表头已切换但仍显示上次明细
+    const id = props.model?.id
+    if (!id) return
+    const token = ++loadToken
+    try {
+      const items = await managerItemsByTableNameId(id)
+      if (token !== loadToken) return // 已被后续打开覆盖,丢弃过期结果
       rows.value = items.map((it) => ({ ...it, mustFill: parseMustFill(it.mustFill) ? '1' : '0' }))
-    } else {
-      rows.value = []
+    } catch {
+      if (token === loadToken) rows.value = [] // 接口失败兜底,响应拦截器已提示
     }
   },
 )
