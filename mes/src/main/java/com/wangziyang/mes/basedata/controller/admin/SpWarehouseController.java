@@ -62,10 +62,29 @@ public class SpWarehouseController {
     @ResponseBody
     @Transactional(rollbackFor = Exception.class)
     public Result addOrUpdate(@RequestBody SpWarehouse record) {
+        // 取旧记录维度,判断库位是否需要重建(避免改名等也重建 → 库位 id 全变孤儿化 2a 库存引用)
+        SpWarehouse old = record.getId() == null ? null : spWarehouseService.getById(record.getId());
         spWarehouseService.saveOrUpdate(record);
-        // Regenerate locations when spec changes
-        regenerateLocations(record.getId(), record.getGroups(), record.getRows(), record.getLayers(), record.getColumns());
+        if (dimensionsChanged(old, record)) {
+            regenerateLocations(record.getId(), record.getGroups(), record.getRows(), record.getLayers(), record.getColumns());
+        }
         return Result.success(record.getId());
+    }
+
+    /** 维度是否变化:无旧记录(新建)→ true;groups/rows/layers/columns 任一不同 → true */
+    private boolean dimensionsChanged(SpWarehouse old, SpWarehouse next) {
+        if (old == null) {
+            return true;
+        }
+        return !java.util.Objects.equals(old.getGroups(), next.getGroups())
+                || !java.util.Objects.equals(old.getRows(), next.getRows())
+                || !java.util.Objects.equals(old.getLayers(), next.getLayers())
+                || !java.util.Objects.equals(old.getColumns(), next.getColumns());
+    }
+
+    @GetMapping("/list-ui")
+    public String listUI() {
+        return "forward:/index.html";
     }
 
     @PostMapping("/delete")
