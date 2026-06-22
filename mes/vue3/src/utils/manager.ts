@@ -17,7 +17,11 @@ export function validateManagerForm(header: SpTableManager, rows: SpTableManager
   return null
 }
 
-/** 构造整体保存 payload:mustFill→"1"/"0"、按行序生成 sortNum(从1)、剥离 item id、编辑回带表头 id */
+/**
+ * 构造整体保存 payload:mustFill→"1"/"0"、按行序生成 sortNum(从1)、剥离 item id、编辑回带表头 id。
+ * isDeleted 固定 "0":sp_table_manager.is_deleted 为 NOT NULL 无默认值,且后端不自动填充,
+ * 不显式提交会触发 NOT NULL 约束失败,且非 "0" 值会让 Layer2 表名白名单拒绝该表的数据维护。
+ */
 export function buildUpsertPayload(
   header: SpTableManager,
   rows: SpTableManagerItem[],
@@ -33,6 +37,7 @@ export function buildUpsertPayload(
     ...(existingId ? { id: existingId } : {}),
     tableName: header.tableName.trim(),
     tableDesc: header.tableDesc?.trim() ?? '',
+    isDeleted: '0',
     spTableManagerItems: items,
   }
 }

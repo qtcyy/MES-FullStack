@@ -55,6 +55,7 @@ describe('buildUpsertPayload', () => {
     )
     expect(out.tableName).toBe('sp_demo')
     expect(out.id).toBeUndefined()
+    expect(out.isDeleted).toBe('0')
     expect(out.spTableManagerItems).toEqual([
       { field: 'code', fieldDesc: '编码', mustFill: '1', sortNum: 1 },
       { field: 'name', fieldDesc: '名称', mustFill: '0', sortNum: 2 },
