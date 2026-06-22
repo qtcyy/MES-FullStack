@@ -97,3 +97,41 @@ export interface DefinitionPageParams {
   size: number
   name?: string
 }
+
+/** 流程模型状态 */
+export type WorkflowModelStatus = 'DRAFT' | 'PUBLISHED'
+
+/** 流程模型(sp_workflow_model) */
+export interface WorkflowModel {
+  id: string
+  modelKey: string
+  name: string
+  /** BPMN 2.0 XML(longtext) */
+  bpmnXml: string
+  status: WorkflowModelStatus
+  version: number
+  categoryCode?: string
+  categoryName?: string
+  createTime?: string
+  updateTime?: string
+}
+
+export interface ModelSaveDTO {
+  id?: string
+  modelKey: string
+  name: string
+  bpmnXml: string
+}
+
+export interface ModelPublishDTO {
+  id: string
+  categoryCode: string
+  categoryName: string
+}
+
+export interface ModelPageParams {
+  current: number
+  size: number
+  name?: string
+  modelKey?: string
+}
