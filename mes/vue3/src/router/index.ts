@@ -158,6 +158,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '流程定义管理', perm: 'workflow:definition:list' },
       },
       {
+        path: 'workflow/model',
+        name: 'workflow-model',
+        component: () => import('@/views/workflow/model/ModelList.vue'),
+        meta: { title: '流程模型设计', perm: 'workflow:model:list' },
+      },
+      {
         path: 'inventory/receipt',
         name: 'inventory-receipt',
         component: () => import('@/views/inventory/ReceiptPage.vue'),
