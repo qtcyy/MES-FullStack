@@ -46,14 +46,27 @@ public class Cycle2b2BackendTest {
         return w;
     }
 
-    /** 新建(getById 返回 null)→ 重建库位 1 次 */
+    /** id 非 null 但记录已被删除 → 退化为重建(getById 返回 null → 重建库位 1 次) */
     @Test
-    public void create_regeneratesLocations() {
+    public void edit_staleDeletedRecord_regeneratesLocations() {
         SpWarehouse rec = warehouse("w1", 1, 1, 1, 1);
         when(spWarehouseService.getById("w1")).thenReturn(null);
 
         controller.addOrUpdate(rec);
 
+        verify(spWarehouseLocationService, times(1)).remove(any(QueryWrapper.class));
+        verify(spWarehouseLocationService, atLeastOnce()).save(any(SpWarehouseLocation.class));
+    }
+
+    /** 真正新建(id 为 null)→ 跳过 getById,直接重建库位 1 次 */
+    @Test
+    public void create_nullId_regeneratesLocations() {
+        SpWarehouse rec = warehouse(null, 1, 1, 1, 1); // id 为 null
+        // 不 stub getById:新建路径不应调用它(Mockito strict 模式下多余 stub 会报错)
+
+        controller.addOrUpdate(rec);
+
+        verify(spWarehouseService, never()).getById(any());
         verify(spWarehouseLocationService, times(1)).remove(any(QueryWrapper.class));
         verify(spWarehouseLocationService, atLeastOnce()).save(any(SpWarehouseLocation.class));
     }
