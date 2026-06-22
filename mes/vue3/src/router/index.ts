@@ -132,6 +132,11 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'BOM工艺绑定', perm: 'bom-flow:add' },
       },
       {
+        path: 'technology/process-content',
+        name: 'technology-process-content',
+        component: () => import('@/views/technology/process-content/ProcessContentPage.vue'),
+      },
+      {
         path: 'order/release',
         name: 'order-release',
         component: () => import('@/views/order/release/OrderList.vue'),
