@@ -46,8 +46,13 @@ const { data: locations, loading: locLoading, run: loadLocations } = useRequest(
 const occupancy = ref<Record<string, string>>({})
 
 async function loadOccupancy() {
-  const page = await pageInventory({ current: 1, size: 100000 })
-  occupancy.value = buildOccupancyMap(page.records ?? [])
+  // 占用标注为辅助信息:取数失败则降级为全部"空闲",不阻断选择
+  try {
+    const page = await pageInventory({ current: 1, size: 100000 })
+    occupancy.value = buildOccupancyMap(page.records ?? [])
+  } catch {
+    occupancy.value = {}
+  }
 }
 
 function onWarehouse(warehouseId: string) {
