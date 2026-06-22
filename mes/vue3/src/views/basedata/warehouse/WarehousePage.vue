@@ -32,7 +32,11 @@
       </template>
 
       <template #detail>
-        <WarehouseLocations v-if="selected?.id" :key="selected.id" :warehouse="selected" />
+        <WarehouseLocations
+          v-if="selected?.id"
+          :key="`${selected.id}-${selected.groups}x${selected.rows}x${selected.layers}x${selected.columns}`"
+          :warehouse="selected"
+        />
       </template>
       <template #detail-empty>
         <el-empty description="请选择左侧仓库查看库位" />
