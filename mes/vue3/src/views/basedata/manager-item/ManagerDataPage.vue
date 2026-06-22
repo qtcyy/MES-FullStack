@@ -106,14 +106,19 @@ const dataColumns = computed<Column[]>(() =>
 // ---- 右:动态数据 ----
 const { pager: dataPager, setTotal: setDataTotal, reset: resetData } = usePagination()
 const rows = ref<ManagerDataRow[]>([])
+// 守卫:快速切表(或分页)时,丢弃乱序返回的过期数据,避免动态列与右侧数据错配
+let dataToken = 0
 const { loading: rowsLoading, run: loadRows } = useRequest(async () => {
-  if (!selected.value?.id) return
+  const sel = selected.value // await 前取快照,避免回填时入参/数据与已变更的 selected 错配
+  if (!sel?.id) return
+  const token = ++dataToken
   const res = await managerDataPage({
-    tableName: selected.value.tableName,
-    tableNameId: selected.value.id,
+    tableName: sel.tableName,
+    tableNameId: sel.id,
     current: dataPager.current,
     size: dataPager.size,
   })
+  if (token !== dataToken) return // 过期请求,丢弃
   rows.value = res.records
   setDataTotal(res.total)
 })
