@@ -1,3 +1,5 @@
+import type { PageReq } from '@/types/system'
+
 /** 库存台账(对应后端 sp_inventory) */
 export interface SpInventory {
   id: string
@@ -72,10 +74,20 @@ export interface SpOutboundOrderItem {
   postedAt?: string
 }
 
-/** 分页参数 */
-export interface ReceiptPageParams { current: number; size: number; receiptCode?: string; receiptStatus?: string }
-export interface OutboundPageParams { current: number; size: number; outboundCode?: string; outboundStatus?: string }
-export interface InventoryPageParams { current: number; size: number; materialCode?: string; startDate?: string; endDate?: string }
+/** 分页参数(复用项目 PageReq 基类:current + size) */
+export interface ReceiptPageParams extends PageReq {
+  receiptCode?: string
+  receiptStatus?: string
+}
+export interface OutboundPageParams extends PageReq {
+  outboundCode?: string
+  outboundStatus?: string
+}
+export interface InventoryPageParams extends PageReq {
+  materialCode?: string
+  startDate?: string
+  endDate?: string
+}
 
 /** 登账/手工入库 DTO */
 export interface PostReceiptItemDTO { itemId: string; warehouseId: string; locationId: string }
