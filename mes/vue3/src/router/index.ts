@@ -138,6 +138,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '工艺内容编制', perm: 'process-content:list' },
       },
       {
+        path: 'technology/process-query',
+        name: 'technology-process-query',
+        component: () => import('@/views/technology/process-query/ProcessQueryPage.vue'),
+        meta: { title: '工艺查询', perm: 'process-query:list' },
+      },
+      {
         path: 'order/release',
         name: 'order-release',
         component: () => import('@/views/order/release/OrderList.vue'),
