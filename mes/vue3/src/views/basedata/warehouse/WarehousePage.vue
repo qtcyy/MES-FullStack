@@ -1,6 +1,6 @@
 <template>
   <PageContainer title="仓库管理">
-    <MasterDetailLayout :has-selection="!!selected?.id">
+    <MasterDetailLayout :has-selection="!!selected?.id" :master-width="560">
       <template #master>
         <DataTable
           :data="tableData"
