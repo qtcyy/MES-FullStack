@@ -114,8 +114,12 @@ const treeColumns: Column[] = [
 const onPickProduct = async (rootId: string) => {
   selectedBomId.value = ''
   detail.value = null
-  await loadTree()
-  selectNode(rootId) // 自动选中产品根
+  try {
+    await loadTree() // useRequest.run 失败会 re-throw
+    selectNode(rootId) // 自动选中产品根
+  } catch {
+    /* 树加载失败,拦截器已提示;保持空状态不进 selectNode */
+  }
 }
 
 // ─── 选节点 → 取详情 + 物料(selToken 守卫防快速切节点乱序)──
