@@ -2,7 +2,12 @@
   <div class="pc-editor">
     <!-- 顶部:状态 + 操作 -->
     <div class="pc-editor__head">
-      <el-tag :type="statusTagType" size="small" disable-transitions>{{ statusLabel }}</el-tag>
+      <div class="pc-editor__status">
+        <el-tag :type="statusTagType" size="small" disable-transitions>{{ statusLabel }}</el-tag>
+        <el-tag v-if="dirty" type="warning" size="small" effect="light" disable-transitions>
+          ● 有未保存修改
+        </el-tag>
+      </div>
       <div class="pc-editor__ops">
         <el-button
           type="primary"
@@ -183,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, watch } from 'vue'
+import { reactive, ref, computed, watch, onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Upload } from '@element-plus/icons-vue'
 import type { UploadRequestOptions } from 'element-plus'
@@ -251,6 +256,9 @@ const form = reactive<ContentFormModel>({
 const contentImageUrls = ref<string[]>([])
 const inspectionImageUrls = ref<string[]>([])
 
+// 基线快照(detail 回填时刷新),须在 immediate watch 同步执行前完成声明
+const baseline = ref('')
+
 // detail/bomId 变化时回填(切节点)
 watch(
   () => [props.bomId, props.detail] as const,
@@ -267,11 +275,36 @@ watch(
     form.inspectionRequiredBool = inspectionToBool(c?.inspectionRequired)
     contentImageUrls.value = [...props.detail.contentImageUrls]
     inspectionImageUrls.value = [...props.detail.inspectionImageUrls]
+    // 回填完成即记录基线快照,后续 form 与之比对判定脏状态;保存后静默 reload 会重置基线
+    baseline.value = snapshot()
     // 不在此重置 activeTab:切节点时父级 :key=bomId 整体重挂(activeTab 自然回 main),
     // 保存后静默 reload 同节点则保留当前 Tab。
   },
   { immediate: true, deep: true },
 )
+
+// ─── 未保存状态:主信息表单(走"保存主信息")与基线快照比对 ────
+// 设备/文档为即时保存的子资源,不计入脏状态
+function snapshot(): string {
+  return JSON.stringify({
+    mainInfo: form.mainInfo ?? '',
+    content: form.content ?? '',
+    requirements: form.requirements ?? '',
+    notes: form.notes ?? '',
+    inspectionRequiredBool: form.inspectionRequiredBool,
+    contentImageKeys: form.contentImageKeys,
+    inspectionImageKeys: form.inspectionImageKeys,
+  })
+}
+// 仅可编辑态(草稿/未编制)才可能脏;已完成为只读
+const dirty = computed(() => editable.value && snapshot() !== baseline.value)
+
+// 脏状态下离开/刷新页面给浏览器原生二次确认,避免误丢未保存的主信息
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+  if (dirty.value) e.preventDefault()
+}
+window.addEventListener('beforeunload', handleBeforeUnload)
+onBeforeUnmount(() => window.removeEventListener('beforeunload', handleBeforeUnload))
 
 const onSave = () => {
   const err = validateContent(form)
@@ -378,6 +411,11 @@ const onDocDelete = async (row: SpProcessDocumentVO) => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--sp-3);
+  gap: var(--sp-2);
+}
+.pc-editor__status {
+  display: flex;
+  align-items: center;
   gap: var(--sp-2);
 }
 .pc-editor__bar {
