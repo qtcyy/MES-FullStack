@@ -7,7 +7,7 @@
     @update:model-value="(v) => emit('update:modelValue', v)"
     @submit="handleSubmit"
   >
-    <el-form ref="formRef" :model="form" :rules="rules" label-width="88px">
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="零部件编码" prop="code">
         <el-input v-model="form.code" placeholder="请输入零部件编码" clearable />
       </el-form-item>
