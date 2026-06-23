@@ -50,13 +50,14 @@ public class SysNoticeInboxController extends BaseController {
             return Result.failure("通知不存在或无权访问");
         }
         inboxService.markRead(inboxId, uid);
+        SysNoticeUser fresh = inboxService.getById(inboxId);
         SysNotice notice = noticeService.getById(nu.getNoticeId());
         SysNoticeInboxDTO dto = new SysNoticeInboxDTO();
         dto.setId(nu.getId());
         dto.setNoticeId(nu.getNoticeId());
         dto.setUserId(uid);
         dto.setIsRead("1");
-        dto.setReadTime(nu.getReadTime());
+        dto.setReadTime(fresh != null ? fresh.getReadTime() : nu.getReadTime());
         if (notice != null) {
             dto.setTitle(notice.getTitle());
             dto.setContent(notice.getContent());

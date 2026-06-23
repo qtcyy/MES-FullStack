@@ -121,9 +121,7 @@ public class SysNoticeServiceImpl
         UpdateWrapper<SysNotice> uw = new UpdateWrapper<>();
         uw.eq("id", noticeId).set("is_deleted", "1");
         this.update(uw);
-        UpdateWrapper<SysNoticeUser> uw2 = new UpdateWrapper<>();
-        uw2.eq("notice_id", noticeId).set("is_deleted", "1");
-        ((SysNoticeUserServiceImpl) noticeUserService).update(uw2);
+        noticeUserService.softDeleteByNoticeId(noticeId);
         return true;
     }
 

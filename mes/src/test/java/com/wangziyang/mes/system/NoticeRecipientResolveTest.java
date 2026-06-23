@@ -55,4 +55,12 @@ public class NoticeRecipientResolveTest {
     public void emptyTargetIds_returnsEmpty() {
         assertTrue(service.resolveRecipientIds("user", null).isEmpty());
     }
+
+    @Test
+    public void dept_returnsUsersInDepts() {
+        when(sysUserMapper.selectList(any())).thenReturn(Arrays.asList(user("3"), user("4")));
+        List<String> ids = service.resolveRecipientIds("dept", Arrays.asList("d1"));
+        assertEquals(2, ids.size());
+        assertTrue(ids.contains("3") && ids.contains("4"));
+    }
 }

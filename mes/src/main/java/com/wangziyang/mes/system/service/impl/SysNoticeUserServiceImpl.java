@@ -56,4 +56,11 @@ public class SysNoticeUserServiceImpl
         uw.eq("id", inboxId).eq("user_id", userId).set("is_deleted", "1");
         return this.update(uw);
     }
+
+    @Override
+    public boolean softDeleteByNoticeId(String noticeId) {
+        UpdateWrapper<SysNoticeUser> uw = new UpdateWrapper<>();
+        uw.eq("notice_id", noticeId).set("is_deleted", "1");
+        return this.update(uw);
+    }
 }

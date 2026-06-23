@@ -12,4 +12,5 @@ public interface ISysNoticeUserService extends IService<SysNoticeUser> {
     boolean markRead(String inboxId, String userId);
     boolean markAllRead(String userId);
     boolean removeForUser(String inboxId, String userId);
+    boolean softDeleteByNoticeId(String noticeId);
 }
