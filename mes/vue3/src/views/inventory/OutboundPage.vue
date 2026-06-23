@@ -1,6 +1,6 @@
 <template>
   <PageContainer title="配套出库确认">
-    <MasterDetailLayout :has-selection="!!selected" :master-width="440">
+    <MasterDetailLayout :has-selection="!!selected" :master-width="560">
       <template #master>
         <DataTable
           :data="page?.records ?? []"
@@ -42,9 +42,9 @@ import { outboundStatusMeta } from '@/utils/inventory'
 import type { SpOutboundOrder, SpOutboundOrderItem } from '@/types/inventory'
 
 const columns: Column[] = [
-  { prop: 'outboundCode', label: '出库单号', minWidth: 140 },
-  { prop: 'orderCode', label: '订单号', width: 120 },
-  { prop: 'outboundStatus', label: '状态', width: 100 },
+  { prop: 'outboundCode', label: '出库单号', width: 170 },
+  { prop: 'orderCode', label: '订单号', minWidth: 180 },
+  { prop: 'outboundStatus', label: '状态', width: 110 },
 ]
 
 const current = ref(1)
