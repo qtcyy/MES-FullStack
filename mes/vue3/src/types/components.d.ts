@@ -16,6 +16,7 @@ declare module 'vue' {
     AiFab: typeof import('./../components/ai/AiFab.vue')['default']
     AiMessage: typeof import('./../components/ai/AiMessage.vue')['default']
     AiToolSteps: typeof import('./../components/ai/AiToolSteps.vue')['default']
+    CopyText: typeof import('./../components/CopyText.vue')['default']
     DataTable: typeof import('./../components/DataTable.vue')['default']
     DualListTransfer: typeof import('./../components/DualListTransfer.vue')['default']
     EChart: typeof import('./../components/EChart.vue')['default']
