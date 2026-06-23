@@ -1,6 +1,6 @@
 <template>
   <PageContainer title="配套出库确认">
-    <MasterDetailLayout :has-selection="!!selected">
+    <MasterDetailLayout :has-selection="!!selected" :master-width="440">
       <template #master>
         <DataTable
           :data="page?.records ?? []"
