@@ -89,7 +89,13 @@
         <el-table :data="detail.documents" stripe border>
           <el-table-column label="文档名称" show-overflow-tooltip>
             <template #default="{ row }">
-              <el-link :href="row.fileUrl" target="_blank" type="primary">{{ row.name }}</el-link>
+              <el-link
+                :href="row.fileUrl || undefined"
+                :disabled="!row.fileUrl"
+                target="_blank"
+                type="primary"
+                >{{ row.name }}</el-link
+              >
             </template>
           </el-table-column>
           <template #empty><el-empty description="暂无文档" :image-size="60" /></template>
