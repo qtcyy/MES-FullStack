@@ -215,6 +215,18 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/inventory/ManualInboundPage.vue'),
         meta: { title: '手动入库', perm: 'inventory:inbound' },
       },
+      {
+        path: 'system/notice',
+        name: 'system-notice',
+        component: () => import('@/views/system/notice/NoticeInbox.vue'),
+        meta: { title: '通知中心' },
+      },
+      {
+        path: 'system/notice/admin',
+        name: 'system-notice-admin',
+        component: () => import('@/views/system/notice/NoticePublish.vue'),
+        meta: { title: '通知发布', perm: 'notice:publish' },
+      },
     ],
   },
   {

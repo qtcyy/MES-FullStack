@@ -32,6 +32,8 @@ const URL_MAP: Record<string, string> = {
   '/workflow/form/list-ui': '/workflow/form',
   '/workflow/definition/list-ui': '/workflow/definition',
   '/workflow/model/list-ui': '/workflow/model',
+  '/admin/sys/notice/list-ui': '/system/notice',
+  '/admin/sys/notice/admin-ui': '/system/notice/admin',
 }
 
 /** 不可导航(#/空/javascript:)→ undefined;已知→映射;未知→原样 */
