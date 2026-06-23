@@ -64,7 +64,7 @@
   6. **技术文档**：只读 `el-table`（文档名称 `el-link target=_blank` 预览），无删除列，空态 `el-empty`。
   7. **物料清单**：只读 `el-table`（物料编码 / 描述 / 数量 / 单位），空态 `el-empty`。
 
-> 只读展示统一用 `el-input ... readonly` 或纯文本块（实现时择一保持视觉克制）；图片区复用 `MultiImageUpload :disabled`（已支持），文档/物料/设备复用原生 `el-table`（与编制器子表一致，子表不分页故不用 DataTable）。
+> 只读文本展示统一用 `el-input ... readonly`（含 `type=textarea`，与编制页视觉一致，已确认）；图片区复用 `MultiImageUpload :disabled`（已支持），文档/物料/设备复用原生 `el-table`（与编制器子表一致，子表不分页故不用 DataTable）。**不加额外查询页搜索过滤**（保持范围最小，纯镜像 mes-new）。
 
 ---
 
