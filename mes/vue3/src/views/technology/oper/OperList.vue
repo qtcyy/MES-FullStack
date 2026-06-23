@@ -15,7 +15,7 @@
       @size-change="handleSizeChange"
     >
       <template #toolbar>
-        <el-button v-permission="'oper:add'" type="primary" :icon="Plus" @click="openCreate">新增</el-button>
+        <el-button v-permission="'oper:list'" type="primary" :icon="Plus" @click="openCreate">新增</el-button>
       </template>
 
       <template #col-generatePlan="{ row }">

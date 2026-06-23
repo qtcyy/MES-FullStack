@@ -21,7 +21,7 @@
           @size-change="handleSizeChange"
         >
           <template #toolbar>
-            <el-button v-permission="'process-unit:add'" type="primary" :icon="Plus" @click="openCreate">
+            <el-button v-permission="'processUnit:add'" type="primary" :icon="Plus" @click="openCreate">
               新增
             </el-button>
           </template>

@@ -7,7 +7,7 @@
           <el-radio-button value="list">列表</el-radio-button>
           <el-radio-button value="tree">树视图</el-radio-button>
         </el-radio-group>
-        <el-button v-permission="'product-bom:add'" type="primary" :icon="Plus" @click="openCreateRoot">新建产品 BOM</el-button>
+        <el-button v-permission="'product-bom:list'" type="primary" :icon="Plus" @click="openCreateRoot">新建产品 BOM</el-button>
       </div>
 
       <!-- 列表视图:根节点分页 -->

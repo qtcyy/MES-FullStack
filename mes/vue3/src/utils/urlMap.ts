@@ -20,6 +20,7 @@ const URL_MAP: Record<string, string> = {
   '/technology/bom/list-ui': '/technology/bom',
   '/technology/product-bom/list-ui': '/technology/product-bom',
   '/technology/bom-flow/list-ui': '/technology/bom-flow',
+  '/technology/process-flow': '/technology/bom-flow', // 菜单#114「工艺流程管理」→ 复用 BOM 工艺绑定页
   '/technology/process-content': '/technology/process-content',
   '/technology/process-query': '/technology/process-query',
   '/order/release/list-ui': '/order/release',
