@@ -2,45 +2,60 @@
   <FormDialog
     :model-value="modelValue"
     :title="isEdit ? '编辑班组' : '新增班组'"
-    width="560px"
+    width="720px"
     :loading="loading"
     @update:model-value="(v) => emit('update:modelValue', v)"
     @submit="handleSubmit"
   >
-    <el-form ref="formRef" :model="form" :rules="rules" label-width="92px">
-      <el-form-item label="班组代码" prop="code">
-        <el-input v-model="form.code" placeholder="如 BZ001" clearable />
-      </el-form-item>
-      <el-form-item label="班组名称" prop="name">
-        <el-input v-model="form.name" placeholder="请输入班组名称" clearable />
-      </el-form-item>
-      <el-form-item label="上班时间" prop="startTime">
-        <el-time-picker
-          v-model="form.startTime"
-          format="HH:mm"
-          value-format="HH:mm"
-          placeholder="如 08:00"
-          clearable
-        />
-      </el-form-item>
-      <el-form-item label="下班时间" prop="endTime">
-        <el-time-picker
-          v-model="form.endTime"
-          format="HH:mm"
-          value-format="HH:mm"
-          placeholder="如 17:00"
-          clearable
-        />
-      </el-form-item>
-      <el-form-item label="工作日" prop="workdays">
-        <el-select v-model="form.workdays" multiple placeholder="选择工作日" style="width: 100%">
-          <el-option v-for="w in WEEKDAYS" :key="w.value" :label="w.label" :value="w.value" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="备注" prop="descr">
-        <el-input v-model="form.descr" type="textarea" :rows="3" placeholder="请输入备注" />
-      </el-form-item>
-    </el-form>
+    <el-tabs v-model="activeTab">
+      <el-tab-pane label="基本信息" name="basic">
+        <el-form ref="formRef" :model="form" :rules="rules" label-width="92px">
+          <el-form-item label="班组代码" prop="code">
+            <el-input v-model="form.code" placeholder="如 BZ001" clearable />
+          </el-form-item>
+          <el-form-item label="班组名称" prop="name">
+            <el-input v-model="form.name" placeholder="请输入班组名称" clearable />
+          </el-form-item>
+          <el-form-item label="上班时间" prop="startTime">
+            <el-time-picker
+              v-model="form.startTime"
+              format="HH:mm"
+              value-format="HH:mm"
+              placeholder="如 08:00"
+              clearable
+            />
+          </el-form-item>
+          <el-form-item label="下班时间" prop="endTime">
+            <el-time-picker
+              v-model="form.endTime"
+              format="HH:mm"
+              value-format="HH:mm"
+              placeholder="如 17:00"
+              clearable
+            />
+          </el-form-item>
+          <el-form-item label="工作日" prop="workdays">
+            <el-select v-model="form.workdays" multiple placeholder="选择工作日" style="width: 100%">
+              <el-option v-for="w in WEEKDAYS" :key="w.value" :label="w.label" :value="w.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="备注" prop="descr">
+            <el-input v-model="form.descr" type="textarea" :rows="3" placeholder="请输入备注" />
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
+
+      <el-tab-pane name="members" :disabled="!isEdit">
+        <template #label>
+          <span>班组成员</span>
+          <el-tooltip v-if="!isEdit" content="保存基本信息后可维护成员" placement="top">
+            <span class="tab-hint">(保存后可维护)</span>
+          </el-tooltip>
+        </template>
+        <!-- :key 绑定 model.id,切换不同班组时强制重挂载,避免成员数据串台 -->
+        <TeamMembers v-if="isEdit && props.model?.id" :key="props.model.id" :team-id="props.model.id" />
+      </el-tab-pane>
+    </el-tabs>
   </FormDialog>
 </template>
 
@@ -48,6 +63,7 @@
 import { ref, reactive, computed, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import FormDialog from '@/components/FormDialog.vue'
+import TeamMembers from './TeamMembers.vue'
 import { WEEKDAYS, buildTeamPayload, parseWorkdays } from '@/utils/team'
 import type { SpTeam, SpTeamDTO, TeamFormModel } from '@/types/team'
 
@@ -65,6 +81,7 @@ const emit = defineEmits<{
 
 const formRef = ref<FormInstance>()
 const isEdit = computed(() => !!props.model?.id)
+const activeTab = ref<'basic' | 'members'>('basic')
 
 const form = reactive<TeamFormModel>({
   id: undefined,
@@ -89,6 +106,7 @@ function resetForm() {
 watch(
   () => props.model,
   (val) => {
+    activeTab.value = 'basic'
     if (val) {
       resetForm()
       Object.assign(form, {
@@ -117,3 +135,11 @@ async function handleSubmit() {
   emit('submit', buildTeamPayload({ ...form }))
 }
 </script>
+
+<style scoped>
+.tab-hint {
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--el-text-color-placeholder);
+}
+</style>
