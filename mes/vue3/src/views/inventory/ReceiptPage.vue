@@ -17,6 +17,12 @@
             <el-button type="primary" @click="search">搜索</el-button>
             <el-button @click="reset">重置</el-button>
           </template>
+          <template #col-receiptCode="{ row }">
+            <CopyText :text="row.receiptCode" />
+          </template>
+          <template #col-orderCode="{ row }">
+            <CopyText :text="row.orderCode" />
+          </template>
           <template #col-receiptStatus="{ row }">
             <el-tag :type="receiptStatusMeta(row.receiptStatus).tag" disable-transitions>{{ receiptStatusMeta(row.receiptStatus).label }}</el-tag>
           </template>
@@ -35,6 +41,7 @@ import { reactive, ref, watch } from 'vue'
 import PageContainer from '@/components/PageContainer.vue'
 import MasterDetailLayout from '@/components/MasterDetailLayout.vue'
 import DataTable, { type Column } from '@/components/DataTable.vue'
+import CopyText from '@/components/CopyText.vue'
 import ReceiptItemsPanel from './ReceiptItemsPanel.vue'
 import ReceiptPostDialog from './ReceiptPostDialog.vue'
 import { pageReceipts, receiptItems } from '@/api/inventory/receipt'
