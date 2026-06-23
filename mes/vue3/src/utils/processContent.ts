@@ -106,3 +106,11 @@ export function buildTreeFromList(items: ProcessContentListItem[]): ProcessConte
   sortRec(roots)
   return roots
 }
+
+/** BOM 层级文案：0 产品 / 1 半成品 / ≥2 组件（undefined 按 0） */
+export function levelLabel(level?: number): string {
+  const lv = level ?? 0
+  if (lv === 0) return '产品'
+  if (lv === 1) return '半成品'
+  return '组件'
+}

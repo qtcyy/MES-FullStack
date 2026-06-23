@@ -9,6 +9,7 @@ import {
   buildContentPayload,
   buildEquipmentPayload,
   buildTreeFromList,
+  levelLabel,
 } from '@/utils/processContent'
 import type { ProcessContentListItem, SpProcessContent } from '@/types/technology'
 
@@ -126,5 +127,17 @@ describe('buildEquipmentPayload', () => {
     expect(out.id).toBe('E9')
     expect(out.quantity).toBe(3)
     expect(out.remark).toBe('')
+  })
+})
+
+describe('levelLabel', () => {
+  it('0→产品 / 1→半成品 / ≥2→组件', () => {
+    expect(levelLabel(0)).toBe('产品')
+    expect(levelLabel(1)).toBe('半成品')
+    expect(levelLabel(2)).toBe('组件')
+    expect(levelLabel(5)).toBe('组件')
+  })
+  it('undefined 按 0 处理→产品', () => {
+    expect(levelLabel(undefined)).toBe('产品')
   })
 })
