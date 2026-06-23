@@ -156,7 +156,9 @@ async function handleDelete(row: SysNoticeInbox) {
 
 onMounted(async () => {
   await load()
-  // ?open=<inboxId> 深链接：自动打开指定通知详情
+  // ?open=<inboxId> 深链接：自动打开指定通知详情。
+  // 仅在首页结果中查找——铃铛下拉只取最新 10 条(按时间降序),目标几乎必在第 1 页;
+  // 若目标不在当前页则静默跳过,用户仍可手动在列表中点开,可接受。
   const openId = route.query.open as string | undefined
   if (openId) {
     const found = rows.value.find((r) => r.id === openId)

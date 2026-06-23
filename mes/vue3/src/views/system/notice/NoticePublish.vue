@@ -225,7 +225,8 @@ async function handleDelete(row: SysNotice) {
   }
   await noticeDelete(row.id)
   ElMessage.success('删除成功')
-  await load()
+  // 级联撤回收件箱后,刷新铃铛未读数(管理员自身可能是收件人)
+  await Promise.all([load(), store.refresh()])
 }
 
 onMounted(() => {
