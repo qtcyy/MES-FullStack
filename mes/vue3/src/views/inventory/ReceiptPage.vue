@@ -1,6 +1,6 @@
 <template>
   <PageContainer title="计划入库确认">
-    <MasterDetailLayout :has-selection="!!selected">
+    <MasterDetailLayout :has-selection="!!selected" :master-width="560">
       <template #master>
         <DataTable
           :data="page?.records ?? []"
@@ -43,9 +43,9 @@ import { receiptStatusMeta } from '@/utils/inventory'
 import type { SpWarehouseReceipt, SpWarehouseReceiptItem } from '@/types/inventory'
 
 const columns: Column[] = [
-  { prop: 'receiptCode', label: '入库单号', minWidth: 140 },
-  { prop: 'orderCode', label: '订单号', width: 120 },
-  { prop: 'receiptStatus', label: '状态', width: 100 },
+  { prop: 'receiptCode', label: '入库单号', width: 170 },
+  { prop: 'orderCode', label: '订单号', minWidth: 180 },
+  { prop: 'receiptStatus', label: '状态', width: 110 },
 ]
 
 const current = ref(1)
