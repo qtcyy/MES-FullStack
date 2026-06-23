@@ -139,7 +139,7 @@ async function load() {
 
 const users = ref<Array<{ id: string; name: string; username: string }>>([])
 const roles = ref<Array<{ id: string; name: string }>>([])
-const deptTree = ref<unknown[]>([])
+const deptTree = ref<Record<string, unknown>[]>([])
 
 async function loadTargets() {
   const [u, r, d] = await Promise.all([
@@ -149,7 +149,7 @@ async function loadTargets() {
   ])
   users.value = u.records as Array<{ id: string; name: string; username: string }>
   roles.value = r.records as Array<{ id: string; name: string }>
-  deptTree.value = buildTree(d.records)
+  deptTree.value = buildTree(d.records) as unknown as Record<string, unknown>[]
 }
 
 const dialogVisible = ref(false)
