@@ -20,6 +20,7 @@ const URL_MAP: Record<string, string> = {
   '/technology/product-bom/list-ui': '/technology/product-bom',
   '/technology/bom-flow/list-ui': '/technology/bom-flow',
   '/technology/process-content': '/technology/process-content',
+  '/technology/process-query': '/technology/process-query',
   '/order/release/list-ui': '/order/release',
   '/order/dispatch': '/order/dispatch',
   '/order/gantt': '/order/gantt',
