@@ -2,6 +2,10 @@
   <div class="members">
     <div class="members__bar">
       <span class="members__title">编组成员维护</span>
+      <el-tag v-if="dirty" type="warning" size="small" effect="light" class="members__dirty">
+        ● 有未保存修改
+      </el-tag>
+      <span class="members__spacer" />
       <el-button type="primary" size="small" :loading="saving" @click="save">保存成员</el-button>
     </div>
     <DualListTransfer
@@ -14,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
 import DualListTransfer from '@/components/DualListTransfer.vue'
 import { devicePage } from '@/api/basedata/device'
@@ -29,6 +33,20 @@ const selected = ref<TransferItem[]>([])
 const originalMemberIds = ref<string[]>([])
 const loading = ref(false)
 const saving = ref(false)
+
+// 脏状态:当前穿梭框选择与服务端原始成员存在增/删差异 → 有未保存修改
+const dirty = computed(() => {
+  const nextIds = selected.value.map((i) => i.id)
+  const { added, removed } = diffMembers(originalMemberIds.value, nextIds)
+  return added.length > 0 || removed.length > 0
+})
+
+// 脏状态下离开/刷新页面给浏览器原生二次确认,避免误丢未保存的成员改动
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+  if (dirty.value) e.preventDefault()
+}
+window.addEventListener('beforeunload', handleBeforeUnload)
+onBeforeUnmount(() => window.removeEventListener('beforeunload', handleBeforeUnload))
 
 async function load() {
   if (!props.groupId) return
@@ -86,9 +104,12 @@ async function save() {
 .members__bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
 }
 .members__title {
   font-weight: 600;
+}
+.members__spacer {
+  flex: 1;
 }
 </style>
