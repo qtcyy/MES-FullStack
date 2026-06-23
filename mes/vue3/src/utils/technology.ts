@@ -72,3 +72,20 @@ export function validateFlow(
   if (items.length < 2) return '工艺路线至少需要 2 道工序'
   return null
 }
+
+/** 工艺 BOM 状态选项(对应 sp_bom.is_deleted:0 正常 / 1 已删除 / 2 已禁用) */
+export const BOM_STATUS_OPTIONS = [
+  { value: '0', label: '正常', type: 'success' as const },
+  { value: '1', label: '已删除', type: 'info' as const },
+  { value: '2', label: '已禁用', type: 'warning' as const },
+]
+
+/** 取 BOM 状态展示文案(默认按「正常」) */
+export function bomStatusText(deleted?: string): string {
+  return BOM_STATUS_OPTIONS.find((o) => o.value === deleted)?.label ?? '正常'
+}
+
+/** 取 BOM 状态标签类型(默认 success) */
+export function bomStatusType(deleted?: string): 'success' | 'info' | 'warning' {
+  return BOM_STATUS_OPTIONS.find((o) => o.value === deleted)?.type ?? 'success'
+}

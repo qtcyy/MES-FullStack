@@ -215,3 +215,25 @@ export interface ProcessContentTreeNode extends SpProductBom {
   contentStatus: string | null // null=未编制 / 'draft' / 'completed'
   children: ProcessContentTreeNode[]
 }
+
+/** 工艺 BOM 头表(对应 sp_bom) */
+export interface SpBom {
+  id: string
+  bomCode: string        // BOM 编号(必填)
+  materielCode: string   // 物料编号(必填)
+  materielDesc: string   // 物料名称(必填)
+  versionNumber: string  // 版本号(必填,默认 '1')
+  factory?: string       // 所属工厂
+  state?: string         // BOM 状态(后端遗留字段,旧 UI 未使用)
+  deleted?: string       // 状态:'0' 正常 / '1' 已删除 / '2' 已禁用
+  remark?: string
+  createTime?: string
+  createUsername?: string
+  updateTime?: string
+  updateUsername?: string
+}
+
+/** 工艺 BOM 分页请求(后端仅支持物料编号 likeRight) */
+export interface BomPageReq extends PageReq {
+  materielCodeLike?: string
+}

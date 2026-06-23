@@ -120,6 +120,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '工艺路线管理', perm: 'flow:add' },
       },
       {
+        path: 'technology/bom',
+        name: 'technology-bom',
+        component: () => import('@/views/technology/bom/BomList.vue'),
+        meta: { title: '工艺BOM管理', perm: 'bom:add' },
+      },
+      {
         path: 'technology/product-bom',
         name: 'technology-product-bom',
         component: () => import('@/views/technology/product-bom/ProductBomList.vue'),
