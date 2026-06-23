@@ -7,7 +7,13 @@ export function collectPermissions(menuInfo: MenuMap | null): Set<string> {
   const set = new Set<string>()
   if (!menuInfo) return set
   const walk = (node: TreeVO<SysMenu>) => {
-    if (node.permission) set.add(node.permission)
+    // permission 可能是逗号分隔的多个权限(与后端 ShiroRealm 的 split 行为一致)
+    if (node.permission) {
+      node.permission.split(',').forEach((p) => {
+        const t = p.trim()
+        if (t) set.add(t)
+      })
+    }
     node.children?.forEach(walk)
   }
   Object.values(menuInfo).forEach(walk)

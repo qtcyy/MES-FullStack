@@ -186,6 +186,18 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '流程模型设计', perm: 'workflow:model:list' },
       },
       {
+        path: 'plan/order',
+        name: 'plan-order',
+        component: () => import('@/views/plan/order-entry/OrderEntryList.vue'),
+        meta: { title: '生产订单录入', perm: 'plan:order:list' },
+      },
+      {
+        path: 'plan/todo',
+        name: 'plan-todo',
+        component: () => import('@/views/plan/todo/TodoList.vue'),
+        meta: { title: '待办任务', perm: 'plan:todo:list' },
+      },
+      {
         path: 'inventory/receipt',
         name: 'inventory-receipt',
         component: () => import('@/views/inventory/ReceiptPage.vue'),

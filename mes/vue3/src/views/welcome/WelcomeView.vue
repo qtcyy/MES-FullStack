@@ -21,6 +21,15 @@
       </div>
     </section>
 
+    <!-- 我的待办 -->
+    <section
+      v-motion
+      :initial="{ opacity: 0, y: 16 }"
+      :enter="{ opacity: 1, y: 0, transition: { duration: 300, delay: 60 } }"
+    >
+      <MyTodoCard />
+    </section>
+
     <!-- KPI 统计卡 -->
     <section class="welcome__stats">
       <el-card
@@ -168,6 +177,7 @@ import {
 import { useUserStore } from '@/stores/user'
 import { useAppStore } from '@/stores/app'
 import EChart from '@/components/EChart.vue'
+import MyTodoCard from './components/MyTodoCard.vue'
 import { kpis, quickEntries, activities, todos, type QuickEntry } from './mock'
 import {
   sparkOption,
