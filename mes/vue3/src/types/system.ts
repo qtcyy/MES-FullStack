@@ -91,3 +91,60 @@ export interface SysDepartmentPageReq extends PageReq {
 export interface SysMenuPageReq extends PageReq {
   nameLike?: string
 }
+
+// ─── 通知中心 ───────────────────────────────────────────────────────────────
+
+export type NoticeType = 'info' | 'success' | 'warning' | 'error'
+export type NoticeTargetType = 'all' | 'user' | 'role' | 'dept'
+
+/** 发布端：通知主体 */
+export interface SysNotice {
+  id: string
+  title: string
+  content?: string
+  type: NoticeType
+  targetType: NoticeTargetType
+  targetIds?: string
+  targetDesc?: string
+  sender?: string
+  status?: string
+  recipientCount?: number
+  createTime?: string
+}
+
+/** 接收端：收件箱行(含展开的通知字段) */
+export interface SysNoticeInbox {
+  id: string            // 收件箱行 id
+  noticeId: string
+  userId?: string
+  isRead: string        // '0'/'1'
+  readTime?: string
+  title: string
+  content?: string
+  type: NoticeType
+  sender?: string
+  noticeTime?: string
+}
+
+export interface NoticePublishReq {
+  title: string
+  content?: string
+  type: NoticeType
+  targetType: NoticeTargetType
+  targetIds?: string[]
+}
+
+export interface SysNoticePageReq extends PageReq {
+  titleLike?: string
+}
+
+export interface SysNoticeInboxPageReq extends PageReq {
+  titleLike?: string
+  isRead?: string
+}
+
+export interface NoticeReadStat {
+  total: number
+  readCount: number
+  unreadCount: number
+}

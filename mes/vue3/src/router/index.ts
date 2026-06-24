@@ -95,7 +95,7 @@ export const routes: RouteRecordRaw[] = [
         path: 'basedata/process-unit',
         name: 'basedata-process-unit',
         component: () => import('@/views/basedata/process-unit/ProcessUnitList.vue'),
-        meta: { title: '加工单元', perm: 'process-unit:add' },
+        meta: { title: '加工单元', perm: 'processUnit:add' /* 后端菜单权限串为驼峰 processUnit,须与之一致 */ },
       },
       {
         path: 'basedata/manager',
@@ -111,7 +111,7 @@ export const routes: RouteRecordRaw[] = [
         path: 'technology/oper',
         name: 'technology-oper',
         component: () => import('@/views/technology/oper/OperList.vue'),
-        meta: { title: '工序定义', perm: 'oper:add' },
+        meta: { title: '工序信息定义', perm: 'oper:list' /* 后端菜单 #113 授予 oper:list */ },
       },
       {
         path: 'technology/flow',
@@ -120,16 +120,22 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '工艺路线管理', perm: 'flow:add' },
       },
       {
+        path: 'technology/bom',
+        name: 'technology-bom',
+        component: () => import('@/views/technology/bom/BomList.vue'),
+        meta: { title: '工艺BOM管理', perm: 'bom:add' },
+      },
+      {
         path: 'technology/product-bom',
         name: 'technology-product-bom',
         component: () => import('@/views/technology/product-bom/ProductBomList.vue'),
-        meta: { title: '产品BOM管理', perm: 'product-bom:add' },
+        meta: { title: '产品BOM管理', perm: 'product-bom:list' /* 后端菜单 #112 授予 product-bom:list */ },
       },
       {
         path: 'technology/bom-flow',
         name: 'technology-bom-flow',
         component: () => import('@/views/technology/bom-flow/BomFlowPage.vue'),
-        meta: { title: 'BOM工艺绑定', perm: 'bom-flow:add' },
+        meta: { title: '工艺流程管理', perm: 'process-flow:list' /* 后端菜单 #114「工艺流程管理」授予 process-flow:list,经 urlMap 指向本页 */ },
       },
       {
         path: 'technology/process-content',
@@ -220,6 +226,18 @@ export const routes: RouteRecordRaw[] = [
         name: 'inventory-manual-inbound',
         component: () => import('@/views/inventory/ManualInboundPage.vue'),
         meta: { title: '手动入库', perm: 'inventory:inbound' },
+      },
+      {
+        path: 'system/notice',
+        name: 'system-notice',
+        component: () => import('@/views/system/notice/NoticeInbox.vue'),
+        meta: { title: '通知中心' },
+      },
+      {
+        path: 'system/notice/admin',
+        name: 'system-notice-admin',
+        component: () => import('@/views/system/notice/NoticePublish.vue'),
+        meta: { title: '通知发布', perm: 'notice:publish' },
       },
     ],
   },

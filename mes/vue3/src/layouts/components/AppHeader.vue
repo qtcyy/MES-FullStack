@@ -13,9 +13,7 @@
     </div>
 
     <div class="app-header__right">
-      <el-badge :value="notice.unread" :hidden="notice.unread === 0">
-        <el-button text circle :icon="Bell" @click="onBell" />
-      </el-badge>
+      <NoticeBell />
       <ThemeToggle />
       <el-dropdown @command="onCommand">
         <span class="app-header__user">
@@ -35,18 +33,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, Bell } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { Fold, Expand } from '@element-plus/icons-vue'
+import { ElMessageBox } from 'element-plus'
 import { useAppStore } from '@/stores/app'
 import { useUserStore } from '@/stores/user'
 import { usePermissionStore } from '@/stores/permission'
-import { useNotificationStore } from '@/stores/notification'
 import ThemeToggle from './ThemeToggle.vue'
+import NoticeBell from '@/components/NoticeBell.vue'
 
 const app = useAppStore()
 const userStore = useUserStore()
 const permStore = usePermissionStore()
-const notice = useNotificationStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -59,10 +56,6 @@ const breadcrumbs = computed(() =>
     .filter((m) => m.meta?.title)
     .map((m) => ({ path: m.path, title: m.meta.title as string })),
 )
-
-function onBell() {
-  ElMessage.info('通知中心将在后续周期接入')
-}
 
 async function onCommand(cmd: string) {
   if (cmd !== 'logout') return

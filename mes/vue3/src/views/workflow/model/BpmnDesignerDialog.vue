@@ -2,6 +2,7 @@
   <el-dialog
     :model-value="modelValue"
     fullscreen
+    append-to-body
     destroy-on-close
     :show-close="true"
     class="bpmn-dialog"
@@ -157,7 +158,7 @@ function handleValidate() {
 }
 .bpmn-dialog__body {
   display: flex;
-  height: calc(100vh - 110px);
+  height: 100%;
 }
 .bpmn-dialog__canvas {
   flex: 1;
@@ -172,7 +173,22 @@ function handleValidate() {
 }
 </style>
 <style>
-.bpmn-dialog .el-dialog__body {
+/* 全屏对话框改为 flex 纵向布局,body 占满剩余空间,避免用魔法值算高度导致底部被裁切 */
+.bpmn-dialog.is-fullscreen {
+  display: flex;
+  flex-direction: column;
   padding: 0;
+  overflow: hidden;
+}
+.bpmn-dialog .el-dialog__header {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 12px 16px;
+}
+.bpmn-dialog .el-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 </style>

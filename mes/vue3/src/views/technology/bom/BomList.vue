@@ -1,8 +1,8 @@
 <template>
   <PageContainer>
     <SearchForm :model="search" @search="handleSearch" @reset="handleReset">
-      <el-form-item label="工序描述">
-        <el-input v-model="search.operDescLike" placeholder="请输入工序描述" clearable />
+      <el-form-item label="物料编号">
+        <el-input v-model="search.materielCodeLike" placeholder="请输入物料编号" clearable />
       </el-form-item>
     </SearchForm>
 
@@ -15,22 +15,20 @@
       @size-change="handleSizeChange"
     >
       <template #toolbar>
-        <el-button v-permission="'oper:list'" type="primary" :icon="Plus" @click="openCreate">新增</el-button>
+        <el-button v-permission="'bom:add'" type="primary" :icon="Plus" @click="openCreate">新增</el-button>
       </template>
 
-      <template #col-generatePlan="{ row }">
-        <el-tag size="small" :type="row.generatePlan === '1' ? 'success' : 'info'">
-          {{ row.generatePlan === '1' ? '是' : '否' }}
-        </el-tag>
+      <template #col-deleted="{ row }">
+        <el-tag size="small" :type="bomStatusType(row.deleted)">{{ bomStatusText(row.deleted) }}</el-tag>
       </template>
 
       <template #actions="{ row }">
-        <el-button type="primary" link size="small" @click="openEdit(row as SpOper)">编辑</el-button>
-        <el-button type="danger" link size="small" @click="handleDelete(row as SpOper)">删除</el-button>
+        <el-button type="primary" link size="small" @click="openEdit(row as SpBom)">编辑</el-button>
+        <el-button type="danger" link size="small" @click="handleDelete(row as SpBom)">删除</el-button>
       </template>
     </DataTable>
 
-    <OperForm
+    <BomForm
       v-model="dialogVisible"
       :model="editingModel"
       :loading="submitLoading"
@@ -46,45 +44,47 @@ import { Plus } from '@element-plus/icons-vue'
 import PageContainer from '@/components/PageContainer.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import DataTable, { type Column } from '@/components/DataTable.vue'
-import OperForm from './OperForm.vue'
+import BomForm from './BomForm.vue'
 import { useRequest } from '@/composables/useRequest'
 import { usePagination } from '@/composables/usePagination'
-import { operPage, operAddOrUpdate, operDelete } from '@/api/technology/oper'
-import type { SpOper } from '@/types/technology'
+import { bomPage, bomAddOrUpdate, bomDelete } from '@/api/technology/bom'
+import { bomStatusText, bomStatusType } from '@/utils/technology'
+import type { SpBom } from '@/types/technology'
 
 const { pager, setTotal, reset } = usePagination()
-const search = reactive({ operDescLike: '' })
+const search = reactive({ materielCodeLike: '' })
 
 const { data: pageData, loading, run } = useRequest(
-  () => operPage({ current: pager.current, size: pager.size, ...search }),
+  () => bomPage({ current: pager.current, size: pager.size, ...search }),
   { immediate: true },
 )
 
-const tableData = computed<SpOper[]>(() => {
+const tableData = computed<SpBom[]>(() => {
   const result = pageData.value
   if (result) setTotal(result.total)
   return result?.records ?? []
 })
 
 const columns: Column[] = [
-  { prop: 'operCode', label: '工序编码', width: 130 },
-  { prop: 'operDesc', label: '工序描述', minWidth: 160 },
-  { prop: 'laborHours', label: '工时(分)', width: 100 },
-  { prop: 'manufacturingCycle', label: '制造周期(分)', width: 120 },
-  { prop: 'generatePlan', label: '生成计划', width: 100 },
+  { prop: 'bomCode', label: 'BOM 编号', minWidth: 140 },
+  { prop: 'materielCode', label: '物料编号', minWidth: 140 },
+  { prop: 'materielDesc', label: '物料名称', minWidth: 160 },
+  { prop: 'versionNumber', label: '版本号', width: 90 },
+  { prop: 'factory', label: '所属工厂', minWidth: 120 },
+  { prop: 'deleted', label: '状态', width: 90 },
   { prop: 'remark', label: '备注', minWidth: 120 },
   { prop: 'createTime', label: '创建时间', minWidth: 160 },
 ]
 
 const dialogVisible = ref(false)
-const editingModel = ref<Partial<SpOper> | null>(null)
+const editingModel = ref<Partial<SpBom> | null>(null)
 const submitLoading = ref(false)
 
 function openCreate() {
   editingModel.value = null
   dialogVisible.value = true
 }
-function openEdit(row: SpOper) {
+function openEdit(row: SpBom) {
   editingModel.value = { ...row }
   dialogVisible.value = true
 }
@@ -103,15 +103,15 @@ function handleSearch() {
   run()
 }
 function handleReset() {
-  search.operDescLike = ''
+  search.materielCodeLike = ''
   reset()
   run()
 }
 
-async function handleFormSubmit(dto: Partial<SpOper>) {
+async function handleFormSubmit(dto: Partial<SpBom>) {
   submitLoading.value = true
   try {
-    await operAddOrUpdate(dto)
+    await bomAddOrUpdate(dto)
     ElMessage.success('保存成功')
     dialogVisible.value = false
     run()
@@ -120,9 +120,9 @@ async function handleFormSubmit(dto: Partial<SpOper>) {
   }
 }
 
-async function handleDelete(row: SpOper) {
+async function handleDelete(row: SpBom) {
   try {
-    await ElMessageBox.confirm(`确认删除工序「${row.operDesc}」?`, '提示', {
+    await ElMessageBox.confirm(`确认删除工艺 BOM「${row.bomCode}」?`, '提示', {
       type: 'warning',
       confirmButtonText: '确认删除',
       cancelButtonText: '取消',
@@ -131,9 +131,9 @@ async function handleDelete(row: SpOper) {
     return
   }
   try {
-    await operDelete(row.id)
+    await bomDelete(row.id)
     ElMessage.success('删除成功')
     run()
-  } catch { /* 响应拦截器已提示(含「被引用拒删」后端文案) */ }
+  } catch { /* 响应拦截器已提示 */ }
 }
 </script>

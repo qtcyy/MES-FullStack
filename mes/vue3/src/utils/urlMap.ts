@@ -17,8 +17,10 @@ const URL_MAP: Record<string, string> = {
   '/basedata/manager/item/list-ui': '/basedata/manager-item',
   '/basedata/flow/process/list-ui': '/technology/flow',
   '/basedata/sp-oper/list-ui': '/technology/oper',
+  '/technology/bom/list-ui': '/technology/bom',
   '/technology/product-bom/list-ui': '/technology/product-bom',
   '/technology/bom-flow/list-ui': '/technology/bom-flow',
+  '/technology/process-flow': '/technology/bom-flow', // 菜单#114「工艺流程管理」→ 复用 BOM 工艺绑定页
   '/technology/process-content': '/technology/process-content',
   '/technology/process-query': '/technology/process-query',
   '/order/release/list-ui': '/order/release',
@@ -30,6 +32,8 @@ const URL_MAP: Record<string, string> = {
   '/workflow/form/list-ui': '/workflow/form',
   '/workflow/definition/list-ui': '/workflow/definition',
   '/workflow/model/list-ui': '/workflow/model',
+  '/admin/sys/notice/list-ui': '/system/notice',
+  '/admin/sys/notice/admin-ui': '/system/notice/admin',
 }
 
 /** 不可导航(#/空/javascript:)→ undefined;已知→映射;未知→原样 */
