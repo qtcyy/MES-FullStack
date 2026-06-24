@@ -3,6 +3,7 @@
     :model-value="modelValue"
     :title="data?.title || '通知详情'"
     width="560px"
+    append-to-body
     @update:model-value="(v: boolean) => emit('update:modelValue', v)"
   >
     <div v-if="data" class="notice-detail">

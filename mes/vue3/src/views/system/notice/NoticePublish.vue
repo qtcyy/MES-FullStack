@@ -26,7 +26,7 @@
       </template>
     </DataTable>
 
-    <el-dialog v-model="dialogVisible" title="发布通知" width="600px">
+    <el-dialog v-model="dialogVisible" title="发布通知" width="600px" append-to-body>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入标题" clearable />
@@ -79,7 +79,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="statVisible" title="已读统计" width="360px">
+    <el-dialog v-model="statVisible" title="已读统计" width="360px" append-to-body>
       <el-descriptions v-if="stat" :column="1" border>
         <el-descriptions-item label="收件人数">{{ stat.total }}</el-descriptions-item>
         <el-descriptions-item label="已读">{{ stat.readCount }}</el-descriptions-item>
