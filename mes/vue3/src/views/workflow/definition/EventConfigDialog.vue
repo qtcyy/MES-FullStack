@@ -3,6 +3,7 @@
     :model-value="modelValue"
     title="流程事件规则"
     width="760px"
+    append-to-body
     @update:model-value="(v: boolean) => emit('update:modelValue', v)"
   >
     <div v-if="definition" class="event-cfg">

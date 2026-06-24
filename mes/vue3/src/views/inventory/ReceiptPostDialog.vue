@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :model-value="modelValue" title="入库登账" width="520px" @update:model-value="close">
+  <el-dialog :model-value="modelValue" title="入库登账" width="520px" append-to-body @update:model-value="close">
     <el-form v-if="item" label-width="90px">
       <el-form-item label="物料">{{ item.materialCode }} · {{ item.materialDesc }}</el-form-item>
       <el-form-item label="数量">{{ item.quantity }} {{ item.unit }}</el-form-item>
