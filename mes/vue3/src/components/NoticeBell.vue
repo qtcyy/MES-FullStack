@@ -67,7 +67,8 @@ async function loadRecent() {
   recent.value = (await inboxRecent(10)) ?? []
 }
 function openDetail(it: SysNoticeInbox) {
-  router.push({ path: '/system/notice', query: { open: it.id } })
+  // 跳转到动态路由详情页 /system/notice/:id
+  router.push({ name: 'system-notice-detail', params: { id: it.id } })
 }
 function goCenter() {
   router.push('/system/notice')

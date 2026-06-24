@@ -239,6 +239,13 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/system/notice/NoticePublish.vue'),
         meta: { title: '通知发布', perm: 'notice:publish' },
       },
+      {
+        // 动态路由参数:按收件箱行 id 查看通知详情(useRoute().params.id)
+        path: 'system/notice/:id',
+        name: 'system-notice-detail',
+        component: () => import('@/views/system/notice/NoticeDetailView.vue'),
+        meta: { title: '通知详情' },
+      },
     ],
   },
   {

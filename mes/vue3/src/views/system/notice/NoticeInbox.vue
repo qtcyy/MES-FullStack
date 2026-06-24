@@ -54,26 +54,24 @@
         <el-button type="danger" link size="small" @click="handleDelete(row as SysNoticeInbox)">删除</el-button>
       </template>
     </DataTable>
-
-    <NoticeDetailDialog v-model="detailVisible" :data="detailData" />
   </PageContainer>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Check } from '@element-plus/icons-vue'
 import PageContainer from '@/components/PageContainer.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import DataTable from '@/components/DataTable.vue'
 import type { Column } from '@/components/DataTable.vue'
-import NoticeDetailDialog from './NoticeDetailDialog.vue'
 import { useNoticeStore } from '@/stores/notice'
-import { inboxPage, inboxDetail, inboxMarkAllRead, inboxDelete } from '@/api/system/notice'
+import { inboxPage, inboxMarkAllRead, inboxDelete } from '@/api/system/notice'
 import type { SysNoticeInbox, NoticeType } from '@/types/system'
 
 const route = useRoute()
+const router = useRouter()
 const store = useNoticeStore()
 
 const columns: Column[] = [
@@ -123,14 +121,9 @@ function handleReset() {
   load()
 }
 
-const detailVisible = ref(false)
-const detailData = ref<SysNoticeInbox | null>(null)
-
-async function openDetail(row: SysNoticeInbox) {
-  detailData.value = await inboxDetail(row.id)
-  detailVisible.value = true
-  // 标记已读后刷新列表和未读计数
-  await Promise.all([load(), store.refresh()])
+/** 跳转到动态路由详情页 /system/notice/:id */
+function openDetail(row: SysNoticeInbox) {
+  router.push({ name: 'system-notice-detail', params: { id: row.id } })
 }
 
 async function handleMarkAll() {
@@ -156,14 +149,9 @@ async function handleDelete(row: SysNoticeInbox) {
 
 onMounted(async () => {
   await load()
-  // ?open=<inboxId> 深链接：自动打开指定通知详情。
-  // 仅在首页结果中查找——铃铛下拉只取最新 10 条(按时间降序),目标几乎必在第 1 页;
-  // 若目标不在当前页则静默跳过,用户仍可手动在列表中点开,可接受。
+  // ?open=<inboxId> 深链接(向后兼容旧链接)：直接跳转到动态路由详情页
   const openId = route.query.open as string | undefined
-  if (openId) {
-    const found = rows.value.find((r) => r.id === openId)
-    if (found) await openDetail(found)
-  }
+  if (openId) router.push({ name: 'system-notice-detail', params: { id: openId } })
 })
 </script>
 
