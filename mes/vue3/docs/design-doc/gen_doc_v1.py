@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-章鱼师兄 MES · Vue3 工业互联网应用系统 —— 期末大作业设计文档生成脚本
+MES智慧管理系统 · Vue3 工业互联网应用系统 —— 期末大作业设计文档生成脚本
 版本：v1（2026-06-24）
 
 用途：用 python-docx 生成《设计文档.docx》。
@@ -142,7 +142,7 @@ def table(headers, rows, widths=None):
 title = doc.add_paragraph()
 title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 title.paragraph_format.space_before = Pt(80)
-r = title.add_run("章鱼师兄 MES")
+r = title.add_run("MES智慧管理系统")
 _set_cn_font(r, font="黑体", size=34, bold=True, color=RGBColor(0x1F, 0x4E, 0x79))
 
 sub = doc.add_paragraph()
@@ -161,7 +161,7 @@ for _ in range(2):
 info_tbl = doc.add_table(rows=0, cols=2)
 info_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
 for k, v in [
-    ("项目名称", "章鱼师兄 MES（制造执行系统）Vue3 前端"),
+    ("项目名称", "MES智慧管理系统（制造执行系统）Vue3 前端"),
     ("应用领域", "工业互联网 / 智能制造 / 车间生产管理"),
     ("技术栈", "Vue 3.5 + TypeScript + Vite 8 + Pinia + Vue Router + Element Plus"),
     ("代码规模", "126 个单文件组件 / 107 个 TS 模块 / 约 2.1 万行 / 30 个单测文件 333 用例"),
@@ -199,7 +199,7 @@ doc.add_page_break()
 # ================================================================== 一、项目概述
 h1("一、项目概述")
 
-para("章鱼师兄 MES（Manufacturing Execution System，制造执行系统）是一套面向离散制造车间的"
+para("MES智慧管理系统（Manufacturing Execution System，制造执行系统）是一套面向离散制造车间的"
      "工业互联网应用系统，目标是把工厂从「计划下达」到「车间执行」再到「数据回采」的全过程数字化，"
      "覆盖系统管理、基础数据、工艺技术、生产计划、库存、数字化看板、数字孪生与工作流八大业务域。"
      "本作业以 Vue3 全面重写前端，后端为既有的 Spring Boot 单体（Shiro 会话鉴权），前后端经由 "

@@ -9,7 +9,7 @@
     >
       <div class="welcome__hello">
         <h2>{{ greeting }},{{ user?.name || user?.username || '同学' }} 👋</h2>
-        <p>欢迎使用 章鱼师兄 MES · 智能制造执行系统</p>
+        <p>欢迎使用 MES智慧管理系统 · 智能制造执行系统</p>
         <div class="welcome__chips">
           <span class="welcome__chip"><el-icon><Sunny /></el-icon> 系统运行正常</span>
           <span class="welcome__chip"><el-icon><Bell /></el-icon> {{ todos.length }} 项待办</span>

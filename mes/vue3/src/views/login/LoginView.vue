@@ -8,7 +8,7 @@
       :enter="{ opacity: 1, x: 0, transition: { duration: 420 } }"
     >
       <div class="login__brand-inner">
-        <h1>章鱼师兄 MES</h1>
+        <h1>MES智慧管理系统</h1>
         <p>智能制造执行系统</p>
         <ul class="login__features">
           <li>📊 数据可视化大屏</li>

@@ -3,7 +3,7 @@
     <el-aside :width="app.collapsed ? '64px' : '220px'" class="admin-layout__aside">
       <div class="admin-layout__logo">
         <span class="admin-layout__logo-mark">🐙</span>
-        <span v-show="!app.collapsed" class="admin-layout__logo-text">章鱼师兄 MES</span>
+        <span v-show="!app.collapsed" class="admin-layout__logo-text">MES智慧管理系统</span>
       </div>
       <el-scrollbar class="admin-layout__menu">
         <AppSidebar />
