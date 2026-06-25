@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import AppSidebar from './components/AppSidebar'
 import AppHeader from './components/AppHeader'
 import AppTabs from './components/AppTabs'
@@ -7,6 +7,7 @@ import { useMenuStore } from '@/stores/menuStore'
 import { useAppStore } from '@/stores/appStore'
 import { resolveTabMeta } from './routeMeta'
 import PageTransition from '@/components/motion/PageTransition'
+import RouteAccessGuard from '@/components/RouteAccessGuard'
 
 export default function AdminLayout() {
   const loaded = useMenuStore((s) => s.loaded)
@@ -40,7 +41,7 @@ export default function AdminLayout() {
         <AppTabs />
         <main className="flex-1 overflow-auto p-4">
           <PageTransition routeKey={location.pathname}>
-            <Outlet />
+            <RouteAccessGuard />
           </PageTransition>
         </main>
       </div>
