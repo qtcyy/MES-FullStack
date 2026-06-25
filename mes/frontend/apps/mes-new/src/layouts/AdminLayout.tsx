@@ -6,6 +6,7 @@ import AppTabs from './components/AppTabs'
 import { useMenuStore } from '@/stores/menuStore'
 import { useAppStore } from '@/stores/appStore'
 import { resolveTabMeta } from './routeMeta'
+import PageTransition from '@/components/motion/PageTransition'
 
 export default function AdminLayout() {
   const loaded = useMenuStore((s) => s.loaded)
@@ -38,7 +39,9 @@ export default function AdminLayout() {
         <AppHeader />
         <AppTabs />
         <main className="flex-1 overflow-auto p-4">
-          <Outlet />
+          <PageTransition routeKey={location.pathname}>
+            <Outlet />
+          </PageTransition>
         </main>
       </div>
     </div>
