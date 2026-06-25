@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wangziyang.mes.common.util.TreeUtil;
 import com.wangziyang.mes.system.dto.SysMenuDTO;
+import com.wangziyang.mes.system.dto.SysUserDTO;
 import com.wangziyang.mes.system.entity.SysMenu;
 import com.wangziyang.mes.system.entity.SysRoleMenu;
 import com.wangziyang.mes.system.mapper.SysMenuMapper;
 import com.wangziyang.mes.system.mapper.SysRoleMenuMapper;
 import com.wangziyang.mes.system.service.ISysMenuService;
+import com.wangziyang.mes.system.util.MenuTreeFilter;
 import com.wangziyang.mes.system.vo.TreeVO;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,6 +92,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             menus.add(tree);
         }
         List<TreeVO<SysMenu>> treeVOS = TreeUtil.buildList(menus, "0");
+
+        // 按当前登录用户角色剪枝;admin 用户名硬放行(始终全量)
+        SysUserDTO current = currentUser();
+        if (current != null && !"admin".equals(current.getUsername())) {
+            Set<String> granted = new HashSet<>(sysMenuMapper.listMenuIdsByUserId(current.getId()));
+            treeVOS = MenuTreeFilter.prune(treeVOS, granted);
+        }
+
         for (TreeVO<SysMenu> mTree : treeVOS) {
             menuInfo.put(mTree.getCode(), mTree);
         }
@@ -183,5 +194,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         // 清理角色-菜单关联
         sysRoleMenuMapper.delete(new QueryWrapper<SysRoleMenu>().eq("menu_id", id));
         return this.removeById(id);
+    }
+
+    /** 取当前 Shiro 主体(未登录或类型不符返回 null) */
+    private SysUserDTO currentUser() {
+        Object principal = SecurityUtils.getSubject().getPrincipal();
+        return principal instanceof SysUserDTO ? (SysUserDTO) principal : null;
     }
 }
