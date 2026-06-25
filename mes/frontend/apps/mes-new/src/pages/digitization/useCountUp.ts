@@ -6,6 +6,14 @@ export function useCountUp(target: number, durationMs = 1200): number {
   const fromRef = useRef(0)
 
   useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    ) {
+      setVal(target)
+      fromRef.current = target
+      return
+    }
     const from = fromRef.current
     const start = performance.now()
     let raf = 0
