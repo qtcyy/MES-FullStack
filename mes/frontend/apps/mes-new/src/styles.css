@@ -45,6 +45,14 @@ body,
   .bg-brand-gradient {
     background-image: var(--brand-gradient);
   }
+  /* 隐藏滚动条但保留滚动能力（用于横向标签栏等窄条） */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
   /* 玻璃拟态卡 */
   .glass {
     background: rgba(255, 255, 255, 0.08);
