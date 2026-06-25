@@ -34,6 +34,8 @@ function statusBadge(deleted: string) {
   return <Badge variant="destructive">已删除</Badge>
 }
 
+// ⭐ 设计样板：本页是列表页的视觉/动画参考模板（路由入场、行 hover、按压反馈、品牌聚焦光晕
+// 均来自 PageTransition + 共享 primitive + styles.css 令牌，新列表页照此结构即可获得一致观感）。
 export default function UserList() {
   const [params, setParams] = useState<UserPageParams>({ current: 1, size: PAGE_SIZE })
   const [draftName, setDraftName] = useState('')
