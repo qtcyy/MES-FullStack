@@ -1,6 +1,6 @@
 import { http } from '@/http/client'
 import type { PageParams, PageResult } from '@/types/api'
-import type { SysUser, SysUserDTO } from '@/types/user'
+import type { SysUser, SysUserDTO, SysRolePick } from '@/types/user'
 
 export interface UserPageParams extends PageParams {
   nameLike?: string
@@ -21,4 +21,9 @@ export function userAddOrUpdate(record: SysUserDTO) {
 
 export function userDelete(id: string) {
   return http.post<void>('/admin/sys/user/delete', { id })
+}
+
+/** 取角色分配选项;新增用户传空 id → 全部 checked=false */
+export function userRoles(id?: string) {
+  return http.get<SysRolePick[]>('/admin/sys/user/roles', { params: { id: id ?? '' } })
 }
