@@ -1,19 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 
-/** 数字从上次值缓动滚动到 target;返回当前显示值 */
+/** 数字从上次值缓动滚动到 target;返回当前显示值。尊重 prefers-reduced-motion:直接返回目标值。 */
 export function useCountUp(target: number, durationMs = 1200): number {
   const [val, setVal] = useState(0)
   const fromRef = useRef(0)
+  const reduce =
+    typeof window !== 'undefined' &&
+    !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
   useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    ) {
-      setVal(target)
-      fromRef.current = target
-      return
-    }
+    if (reduce) return // 减少动效:不做 rAF 动画,直接由下方 return 返回 target
     const from = fromRef.current
     const start = performance.now()
     let raf = 0
@@ -29,7 +25,7 @@ export function useCountUp(target: number, durationMs = 1200): number {
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [target, durationMs])
+  }, [target, durationMs, reduce])
 
-  return val
+  return reduce ? target : val
 }
