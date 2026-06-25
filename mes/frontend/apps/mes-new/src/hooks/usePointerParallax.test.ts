@@ -31,7 +31,7 @@ describe('pointerFraction', () => {
   it('width 为 0 时不返回 NaN', () => {
     const zero = { left: 0, top: 0, width: 0, height: 0 } as DOMRect
     const { fx, fy } = pointerFraction(10, 10, zero)
-    expect(Number.isNaN(fx)).toBe(false)
-    expect(Number.isNaN(fy)).toBe(false)
+    expect(fx).toBe(0)
+    expect(fy).toBe(0)
   })
 })

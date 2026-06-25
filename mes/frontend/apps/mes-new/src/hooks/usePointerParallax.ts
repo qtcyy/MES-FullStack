@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 
 export interface Fraction { fx: number; fy: number }
 
+const clamp = (n: number) => Math.max(-0.5, Math.min(0.5, n))
+
 /** 把指针坐标归一化为相对元素中心的比例 [-0.5, 0.5]（纯函数，便于单测） */
 export function pointerFraction(clientX: number, clientY: number, rect: DOMRect): Fraction {
-  const clamp = (n: number) => Math.max(-0.5, Math.min(0.5, n))
   const fx = rect.width ? clamp((clientX - rect.left) / rect.width - 0.5) : 0
   const fy = rect.height ? clamp((clientY - rect.top) / rect.height - 0.5) : 0
   return { fx, fy }
