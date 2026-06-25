@@ -10,12 +10,6 @@ export const EASE = {
 /** 与 --dur-* 对齐的时长（秒，framer-motion 用秒） */
 export const DUR = { fast: 0.16, base: 0.24, slow: 0.36 }
 
-/** 单元素入场：淡入 + 上移 */
-export const revealVariants: Variants = {
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0, transition: { duration: DUR.base, ease: EASE.out } },
-}
-
 /** 容器：梯级编排子项 */
 export const staggerContainer: Variants = {
   initial: {},
