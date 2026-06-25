@@ -17,6 +17,7 @@ import {
 } from '@workspace/ui'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import PageContainer from '@/components/PageContainer'
+import PermissionGuard from '@/components/PermissionGuard'
 import MenuForm from './MenuForm'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -74,12 +75,16 @@ export default function MenuList() {
         header: '操作',
         cell: ({ row }) => (
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(toMenu(row.original)); setFormOpen(true) }}>
-              <Pencil className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
+            <PermissionGuard perm="menu:update">
+              <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(toMenu(row.original)); setFormOpen(true) }}>
+                <Pencil className="size-4" />
+              </Button>
+            </PermissionGuard>
+            <PermissionGuard perm="menu:delete">
+              <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
+                <Trash2 className="size-4 text-destructive" />
+              </Button>
+            </PermissionGuard>
           </div>
         ),
       },
@@ -92,10 +97,12 @@ export default function MenuList() {
       title="菜单管理"
       description="维护系统菜单与权限标识"
       actions={
-        <Button onClick={() => { setEditing(null); setFormOpen(true) }}>
-          <Plus className="size-4" />
-          新建菜单
-        </Button>
+        <PermissionGuard perm="menu:add">
+          <Button onClick={() => { setEditing(null); setFormOpen(true) }}>
+            <Plus className="size-4" />
+            新建菜单
+          </Button>
+        </PermissionGuard>
       }
     >
       <TreeDataTable

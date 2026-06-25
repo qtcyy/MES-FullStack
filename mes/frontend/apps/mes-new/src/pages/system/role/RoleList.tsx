@@ -69,12 +69,16 @@ export default function RoleList() {
         header: '操作',
         cell: ({ row }) => (
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setFormOpen(true) }}>
-              <Pencil className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
+            <PermissionGuard perm="role:update">
+              <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setFormOpen(true) }}>
+                <Pencil className="size-4" />
+              </Button>
+            </PermissionGuard>
+            <PermissionGuard perm="role:delete">
+              <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
+                <Trash2 className="size-4 text-destructive" />
+              </Button>
+            </PermissionGuard>
           </div>
         ),
       },

@@ -19,6 +19,7 @@ import {
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import PageContainer from '@/components/PageContainer'
 import SearchForm from '@/components/SearchForm'
+import PermissionGuard from '@/components/PermissionGuard'
 import DictForm from './DictForm'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -68,12 +69,16 @@ export default function DictList() {
         header: '操作',
         cell: ({ row }) => (
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setFormOpen(true) }}>
-              <Pencil className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
+            <PermissionGuard perm="dict:update">
+              <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setFormOpen(true) }}>
+                <Pencil className="size-4" />
+              </Button>
+            </PermissionGuard>
+            <PermissionGuard perm="dict:delete">
+              <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
+                <Trash2 className="size-4 text-destructive" />
+              </Button>
+            </PermissionGuard>
           </div>
         ),
       },
@@ -86,10 +91,12 @@ export default function DictList() {
       title="字典管理"
       description="维护系统数据字典"
       actions={
-        <Button onClick={() => { setEditing(null); setFormOpen(true) }}>
-          <Plus className="size-4" />
-          新建字典
-        </Button>
+        <PermissionGuard perm="dict:add">
+          <Button onClick={() => { setEditing(null); setFormOpen(true) }}>
+            <Plus className="size-4" />
+            新建字典
+          </Button>
+        </PermissionGuard>
       }
     >
       <SearchForm onSearch={onSearch} onReset={onReset}>
