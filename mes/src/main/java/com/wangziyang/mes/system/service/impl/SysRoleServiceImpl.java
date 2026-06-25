@@ -58,7 +58,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
         QueryWrapper<SysRole> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(CommonEnum.FIELD_NAME_IS_DELETED.getCode(), SysRoleEnum.DELETED_NORMAL.getCode());
-        List<SysRole> sysRolesAll = sysRoleMapper.selectList(null);
+        List<SysRole> sysRolesAll = sysRoleMapper.selectList(queryWrapper);
 
         for (SysRole role : sysRolesAll) {
             SysRoleDTO roleDTO = new SysRoleDTO();

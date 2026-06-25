@@ -83,6 +83,16 @@ public class SysUserController extends BaseController {
         return Result.success(result);
     }
 
+    /**
+     * 角色分配选项:返回全部(未删除)角色 + 对该用户是否已选(checked)。
+     * 新增用户(id 为空)时全部 checked=false。
+     */
+    @GetMapping("/roles")
+    @ResponseBody
+    public Result roles(String id) throws Exception {
+        return Result.success(sysRoleService.listByUserId(id));
+    }
+
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SysUserDTO record) throws Exception {
