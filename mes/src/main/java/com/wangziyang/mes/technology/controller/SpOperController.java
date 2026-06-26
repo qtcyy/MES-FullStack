@@ -6,8 +6,10 @@ import com.wangziyang.mes.basedata.entity.SpProcessUnit;
 import com.wangziyang.mes.basedata.service.ISpProcessUnitService;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.technology.entity.SpFlowOperRelation;
 import com.wangziyang.mes.technology.entity.SpOper;
 import com.wangziyang.mes.technology.request.SpOperReq;
+import com.wangziyang.mes.technology.service.ISpFlowOperRelationService;
 import com.wangziyang.mes.technology.service.ISpOperService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class SpOperController extends BaseController {
 
     @Autowired
     private ISpProcessUnitService iSpProcessUnitService;
+
+    @Autowired
+    private ISpFlowOperRelationService iSpFlowOperRelationService;
 
     @PostMapping("/page")
     @ResponseBody
@@ -84,7 +89,14 @@ public class SpOperController extends BaseController {
     @PostMapping("/delete")
     @ResponseBody
     public Result delete(@RequestBody Map<String, String> params) {
-        iSpOperService.removeById(params.get("id"));
+        String id = params.get("id");
+        // 守卫:被任一工艺路线引用(当前/前道/后道)则拒删,避免孤儿关系/断链
+        QueryWrapper<SpFlowOperRelation> qw = new QueryWrapper<>();
+        qw.eq("oper_id", id).or().eq("per_oper_id", id).or().eq("next_oper_id", id);
+        if (iSpFlowOperRelationService.count(qw) > 0) {
+            return Result.failure("该工序已被工艺路线引用,不能删除");
+        }
+        iSpOperService.removeById(id);
         return Result.success(null);
     }
 

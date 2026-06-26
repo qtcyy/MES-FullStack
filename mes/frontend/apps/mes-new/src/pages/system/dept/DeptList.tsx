@@ -19,6 +19,7 @@ import {
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import PageContainer from '@/components/PageContainer'
 import SearchForm from '@/components/SearchForm'
+import PermissionGuard from '@/components/PermissionGuard'
 import DeptForm from './DeptForm'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
@@ -72,12 +73,16 @@ export default function DeptList() {
         header: '操作',
         cell: ({ row }) => (
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setFormOpen(true) }}>
-              <Pencil className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
+            <PermissionGuard perm="dept:update">
+              <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setFormOpen(true) }}>
+                <Pencil className="size-4" />
+              </Button>
+            </PermissionGuard>
+            <PermissionGuard perm="dept:delete">
+              <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
+                <Trash2 className="size-4 text-destructive" />
+              </Button>
+            </PermissionGuard>
           </div>
         ),
       },
@@ -90,10 +95,12 @@ export default function DeptList() {
       title="部门管理"
       description="维护组织部门层级"
       actions={
-        <Button onClick={() => { setEditing(null); setFormOpen(true) }}>
-          <Plus className="size-4" />
-          新建部门
-        </Button>
+        <PermissionGuard perm="dept:add">
+          <Button onClick={() => { setEditing(null); setFormOpen(true) }}>
+            <Plus className="size-4" />
+            新建部门
+          </Button>
+        </PermissionGuard>
       }
     >
       <SearchForm onSearch={() => setSearch(draftName)} onReset={() => { setDraftName(''); setSearch('') }}>

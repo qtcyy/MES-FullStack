@@ -64,6 +64,27 @@ public class SpOrder extends BaseEntity {
      */
     private Integer statue;
 
+    /** 订单来源 DEMAND需求订单 FORECAST预测订单 */
+    private String orderSource;
+    /** 排产方式 FORWARD正向 BACKWARD逆向 */
+    private String scheduleMode;
+    /** 产品BOM ID */
+    private String bomId;
+    /** 产品BOM编码 */
+    private String bomCode;
+    /** BOM版本 */
+    private String bomVersion;
+    /** 客户名称 */
+    private String customerName;
+    /** 销售合同号 */
+    private String contractNo;
+    /** 订单优先级，数字越小优先级越高 */
+    private Integer priority;
+    /** 审批状态 DRAFT/APPROVING/APPROVED/REJECTED */
+    private String auditStatus;
+    /** 计划状态 UNCOMPUTED/COMPUTED/RELEASED/CANCELLED/DONE */
+    private String planStatus;
+
     public String getOrderCode() {
         return orderCode;
     }
@@ -133,6 +154,76 @@ public class SpOrder extends BaseEntity {
 
     public void setStatue(Integer statue) {
         this.statue = statue;
+    }
+    public String getOrderSource() {
+        return orderSource;
+    }
+
+    public void setOrderSource(String orderSource) {
+        this.orderSource = orderSource;
+    }
+    public String getScheduleMode() {
+        return scheduleMode;
+    }
+
+    public void setScheduleMode(String scheduleMode) {
+        this.scheduleMode = scheduleMode;
+    }
+    public String getBomId() {
+        return bomId;
+    }
+
+    public void setBomId(String bomId) {
+        this.bomId = bomId;
+    }
+    public String getBomCode() {
+        return bomCode;
+    }
+
+    public void setBomCode(String bomCode) {
+        this.bomCode = bomCode;
+    }
+    public String getBomVersion() {
+        return bomVersion;
+    }
+
+    public void setBomVersion(String bomVersion) {
+        this.bomVersion = bomVersion;
+    }
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+    public String getAuditStatus() {
+        return auditStatus;
+    }
+
+    public void setAuditStatus(String auditStatus) {
+        this.auditStatus = auditStatus;
+    }
+    public String getPlanStatus() {
+        return planStatus;
+    }
+
+    public void setPlanStatus(String planStatus) {
+        this.planStatus = planStatus;
     }
 
     @Override

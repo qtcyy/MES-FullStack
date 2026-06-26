@@ -85,6 +85,18 @@ public class SpFlowOperRelationServiceImpl extends ServiceImpl<SpFlowOperRelatio
     }
 
     /**
+     * 删除工艺路线头表 + 级联删其工序关系(同一事务)
+     *
+     * @param flowId 工艺路线ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteFlowWithRelations(String flowId) {
+        iSpFlowService.removeById(flowId);
+        spFlowOperRelationMapper.deleteOperRelationByFlowId(flowId);
+    }
+
+    /**
      * 流程与工序关系新增与修改
      *
      * @param spFlowDto 流程信息DTO

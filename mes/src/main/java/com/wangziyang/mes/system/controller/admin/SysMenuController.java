@@ -77,4 +77,12 @@ public class SysMenuController extends BaseController {
         List<TreeVO<SysMenu>> sysMenus = sysMenuService.listMenuTree();
         return Result.success(sysMenus);
     }
+
+    @ApiOperation("物理删除菜单(子守卫 + role_menu 关联清理)")
+    @PostMapping("/delete")
+    @ResponseBody
+    public Result delete(@org.springframework.web.bind.annotation.RequestParam String id) {
+        sysMenuService.deletePhysical(id);
+        return Result.success(id);
+    }
 }

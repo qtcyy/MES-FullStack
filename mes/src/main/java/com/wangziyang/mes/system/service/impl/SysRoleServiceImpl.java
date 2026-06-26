@@ -1,6 +1,7 @@
 package com.wangziyang.mes.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wangziyang.mes.common.enums.CommonEnum;
 import com.wangziyang.mes.system.dto.SysRoleDTO;
@@ -9,6 +10,7 @@ import com.wangziyang.mes.system.entity.SysRole;
 import com.wangziyang.mes.system.entity.SysUserRole;
 import com.wangziyang.mes.system.enums.SysRoleEnum;
 import com.wangziyang.mes.system.mapper.SysRoleMapper;
+import com.wangziyang.mes.system.service.ISysRoleMenuService;
 import com.wangziyang.mes.system.service.ISysRoleService;
 import com.wangziyang.mes.system.service.ISysUserRoleService;
 import org.apache.commons.lang3.ArrayUtils;
@@ -38,6 +40,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Autowired
     private ISysUserRoleService sysUserRoleService;
 
+    @Autowired
+    private ISysRoleMenuService sysRoleMenuService;
+
     /**
      * 根据用户ID获取角色列表信息
      *
@@ -53,7 +58,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
         QueryWrapper<SysRole> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(CommonEnum.FIELD_NAME_IS_DELETED.getCode(), SysRoleEnum.DELETED_NORMAL.getCode());
-        List<SysRole> sysRolesAll = sysRoleMapper.selectList(null);
+        List<SysRole> sysRolesAll = sysRoleMapper.selectList(queryWrapper);
 
         for (SysRole role : sysRolesAll) {
             SysRoleDTO roleDTO = new SysRoleDTO();
@@ -66,6 +71,35 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             result.add(roleDTO);
         }
         return result;
+    }
+
+    /**
+     * BUG-FIX: 新增或更新角色，并同步重建角色-菜单关系（在同一事务内）
+     * 原来 controller 直接分两步调用 saveOrUpdate + rebuild，两步不在同一事务，
+     * rebuild 失败时 saveOrUpdate 已提交，导致数据不一致。
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateWithMenus(SysRoleDTO record) throws Exception {
+        this.saveOrUpdate(record);
+        if (record.getSysMenuIds() != null) {
+            sysRoleMenuService.rebuild(record.getId(), record.getSysMenuIds());
+        }
+    }
+
+    /**
+     * 软删除角色（is_deleted = '1'）
+     *
+     * @param id 角色ID
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean softDelete(String id) {
+        if (id == null || id.trim().isEmpty()) throw new RuntimeException("id 不能为空");
+        UpdateWrapper<SysRole> uw = new UpdateWrapper<>();
+        uw.eq("id", id).set("is_deleted", "1");
+        return this.update(uw);
     }
 
     /**

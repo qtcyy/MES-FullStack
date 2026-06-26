@@ -53,4 +53,12 @@ public interface ISysMenuService extends IService<SysMenu> {
      * @throws Exception 异常
      */
     List<TreeVO<SysMenu>> listMenuTree() throws Exception;
+
+    /**
+     * 物理删除菜单(子守卫 + role_menu 关联清理)
+     *
+     * @param id 菜单ID
+     * @return 是否删除成功
+     */
+    boolean deletePhysical(String id);
 }

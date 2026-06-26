@@ -40,8 +40,13 @@ public class ShiroRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SysUserDTO user = (SysUserDTO) principalCollection.getPrimaryPrincipal();
         Set<String> perms = new HashSet<>();
+        Set<String> roles = new HashSet<>();
         if (CollectionUtils.isNotEmpty(user.getSysRoleDTOs())) {
             for (SysRoleDTO sr : user.getSysRoleDTOs()) {
+                // 注册角色编码，供 subject.hasRole(...) 使用（如 BPMN 待办按候选角色匹配）
+                if (StringUtils.isNotEmpty(sr.getCode())) {
+                    roles.add(sr.getCode());
+                }
                 if (CollectionUtils.isEmpty(sr.getSysMenuDtos())) {
                     continue;
                 }
@@ -53,6 +58,7 @@ public class ShiroRealm extends AuthorizingRealm {
             }
         }
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        info.setRoles(roles);
         info.setStringPermissions(perms);
         return info;
     }

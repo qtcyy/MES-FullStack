@@ -75,5 +75,6 @@
         LEFT JOIN sp_sys_role ssr
         ON ssr.id = ssur.role_id
         WHERE t.username = #{username}
+        AND t.is_deleted != '1'
     </select>
 </mapper>

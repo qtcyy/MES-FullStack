@@ -36,6 +36,7 @@ import FormList from '@/pages/workflow/form/FormList'
 import DefinitionList from '@/pages/workflow/definition/DefinitionList'
 import NotFound from '@/pages/error/NotFound'
 import Forbidden from '@/pages/error/Forbidden'
+import RouteAccessGuard from '@/components/RouteAccessGuard'
 
 // eslint-disable-next-line react-refresh/only-export-components -- 路由配置模块:lazy() 使本文件被识别为含组件,但其仅导出 router 配置,无 Fast Refresh 边界需求
 const PlanDashboard = lazy(() => import('@/pages/digitization/PlanDashboard'))
@@ -98,9 +99,11 @@ export const router = createBrowserRouter([
       {
         path: 'digitization/plan',
         element: (
-          <Suspense fallback={<div style={{ minHeight: '100vh', background: '#050b16' }} />}>
-            <PlanDashboard />
-          </Suspense>
+          <RouteAccessGuard>
+            <Suspense fallback={<div style={{ minHeight: '100vh', background: '#050b16' }} />}>
+              <PlanDashboard />
+            </Suspense>
+          </RouteAccessGuard>
         ),
       },
     ],

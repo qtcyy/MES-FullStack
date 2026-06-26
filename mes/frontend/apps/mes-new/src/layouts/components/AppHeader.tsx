@@ -31,7 +31,7 @@ export default function AppHeader() {
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-card px-4">
-      <Button variant="ghost" size="icon-sm" onClick={toggleCollapsed} aria-label="折叠侧栏">
+      <Button variant="ghost" size="icon-sm" onClick={toggleCollapsed} aria-label="折叠侧栏" className="hover:scale-105">
         <PanelLeft className="size-4" />
       </Button>
       <span className="text-sm text-muted-foreground">
@@ -43,7 +43,7 @@ export default function AppHeader() {
         全局搜索
       </Button>
       <ThemeSwitch />
-      <Button variant="ghost" size="icon-sm" aria-label="通知">
+      <Button variant="ghost" size="icon-sm" aria-label="通知" className="hover:scale-105">
         <Bell className="size-4" />
       </Button>
       <DropdownMenu>

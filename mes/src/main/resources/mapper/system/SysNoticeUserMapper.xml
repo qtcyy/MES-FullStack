@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangziyang.mes.system.mapper.SysNoticeUserMapper">
+
+    <resultMap id="inboxMap" type="com.wangziyang.mes.system.dto.SysNoticeInboxDTO">
+        <id column="id" property="id"/>
+        <result column="notice_id" property="noticeId"/>
+        <result column="user_id" property="userId"/>
+        <result column="is_read" property="isRead"/>
+        <result column="read_time" property="readTime"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="type" property="type"/>
+        <result column="sender" property="sender"/>
+        <result column="notice_time" property="noticeTime"/>
+    </resultMap>
+
+    <select id="selectInboxPage" resultMap="inboxMap">
+        SELECT nu.id, nu.notice_id, nu.user_id, nu.is_read, nu.read_time,
+               n.title, n.content, n.type, n.sender, n.create_time AS notice_time
+        FROM sp_sys_notice_user nu
+        INNER JOIN sp_sys_notice n ON n.id = nu.notice_id AND n.is_deleted != '1'
+        WHERE nu.user_id = #{userId}
+          AND nu.is_deleted != '1'
+        <if test="req.isRead != null and req.isRead != ''">
+          AND nu.is_read = #{req.isRead}
+        </if>
+        <if test="req.titleLike != null and req.titleLike != ''">
+          AND n.title LIKE CONCAT('%', #{req.titleLike}, '%')
+        </if>
+        ORDER BY n.create_time DESC
+    </select>
+</mapper>

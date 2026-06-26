@@ -13,4 +13,11 @@ import com.wangziyang.mes.system.entity.SysDepartment;
  */
 public interface ISysDepartmentService extends IService<SysDepartment> {
 
+    /**
+     * 软删除部门（is_deleted = '1'）
+     *
+     * @param id 部门ID
+     * @return 是否成功
+     */
+    boolean softDelete(String id);
 }

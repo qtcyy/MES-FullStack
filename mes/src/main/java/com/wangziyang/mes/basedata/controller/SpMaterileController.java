@@ -100,16 +100,16 @@ public class SpMaterileController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     public Result page(spMaterileReq req) {
-        QueryWrapper queryWrapper =new QueryWrapper();
-        if (StringUtils.isNotEmpty(req.getMaterielLike()))
-        {
-            queryWrapper.like("materiel",req.getMaterielLike());
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.ne("is_deleted", "1"); // 过滤软删记录
+        if (StringUtils.isNotEmpty(req.getMaterielLike())) {
+            queryWrapper.like("materiel", req.getMaterielLike());
         }
-        if (StringUtils.isNotEmpty(req.getMaterielDescLike()))
-        {
-            queryWrapper.like("materiel_desc",req.getMaterielDescLike());
+        if (StringUtils.isNotEmpty(req.getMaterielDescLike())) {
+            queryWrapper.like("materiel_desc", req.getMaterielDescLike());
         }
-        IPage result = iSpMaterileService.page(req,queryWrapper);
+        queryWrapper.orderByDesc("create_time");
+        IPage result = iSpMaterileService.page(req, queryWrapper);
         return Result.success(result);
     }
 
@@ -147,7 +147,12 @@ public class SpMaterileController extends BaseController {
     }
 
     private String getCodePrefix(String matType) {
+        if (matType == null) return "OTHR-";
         switch (matType) {
+            // 字典 material_type 的 value
+            case "FG": return "FG-";   // 成品
+            case "PG": return "PG-";   // 半成品
+            // 兼容历史中文脏值
             case "产品": return "PROD-";
             case "零件": return "PART-";
             case "标准件": return "STD-";
@@ -184,7 +189,10 @@ public class SpMaterileController extends BaseController {
     @PostMapping("/delete")
     @ResponseBody
     public Result deleteByTableNameId(SpMaterile req) throws Exception {
-        iSpMaterileService.removeById(req.getId());
+        com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<SpMaterile> uw =
+                new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<>();
+        uw.eq("id", req.getId()).set("is_deleted", "1");
+        iSpMaterileService.update(uw);
         return Result.success();
     }
 }

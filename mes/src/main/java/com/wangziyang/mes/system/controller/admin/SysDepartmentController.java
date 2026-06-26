@@ -1,6 +1,7 @@
 package com.wangziyang.mes.system.controller.admin;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
@@ -20,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -51,7 +53,9 @@ public class SysDepartmentController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     public Result page(SysDepartmentPageReq req) {
-        IPage result = sysDepartmentService.page(req);
+        QueryWrapper<SysDepartment> qw = new QueryWrapper<>();
+        qw.ne("is_deleted", "1");
+        IPage result = sysDepartmentService.page(req, qw);
         return Result.success(result);
     }
 
@@ -76,5 +80,12 @@ public class SysDepartmentController extends BaseController {
     public Result addOrUpdate(SysDepartment record) {
         sysDepartmentService.saveOrUpdate(record);
         return Result.success(record.getId());
+    }
+
+    @PostMapping("/delete")
+    @ResponseBody
+    public Result<String> delete(@RequestParam String id) {
+        sysDepartmentService.softDelete(id);
+        return Result.success(id);
     }
 }
