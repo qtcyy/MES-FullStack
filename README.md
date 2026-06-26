@@ -210,16 +210,18 @@ MES-FullStack/
         ├── package.json              # 根工作区脚本（dev/build/lint）
         ├── packages/                 # 预留共享包
         └── apps/
-            └── mes1/                  # SPA 应用（包名 mes1）
+            └── mes-new/              # 活跃 SPA 应用（包名 mes-new）
                 ├── package.json
-                ├── vite.config.ts    # Vite 配置 + API 代理
+                ├── vite.config.ts    # Vite 配置 + API 代理（dev :4100）
                 └── src/
-                    ├── api/          # 后端 API 调用
+                    ├── api/          # 按模块的后端 API 调用
+                    ├── http/         # axios 实例 + 拦截器 + 自研查询缓存
                     ├── pages/        # 页面组件（按模块）
-                    ├── components/   # 共享组件（PageTable, ModalForm 等）
+                    ├── components/   # 共享组件（shadcn/Radix 积木）
                     ├── stores/       # Zustand 状态
                     ├── layouts/      # AdminLayout
                     ├── hooks/        # 自定义 Hooks
+                    ├── router.tsx    # 集中路由表
                     ├── types/        # TypeScript 类型
                     └── utils/        # 工具函数
 ```
@@ -237,9 +239,9 @@ MES-FullStack/
 
 ### 前端
 
-- **API 客户端**：axios 实例 `api/client.ts`，自动 form 编码 POST，响应解包 Result
-- **权限**：`<PermissionGuard perm="xxx:add">` 基于菜单权限 Set
-- **CRUD 模式**：`useQuery` + `useMutation` → `SearchForm` → `PageTable` → `ModalForm` → `Form`
+- **API 客户端**：axios 实例 `http/client.ts`，自动 form 编码 POST，响应解包 Result（`http/queryCache.ts` 提供自研查询缓存，非 TanStack Query）
+- **权限（RBAC）**：登录拉菜单树（后端按角色剪枝）收集 `permission` 成 Set，做菜单/按钮/路由三层管控
+- **CRUD 模式**：搜索表单 → 分页表格 → 弹窗表单（react-hook-form + zod）
 - **参考页面**：`pages/system/user/UserList.tsx` + `UserForm.tsx`
 
 ## 常见问题
@@ -248,7 +250,7 @@ MES-FullStack/
 ```bash
 cd mes/frontend && pnpm install        # 确保依赖安装
 pnpm build                             # 重新构建
-pnpm --filter mes1 exec tsc --noEmit   # 单独检查 TS 错误
+pnpm --filter mes-new exec tsc --noEmit # 单独检查 TS 错误
 ```
 
 ### 后端启动失败

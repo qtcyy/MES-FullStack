@@ -3,14 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "pnpm --filter mes1 dev",
-    "build": "pnpm --filter mes1 build",
-    "lint": "pnpm --filter mes1 lint",
-    "preview": "pnpm --filter mes1 preview",
-    "check-types": "pnpm -r check-types",
-    "dev:new": "pnpm --filter mes-new dev",
-    "build:new": "pnpm --filter mes-new build",
-    "lint:new": "pnpm --filter mes-new lint",
-    "test:new": "pnpm --filter mes-new test"
+    "dev": "pnpm --filter mes-new dev",
+    "build": "pnpm --filter mes-new build",
+    "lint": "pnpm --filter mes-new lint",
+    "preview": "pnpm --filter mes-new preview",
+    "test": "pnpm --filter mes-new test",
+    "check-types": "pnpm -r check-types"
   }
 }

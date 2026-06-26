@@ -9,7 +9,7 @@ MES (Manufacturing Execution System) — "章鱼师兄", a full-stack monolith f
 ## Tech Stack
 
 - **Backend**: Java 8, Spring Boot 2.1.7, MyBatis-Plus 3.1.2, Apache Shiro 1.4.0
-- **Frontend (NEW)**: React 18 + TypeScript + Vite 5 + Ant Design 5 + TanStack Query + Zustand + React Router v6
+- **Frontend (active)**: React 19 + TypeScript + Vite 8 + shadcn/Radix UI (`@workspace/ui`) + Tailwind CSS 4 + react-hook-form + zod + Zustand + React Router v7 — lives in `mes/frontend/apps/mes-new`
 - **Frontend (OLD, retained for reference)**: Freemarker (`.ftl`) templates + Layui + jQuery (in `templates/`)
 - **Database**: MySQL 8 with Druid connection pool
 - **Cache**: Ehcache (local) or Redis (configurable via `spring.cache.type`)
@@ -21,17 +21,17 @@ MES (Manufacturing Execution System) — "章鱼师兄", a full-stack monolith f
 # Build everything (frontend + backend)
 cd mes && mvn clean package -DskipTests
 
-# Build frontend only (pnpm monorepo root → builds apps/mes1)
+# Build frontend only (pnpm monorepo root → builds apps/mes-new)
 cd mes/frontend && pnpm build
 
 # Dev: start backend (port 9090)
 cd mes && mvn spring-boot:run
 
-# Dev: start frontend dev server (port 4000, proxies /api → localhost:9090)
+# Dev: start frontend dev server (port 4100, proxies /api → localhost:9090)
 cd mes/frontend && pnpm dev
 
 # TypeScript check
-cd mes/frontend && pnpm --filter mes1 exec tsc --noEmit
+cd mes/frontend && pnpm --filter mes-new exec tsc --noEmit
 
 # Lint
 cd mes/frontend && pnpm lint
@@ -82,53 +82,21 @@ Each module follows: `controller` → `service`/`service/impl` → `mapper` + `e
 - **Request** objects extend `BasePageReq` for paged list queries — each table gets its own request class (e.g., `SysUserPageReq`).
 - **Password hashing**: MD5 × 3 iterations with username as salt (see `SysUserServiceImpl.save()`).
 
-### Frontend (React SPA)
+### Frontend (React SPA — `mes/frontend/apps/mes-new`)
 
-> **⚠️ 当前活跃前端 = `mes/frontend/apps/mes-new`，不要去看/改 `apps/mes1`。**
-> 最近所有前端开发都围绕 `apps/mes-new` 进行（dev server 实际跑在 `:4100`）。`apps/mes1`（下面文档描述的 Ant Design 版本）已弃用，仅作历史参考，**不要在它里面定位或修改文件**。
-> 注意两者技术栈不同：`mes-new` 使用 shadcn/Radix UI（`@workspace/ui`）+ react-hook-form + zod，而 `mes1` 是 Ant Design 5。改前端前先确认在 `apps/mes-new` 下操作。
+> **⚠️ 当前唯一活跃前端 = `mes/frontend/apps/mes-new`（包名 `mes-new`）。** 旧的 `apps/mes1`（Ant Design 版）与 Vue3 作业前端 `mes/vue3` 已删除，仅可在 tag `pre-remove-vue3-mes1` 中找回。改前端一律在 `apps/mes-new` 下操作。
+> **设计/UI 约定**：科技蓝设计系统（令牌在本地 `src/styles.css`）+ 动画基元（`src/motion/`），新页面复用既有样板（参考 `pages/system/user/UserList.tsx`），不要另起一套丑 UI。栈为 shadcn/Radix（`@workspace/ui`）+ react-hook-form + zod；全局 `StrictMode` 已**故意关闭**（避免 3D 数字孪生大屏丢失 WebGL 上下文），勿重开；RHF 字段名禁用 `nodeName` 等 DOM 属性名（否则提交崩溃）。
 
-The React SPA lives in `mes/frontend/` — a pnpm workspace (monorepo). The root holds `pnpm-workspace.yaml` + root `package.json`; the app itself is `mes/frontend/apps/mes1/` (package name `mes1`), with `mes/frontend/packages/` reserved for shared packages. It replaces the old Freemarker server-rendered templates.
+The active SPA lives in `mes/frontend/apps/mes-new` inside the `mes/frontend/` pnpm workspace (`pnpm-workspace.yaml` globs `apps/*` + `packages/*`; shared UI in `packages/` imported via `@workspace/ui`). It replaces the old Freemarker server-rendered templates. Dev server runs on `:4100` and proxies `/api → localhost:9090`; the Maven `frontend-maven-plugin` builds it via `pnpm --filter mes-new build`.
 
-```
-mes/frontend/apps/mes1/src/
-├── api/                    # API call functions per module
-│   ├── client.ts           # axios instance: form-encoding, Result unwrap, 401 handling
-│   ├── auth.ts             # login, logout, captcha, userInfo
-│   ├── menu.ts             # menu tree API
-│   └── system|basedata|technology|order|digitization/
-├── stores/                 # Zustand state management
-│   ├── authStore.ts        # user, permissions (Set<string>), login/logout/hasPermission
-│   ├── menuStore.ts        # menu tree, sidebar collapsed, selected/open keys
-│   └── appStore.ts         # tabs (multi-tab nav), theme color
-├── layouts/
-│   └── AdminLayout.tsx     # Ant Layout: Sider (menu tree) + Header (user dropdown) + Tabs + Content(Outlet)
-├── components/             # Shared CRUD building blocks
-│   ├── PageTable.tsx       # Ant Table wrapper: server pagination, toolbar, size changer
-│   ├── ModalForm.tsx       # Modal + Form: replaces spLayer iframe dialogs
-│   ├── SearchForm.tsx      # Inline search form with 搜索/重置 buttons
-│   ├── PageContainer.tsx   # Consistent page wrapper
-│   ├── PrivateRoute.tsx    # Auth guard: redirects to /login if not authenticated
-│   └── PermissionGuard.tsx # Renders children only if user has the required permission
-├── pages/
-│   ├── login/              # LoginPage + CaptchaImage
-│   ├── welcome/            # Dashboard home
-│   ├── system/             # User, Role, Menu, Dict, Dept (CRUD)
-│   ├── basedata/           # Materile, Manager, ManagerItem (dynamic table CRUD)
-│   ├── technology/         # BOM, Flow, FlowProcess (Transfer shuttle)
-│   ├── order/              # Production orders
-│   ├── digitization/       # PlanDashboard (ECharts), Simulation3D (Three.js)
-│   └── error/              # 403, 404, 500
-├── hooks/                  # usePagination, usePermission
-├── types/                  # TypeScript interfaces (api.ts, user.ts, menu.ts, common.ts)
-└── utils/                  # iconMap (Font Awesome → Ant Design icons)
-```
+`src/` top-level: `api/` (per-module API functions) · `http/` (axios instance `client.ts` + `interceptors.ts` + `formBody.ts` form-encoding + `result.ts` Result unwrap + `queryCache.ts`/`hooks.ts` 自研查询缓存层) · `stores/` (Zustand) · `layouts/` (`AdminLayout`) · `components/` (shared CRUD blocks, shadcn/Radix) · `pages/` (per module: login / system / basedata / technology / order / digitization) · `hooks/` · `lib/` · `types/` · `utils/` · `router.tsx` (集中路由表) · `styles.css` (设计令牌).
 
-**Key patterns:**
-- **API client** (`api/client.ts`): axios request interceptor converts JSON to form-encoded (`application/x-www-form-urlencoded`) for all POST requests. Two endpoints (`/basedata/manager/add-or-update`, `/basedata/flow/process/add-or-update`) use `@RequestBody` JSON — their API functions set `Content-Type: application/json` explicitly to skip the transform. Response interceptor unwraps backend `Result<T>` wrapper: `code===0` → return `data`, `code!==0` → `message.error(msg)`, HTTP 401 → redirect to `/login`.
-- **Pagination**: request params `current` (page number) + `size` (page size). Response format from MyBatis-Plus IPage: `{ records, total, size, current, pages }`.
-- **Permission system**: login loads menu tree from `/admin/list/index/menu/tree`, recursively collects all `permission` strings into a `Set`. `<PermissionGuard perm="user:add">` checks membership.
-- **CRUD pattern**: every list page uses `useQuery` + `useMutation` (TanStack Query) → SearchForm → PageTable → ModalForm → Form. Follow `pages/system/user/UserList.tsx` and `UserForm.tsx` as the reference.
+**Backend contract (framework-agnostic — applies regardless of which frontend):**
+- **Form-encoding** (`http/formBody.ts`): POST requests default to `application/x-www-form-urlencoded`. Two endpoints (`/basedata/manager/add-or-update`, `/basedata/flow/process/add-or-update`) use `@RequestBody` JSON — their API functions set `Content-Type: application/json` explicitly to opt out. (`/admin/sys/role/add-or-update` may be a third JSON endpoint — verify against the controller.)
+- **Result wrapper** (`http/result.ts`): backend returns `Result<T>` = `{code, data, msg}`; the response interceptor unwraps `code===0` → `data`, otherwise surfaces `msg`, HTTP 401 → redirect to `/login`.
+- **Pagination**: request params `current` (page number) + `size` (page size). Response from MyBatis-Plus IPage: `{ records, total, size, current, pages }`.
+- **Permissions (RBAC)**: login loads the menu tree from `/admin/list/index/menu/tree` (backend prunes by role; `admin` is allowed through) and collects all `permission` strings into a `Set` used to gate menus, buttons, and routes. New pages must match a preset `sp_sys_menu` `url` to be reachable, and be registered in `router.tsx`.
+- **CRUD pattern**: every list page = SearchForm → paged table → modal form (react-hook-form + zod). Follow `pages/system/user/UserList.tsx` and `UserForm.tsx` as the reference. Note: the data layer is the in-repo query-cache hooks (`http/queryCache.ts`/`hooks.ts`), **not** TanStack Query.
 
 ### Frontend (Old — retained for reference)
 

@@ -232,7 +232,7 @@
                         <id>pnpm build</id>
                         <phase>generate-resources</phase>
                         <goals><goal>pnpm</goal></goals>
-                        <configuration><arguments>--filter mes1 build</arguments></configuration>
+                        <configuration><arguments>--filter mes-new build</arguments></configuration>
                     </execution>
                 </executions>
             </plugin>
