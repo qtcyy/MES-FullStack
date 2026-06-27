@@ -84,11 +84,7 @@ public class SpOperStepController extends BaseController {
             // 已在顶部/底部,无需交换
             return Result.success(null);
         }
-        Integer tmp = cur.getStepNo();
-        cur.setStepNo(neighbor.getStepNo());
-        neighbor.setStepNo(tmp);
-        iSpOperStepService.updateById(cur);
-        iSpOperStepService.updateById(neighbor);
+        iSpOperStepService.swapStepNo(cur, neighbor);
         return Result.success(null);
     }
 }
