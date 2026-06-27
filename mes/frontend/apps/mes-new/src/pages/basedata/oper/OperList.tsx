@@ -16,11 +16,12 @@ import {
   Label,
   toast,
 } from '@workspace/ui'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { ListChecks, Pencil, Plus, Trash2 } from 'lucide-react'
 import PageContainer from '@/components/PageContainer'
 import SearchForm from '@/components/SearchForm'
 import PermissionGuard from '@/components/PermissionGuard'
 import OperForm from './OperForm'
+import OperStepDrawer from './OperStepDrawer'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { operPage, operDelete, type OperPageParams } from '@/api/basedata/oper'
@@ -34,6 +35,8 @@ export default function OperList() {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<SpOper | null>(null)
   const [deleting, setDeleting] = useState<SpOper | null>(null)
+  const [stepOper, setStepOper] = useState<SpOper | null>(null)
+  const [stepOpen, setStepOpen] = useState(false)
 
   const { data, loading } = useQuery$(['oper', 'page', params], () => operPage(params))
   const { mutate: removeOper } = useMutation$((id: string) => operDelete(id))
@@ -79,10 +82,13 @@ export default function OperList() {
         header: '操作',
         cell: ({ row }) => (
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setFormOpen(true) }}>
+            <Button variant="ghost" size="icon-sm" title="步骤" onClick={() => { setStepOper(row.original); setStepOpen(true) }}>
+              <ListChecks className="size-4" />
+            </Button>
+            <Button variant="ghost" size="icon-sm" title="编辑" onClick={() => { setEditing(row.original); setFormOpen(true) }}>
               <Pencil className="size-4" />
             </Button>
-            <Button variant="ghost" size="icon-sm" onClick={() => setDeleting(row.original)}>
+            <Button variant="ghost" size="icon-sm" title="删除" onClick={() => setDeleting(row.original)}>
               <Trash2 className="size-4 text-destructive" />
             </Button>
           </div>
@@ -128,6 +134,7 @@ export default function OperList() {
       />
 
       <OperForm open={formOpen} onOpenChange={setFormOpen} record={editing} />
+      <OperStepDrawer open={stepOpen} onOpenChange={setStepOpen} oper={stepOper} />
 
       <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
         <AlertDialogContent>
