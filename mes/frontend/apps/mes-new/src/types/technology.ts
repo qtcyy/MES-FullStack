@@ -11,6 +11,17 @@ export interface SpOper {
   remark?: string
 }
 
+/** 工序步骤(sp_oper_step):某工序的具体作业步骤 */
+export interface SpOperStep {
+  id?: string
+  operId: string
+  stepNo?: number
+  stepTitle: string
+  stepDesc?: string
+  estMinutes?: number
+  remark?: string
+}
+
 /** 加工单元下拉项 */
 export interface SpProcessUnitOption {
   id: string
