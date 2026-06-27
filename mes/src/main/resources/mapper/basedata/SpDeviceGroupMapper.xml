@@ -12,11 +12,23 @@
         <result column="update_time" property="updateTime"/>
         <result column="update_username" property="updateUsername"/>
         <result column="device_count" property="deviceCount"/>
+        <result column="idle_count" property="idleCount"/>
+        <result column="running_count" property="runningCount"/>
+        <result column="repair_count" property="repairCount"/>
+        <result column="scrap_count" property="scrapCount"/>
     </resultMap>
 
     <select id="pageWithRelations" resultMap="groupResultMap">
         SELECT g.*,
-               (SELECT COUNT(*) FROM sp_device_group_item dgi WHERE dgi.group_id = g.id) AS device_count
+               (SELECT COUNT(*) FROM sp_device_group_item dgi WHERE dgi.group_id = g.id) AS device_count,
+               (SELECT COUNT(*) FROM sp_device_group_item dgi JOIN sp_device d ON d.id = dgi.device_id
+                  WHERE dgi.group_id = g.id AND d.is_deleted != '1' AND d.status = '0') AS idle_count,
+               (SELECT COUNT(*) FROM sp_device_group_item dgi JOIN sp_device d ON d.id = dgi.device_id
+                  WHERE dgi.group_id = g.id AND d.is_deleted != '1' AND d.status = '1') AS running_count,
+               (SELECT COUNT(*) FROM sp_device_group_item dgi JOIN sp_device d ON d.id = dgi.device_id
+                  WHERE dgi.group_id = g.id AND d.is_deleted != '1' AND d.status = '2') AS repair_count,
+               (SELECT COUNT(*) FROM sp_device_group_item dgi JOIN sp_device d ON d.id = dgi.device_id
+                  WHERE dgi.group_id = g.id AND d.is_deleted != '1' AND d.status = '3') AS scrap_count
         FROM sp_device_group g
         WHERE g.is_deleted != '1'
         <if test="name != null and name != ''">

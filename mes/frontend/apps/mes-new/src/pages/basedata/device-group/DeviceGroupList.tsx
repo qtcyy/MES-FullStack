@@ -10,6 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Badge,
   Button,
   DataTable,
   Input,
@@ -28,6 +29,7 @@ import DeviceGroupMembers from './DeviceGroupMembers'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
 import { deviceGroupPage, deviceGroupDelete, type DeviceGroupPageParams } from '@/api/basedata/device-group'
+import { deriveGroupStatusMeta } from '@/utils/deviceStatus'
 import type { SpDeviceGroupDTO } from '@/types/device'
 
 const PAGE_SIZE = 10
@@ -70,6 +72,19 @@ export default function DeviceGroupList() {
       { accessorKey: 'code', header: '编组代码' },
       { accessorKey: 'name', header: '编组名称' },
       { accessorKey: 'descr', header: '描述', cell: ({ row }) => row.original.descr || '—' },
+      {
+        id: 'status',
+        header: '状态',
+        cell: ({ row }) => {
+          const { meta, detail } = deriveGroupStatusMeta(row.original)
+          return (
+            <div className="flex items-center gap-2">
+              <Badge className={meta.className}>{meta.label}</Badge>
+              {detail && <span className="text-xs text-muted-foreground">{detail}</span>}
+            </div>
+          )
+        },
+      },
       {
         id: 'actions',
         header: '操作',

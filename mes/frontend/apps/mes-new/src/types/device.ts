@@ -28,4 +28,9 @@ export interface SpDeviceGroupDTO extends SpDeviceGroup {
   deviceCount?: number
   deviceList?: SpDevice[]
   deviceIds?: string[]
+  /** 成员设备按状态计数(后端 pageWithRelations 聚合):0空闲/1运行中/2维修中/3报废 */
+  idleCount?: number
+  runningCount?: number
+  repairCount?: number
+  scrapCount?: number
 }

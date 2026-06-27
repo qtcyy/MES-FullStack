@@ -1,6 +1,7 @@
 // apps/mes-new/src/pages/basedata/device-group/DeviceGroupMembers.tsx
 import { useState } from 'react'
 import {
+  Badge,
   Button,
   Table,
   TableBody,
@@ -22,6 +23,7 @@ import {
   devicePage,
 } from '@/api/basedata/device-group'
 import { excludeSelected, type TransferItem } from '@/utils/transfer'
+import { deviceStatusMeta } from '@/utils/deviceStatus'
 import type { SpDevice, SpDeviceGroup } from '@/types/device'
 
 interface Props {
@@ -90,6 +92,7 @@ export default function DeviceGroupMembers({ group }: Props) {
               <TableRow>
                 <TableHead>设备编码</TableHead>
                 <TableHead>设备名称</TableHead>
+                <TableHead>状态</TableHead>
                 <TableHead className="w-16">操作</TableHead>
               </TableRow>
             </TableHeader>
@@ -98,6 +101,9 @@ export default function DeviceGroupMembers({ group }: Props) {
                 <TableRow key={d.id}>
                   <TableCell>{d.code}</TableCell>
                   <TableCell>{d.name}</TableCell>
+                  <TableCell>
+                    <Badge className={deviceStatusMeta(d.status).className}>{deviceStatusMeta(d.status).label}</Badge>
+                  </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon-sm" onClick={() => handleRemove(d.id)}>
                       <Trash2 className="size-4 text-destructive" />
