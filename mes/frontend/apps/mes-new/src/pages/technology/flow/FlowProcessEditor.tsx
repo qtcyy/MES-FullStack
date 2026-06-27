@@ -45,8 +45,10 @@ export default function FlowProcessEditor({ open, onOpenChange, record }: Props)
   )
   const { mutate, loading } = useMutation$((body: SpFlowDtoReq) => flowSaveProcess(body))
 
+  // secondary 必须是 string|undefined:后端 oper_code 可能为 null,而 zod 的 .optional()
+  // 不接受 null,会导致工序链里这些项静默校验失败(确定无反应)。这里把 null 归一化为 undefined。
   const candidates = useMemo<TransferItem[]>(
-    () => (opers ?? []).map((o) => ({ id: o.id, primary: o.operDesc, secondary: o.operCode })),
+    () => (opers ?? []).map((o) => ({ id: o.id, primary: o.operDesc, secondary: o.operCode ?? undefined })),
     [opers],
   )
   const candidateById = useMemo(() => new Map(candidates.map((c) => [c.id, c])), [candidates])
