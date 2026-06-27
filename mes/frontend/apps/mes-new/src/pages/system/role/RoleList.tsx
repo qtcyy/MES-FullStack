@@ -24,7 +24,7 @@ import PermissionGuard from '@/components/PermissionGuard'
 import RoleForm from './RoleForm'
 import { useQuery$, useMutation$ } from '@/http/hooks'
 import { invalidate } from '@/http/queryCache'
-import { rolePage, roleAddOrUpdate, type RolePageParams } from '@/api/system/role'
+import { rolePage, roleDelete, type RolePageParams } from '@/api/system/role'
 import type { SysRole } from '@/types/system'
 
 const PAGE_SIZE = 10
@@ -37,7 +37,7 @@ export default function RoleList() {
   const [deleting, setDeleting] = useState<SysRole | null>(null)
 
   const { data, loading } = useQuery$(['sys', 'role', 'page', params], () => rolePage(params))
-  const { mutate: softDelete } = useMutation$((record: SysRole) => roleAddOrUpdate({ ...record, deleted: '1' }))
+  const { mutate: softDelete } = useMutation$((record: SysRole) => roleDelete(record.id))
 
   const onSearch = () => setParams({ current: 1, size: PAGE_SIZE, nameLike: draftName || undefined })
   const onReset = () => {
