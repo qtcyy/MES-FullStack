@@ -12,6 +12,7 @@ import DeptList from '@/pages/system/dept/DeptList'
 import TeamPage from '@/pages/system/team/TeamPage'
 import ComponentList from '@/pages/basedata/component/ComponentList'
 import MaterileList from '@/pages/basedata/materile/MaterileList'
+import DeviceList from '@/pages/basedata/device/DeviceList'
 import DeviceGroupList from '@/pages/basedata/device-group/DeviceGroupList'
 import ProcessUnitList from '@/pages/basedata/process-unit/ProcessUnitList'
 import WarehouseList from '@/pages/basedata/warehouse/WarehouseList'
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
           { path: 'system/team', element: <TeamPage /> },
           { path: 'basedata/component', element: <ComponentList /> },
           { path: 'basedata/materile', element: <MaterileList /> },
+          { path: 'basedata/device', element: <DeviceList /> },
           { path: 'basedata/device-group', element: <DeviceGroupList /> },
           { path: 'basedata/process-unit', element: <ProcessUnitList /> },
           { path: 'basedata/warehouse', element: <WarehouseList /> },

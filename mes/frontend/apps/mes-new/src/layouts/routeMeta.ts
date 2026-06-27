@@ -14,6 +14,7 @@ export const ROUTE_META: Record<string, { title: string; icon?: string }> = {
   // 基础数据
   '/basedata/component': { title: '元器件管理', icon: 'block' },
   '/basedata/materile': { title: '物料管理', icon: 'gold' },
+  '/basedata/device': { title: '设备管理', icon: 'tool' },
   '/basedata/device-group': { title: '设备组管理', icon: 'cluster' },
   '/basedata/process-unit': { title: '工艺单元管理', icon: 'deployment-unit' },
   '/basedata/warehouse': { title: '仓库管理', icon: 'bank' },

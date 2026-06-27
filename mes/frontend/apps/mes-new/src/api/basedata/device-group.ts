@@ -38,13 +38,5 @@ export function deviceGroupItemsRemove(groupId: string, deviceId: string) {
   return http.post<void>('/basedata/device-group/items/remove', { groupId, deviceId }, JSON_HEADERS)
 }
 
-export interface DevicePageParams extends PageParams {
-  name?: string
-  code?: string
-  type?: string
-}
-
-/** 候选设备(全量分页,用于穿梭弹窗) */
-export function devicePage(params: DevicePageParams) {
-  return http.post<PageResult<SpDevice>>('/basedata/device/page', params)
-}
+// 设备 API 已统一到 ./device;此处再导出供设备组"管理成员"候选池沿用
+export { devicePage, type DevicePageParams } from './device'
