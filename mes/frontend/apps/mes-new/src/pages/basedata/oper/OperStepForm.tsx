@@ -69,6 +69,7 @@ export default function OperStepForm({ open, onOpenChange, operId, record }: Pro
       })
       toast.success(isEdit ? '修改成功' : '新增成功')
       invalidate('["operStep","list"')
+      if (!isEdit) invalidate('["oper","page"') // 新增改变步骤数,刷新工序列表
       onOpenChange(false)
     } catch {
       /* 错误已由响应拦截器 toast */

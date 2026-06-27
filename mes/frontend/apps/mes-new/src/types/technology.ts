@@ -9,6 +9,8 @@ export interface SpOper {
   manufacturingCycle?: number
   generatePlan?: string
   remark?: string
+  /** 步骤数(后端列表页统计返回,非编辑字段) */
+  stepCount?: number
 }
 
 /** 工序步骤(sp_oper_step):某工序的具体作业步骤 */

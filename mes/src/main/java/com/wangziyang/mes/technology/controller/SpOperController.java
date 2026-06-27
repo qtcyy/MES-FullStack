@@ -8,14 +8,19 @@ import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
 import com.wangziyang.mes.technology.entity.SpFlowOperRelation;
 import com.wangziyang.mes.technology.entity.SpOper;
+import com.wangziyang.mes.technology.entity.SpOperStep;
 import com.wangziyang.mes.technology.request.SpOperReq;
 import com.wangziyang.mes.technology.service.ISpFlowOperRelationService;
 import com.wangziyang.mes.technology.service.ISpOperService;
+import com.wangziyang.mes.technology.service.ISpOperStepService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,6 +37,9 @@ public class SpOperController extends BaseController {
     @Autowired
     private ISpFlowOperRelationService iSpFlowOperRelationService;
 
+    @Autowired
+    private ISpOperStepService iSpOperStepService;
+
     @PostMapping("/page")
     @ResponseBody
     public Result page(SpOperReq req) {
@@ -41,7 +49,32 @@ public class SpOperController extends BaseController {
         }
         qw.orderByDesc("create_time");
         IPage<SpOper> result = iSpOperService.page(req, qw);
+        fillStepCount(result.getRecords());
         return Result.success(result);
+    }
+
+    /** 为当前页工序批量填充步骤数(一次 GROUP BY 查询,避免 N+1) */
+    private void fillStepCount(List<SpOper> records) {
+        if (records == null || records.isEmpty()) {
+            return;
+        }
+        List<String> ids = new ArrayList<>();
+        for (SpOper o : records) {
+            ids.add(o.getId());
+        }
+        QueryWrapper<SpOperStep> cntQw = new QueryWrapper<>();
+        cntQw.select("oper_id", "count(*) as cnt").in("oper_id", ids).groupBy("oper_id");
+        Map<String, Integer> countMap = new HashMap<>();
+        for (Map<String, Object> row : iSpOperStepService.listMaps(cntQw)) {
+            Object operId = row.get("oper_id");
+            if (operId != null) {
+                Object cnt = row.get("cnt");
+                countMap.put(operId.toString(), cnt == null ? 0 : Integer.parseInt(cnt.toString()));
+            }
+        }
+        for (SpOper o : records) {
+            o.setStepCount(countMap.getOrDefault(o.getId(), 0));
+        }
     }
 
     @GetMapping("/list")

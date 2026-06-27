@@ -18,7 +18,7 @@ export function operStepDelete(id: string) {
   return http.post<void>('/basedata/sp-oper-step/delete', { id }, JSON_HEADERS)
 }
 
-/** 上移/下移(表单编码) */
-export function operStepMove(id: string, direction: 'up' | 'down') {
-  return http.post<void>('/basedata/sp-oper-step/move', { id, direction })
+/** 重排步骤顺序(@RequestBody JSON {operId, ids};拖拽 / 上下移共用) */
+export function operStepReorder(operId: string, ids: string[]) {
+  return http.post<void>('/basedata/sp-oper-step/reorder', { operId, ids }, JSON_HEADERS)
 }

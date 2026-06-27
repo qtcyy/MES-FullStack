@@ -78,6 +78,11 @@ export default function OperList() {
         cell: ({ row }) => <span className="block max-w-[16rem] truncate text-muted-foreground">{row.original.remark || '—'}</span>,
       },
       {
+        id: 'stepCount',
+        header: '步骤数',
+        cell: ({ row }) => <Badge variant="secondary">{row.original.stepCount ?? 0}</Badge>,
+      },
+      {
         id: 'actions',
         header: '操作',
         cell: ({ row }) => (

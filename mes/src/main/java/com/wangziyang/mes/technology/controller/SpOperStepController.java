@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -62,29 +64,25 @@ public class SpOperStepController extends BaseController {
         return Result.success(null);
     }
 
-    /** 上移/下移:与同工序内相邻步骤交换 step_no */
-    @PostMapping("/move")
+    /** 重排步骤顺序:按给定 id 列表重写 step_no(拖拽 / 上下移统一走这里) */
+    @PostMapping("/reorder")
     @ResponseBody
-    public Result move(String id, String direction) {
-        SpOperStep cur = iSpOperStepService.getById(id);
-        if (cur == null) {
-            return Result.failure("步骤不存在");
+    public Result reorder(@RequestBody Map<String, Object> body) {
+        Object operIdObj = body.get("operId");
+        String operId = operIdObj == null ? null : operIdObj.toString();
+        if (StringUtils.isEmpty(operId)) {
+            return Result.failure("缺少工序ID");
         }
-        boolean up = "up".equals(direction);
-        QueryWrapper<SpOperStep> qw = new QueryWrapper<>();
-        qw.eq("oper_id", cur.getOperId());
-        if (up) {
-            qw.lt("step_no", cur.getStepNo()).orderByDesc("step_no");
-        } else {
-            qw.gt("step_no", cur.getStepNo()).orderByAsc("step_no");
+        List<String> ids = new ArrayList<>();
+        Object idsObj = body.get("ids");
+        if (idsObj instanceof List) {
+            for (Object o : (List<?>) idsObj) {
+                if (o != null) {
+                    ids.add(o.toString());
+                }
+            }
         }
-        qw.last("LIMIT 1");
-        SpOperStep neighbor = iSpOperStepService.getOne(qw);
-        if (neighbor == null) {
-            // 已在顶部/底部,无需交换
-            return Result.success(null);
-        }
-        iSpOperStepService.swapStepNo(cur, neighbor);
+        iSpOperStepService.reorder(operId, ids);
         return Result.success(null);
     }
 }

@@ -18,6 +18,10 @@ public class SpOper extends BaseEntity {
     private String generatePlan;
     private String remark;
 
+    /** 步骤数(非DB字段,列表页统计填充) */
+    @TableField(exist = false)
+    private Integer stepCount;
+
     public String getOper() { return oper; }
     public void setOper(String oper) { this.oper = oper; }
     public String getOperCode() { return operCode; }
@@ -34,6 +38,9 @@ public class SpOper extends BaseEntity {
     public void setGeneratePlan(String generatePlan) { this.generatePlan = generatePlan; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+
+    public Integer getStepCount() { return stepCount; }
+    public void setStepCount(Integer stepCount) { this.stepCount = stepCount; }
 
     @Override
     public String toString() {
