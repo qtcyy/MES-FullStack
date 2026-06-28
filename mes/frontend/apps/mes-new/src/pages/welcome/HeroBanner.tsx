@@ -50,7 +50,7 @@ export default function HeroBanner({ overview, isFallback }: HeroBannerProps) {
             <div className="flex w-max gap-3 [animation:welcome-marquee_26s_linear_infinite] hover:[animation-play-state:paused] motion-reduce:[animation:none]">
               {[...pills, ...pills].map((p, i) => (
                 <span
-                  key={i}
+                  key={`${p}-${i}`}
                   className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/10 px-3 py-1 text-xs text-white/90 backdrop-blur"
                 >
                   <span className="size-1.5 rounded-full bg-[var(--brand-to)]" aria-hidden />

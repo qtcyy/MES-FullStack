@@ -20,7 +20,7 @@ export default function RecentVisits() {
             key={v.path}
             type="button"
             onClick={() => navigate(v.path)}
-            className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm transition-colors hover:border-primary/40 hover:bg-accent"
+            className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm transition-colors hover:border-primary/40 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <Icon className="size-3.5 text-muted-foreground" />
             <span>{v.title}</span>

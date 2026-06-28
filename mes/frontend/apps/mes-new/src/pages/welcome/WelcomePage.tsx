@@ -64,7 +64,7 @@ export default function WelcomePage() {
       <Stagger className="grid grid-cols-12 gap-4">
         {/* 特征带:生产趋势(8) + 待办(4) */}
         <Cell span="col-span-12 lg:col-span-8">
-          <BentoCell accent="blue" title="生产趋势 · 近 6 月" icon={TrendingUp} extra={isFallback ? <MockTag /> : <RealTag />}>
+          <BentoCell accent="blue" title="生产趋势 · 月度" icon={TrendingUp} extra={isFallback ? <MockTag /> : <RealTag />}>
             <TrendChart data={overview?.monthlyTrend ?? []} />
           </BentoCell>
         </Cell>
@@ -91,17 +91,17 @@ export default function WelcomePage() {
         {/* 三环图 */}
         <Cell span="col-span-12 sm:col-span-6 lg:col-span-4">
           <BentoCell accent="cyan" title="订单状态" icon={ChartPie} extra={isFallback ? <MockTag /> : <RealTag />}>
-            <StatusDonut data={overview?.orderStatus ?? []} accent="cyan" />
+            <StatusDonut data={overview?.orderStatus ?? []} accent="cyan" ariaLabel="订单状态分布" />
           </BentoCell>
         </Cell>
         <Cell span="col-span-12 sm:col-span-6 lg:col-span-4">
           <BentoCell accent="blue" title="设备状态" icon={ChartPie} extra={isFallback ? <MockTag /> : <RealTag />}>
-            <StatusDonut data={overview?.deviceStatus ?? []} accent="blue" />
+            <StatusDonut data={overview?.deviceStatus ?? []} accent="blue" ariaLabel="设备状态分布" />
           </BentoCell>
         </Cell>
         <Cell span="col-span-12 sm:col-span-6 lg:col-span-4">
           <BentoCell accent="emerald" title="订单类型" icon={ChartPie} extra={isFallback ? <MockTag /> : <RealTag />}>
-            <StatusDonut data={overview?.orderType ?? []} accent="emerald" />
+            <StatusDonut data={overview?.orderType ?? []} accent="emerald" ariaLabel="订单类型分布" />
           </BentoCell>
         </Cell>
 

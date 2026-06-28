@@ -10,5 +10,9 @@ export default function TrendChart({ data }: { data: MonthlyTrendPoint[] }) {
       </div>
     )
   }
-  return <EChart option={buildWelcomeTrendOption(data)} className="h-[280px] w-full" />
+  return (
+    <div role="img" aria-label="生产趋势折线图" className="h-[280px] w-full">
+      <EChart option={buildWelcomeTrendOption(data)} className="h-full w-full" />
+    </div>
+  )
 }
