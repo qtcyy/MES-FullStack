@@ -28,6 +28,12 @@ body,
   --shadow-card: 0 2px 12px rgba(15, 23, 42, 0.06);
   --shadow-pop: 0 12px 32px rgba(15, 23, 42, 0.12);
   --shadow-brand: 0 12px 30px rgba(47, 124, 255, 0.28);
+  /* 工作台多彩强调色（主色 + 浅色 tint 背景） */
+  --accent-blue: #2f7cff;
+  --accent-cyan: #36e0ff;
+  --accent-violet: #7c5cff;
+  --accent-amber: #ff9f43;
+  --accent-emerald: #10b981;
 }
 
 .dark {
@@ -62,11 +68,45 @@ body,
     box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
+  /* 工作台 Hero 极光光晕 */
+  .welcome-aurora {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(48px);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .welcome-aurora-1 {
+    width: 260px; height: 260px; background: #2f7cff;
+    left: -40px; top: -80px; animation: welcome-drift-1 11s ease-in-out infinite;
+  }
+  .welcome-aurora-2 {
+    width: 220px; height: 220px; background: #36e0ff;
+    right: 8%; top: -40px; animation: welcome-drift-2 13s ease-in-out infinite;
+  }
+  .welcome-aurora-3 {
+    width: 240px; height: 240px; background: #7c5cff;
+    left: 38%; bottom: -120px; animation: welcome-drift-1 12s ease-in-out infinite reverse;
+  }
+
   /* 登录页背景动画 */
   @keyframes drift {
     0%, 100% { transform: translate(0, 0); }
     50% { transform: translate(-22px, 16px); }
   }
+}
+
+@keyframes welcome-drift-1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(36px, 22px); }
+}
+@keyframes welcome-drift-2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-30px, 18px); }
+}
+@keyframes welcome-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 /* 无障碍：尊重系统"减少动态效果"偏好 */
