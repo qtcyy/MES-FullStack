@@ -56,7 +56,7 @@ export default function WelcomePage() {
   const kpi = overview?.kpi
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-6">
       <Reveal>
         <HeroBanner overview={overview} isFallback={isFallback} />
       </Reveal>
