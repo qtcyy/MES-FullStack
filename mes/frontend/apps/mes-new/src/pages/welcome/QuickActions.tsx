@@ -19,7 +19,7 @@ export default function QuickActions() {
             key={a.to}
             type="button"
             onClick={() => navigate(a.to)}
-            className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-3 transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-pop)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-3 transition-[transform,translate,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-pop)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <span className="flex size-9 items-center justify-center rounded-full bg-accent text-primary">
               <Icon className="size-4" />

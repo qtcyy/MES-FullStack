@@ -14,7 +14,7 @@ export default function MetricCard({ label, value, icon: Icon, accent }: MetricC
   const n = useCountUp(value)
   const a = getAccent(accent)
   return (
-    <div className="group relative flex h-full items-center justify-between overflow-hidden rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)] transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-pop)]">
+    <div className="group relative flex h-full items-center justify-between overflow-hidden rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)] transition-[transform,translate,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-pop)]">
       <span className="absolute inset-y-0 left-0 w-[3px]" style={{ background: a.color }} aria-hidden />
       <div className="min-w-0">
         <p className="truncate text-sm text-muted-foreground">{label}</p>
