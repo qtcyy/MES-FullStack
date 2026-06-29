@@ -8,5 +8,7 @@ import com.wangziyang.mes.basedata.request.SpDevicePageReq;
 
 public interface ISpDeviceService extends IService<SpDevice> {
     IPage<SpDeviceDTO> pageWithRelations(SpDevicePageReq req) throws Exception;
-    boolean hasOrders(String deviceId);
+
+    /** 设备是否被设备编组引用（被引用则禁止删除） */
+    boolean isReferencedByGroup(String deviceId);
 }

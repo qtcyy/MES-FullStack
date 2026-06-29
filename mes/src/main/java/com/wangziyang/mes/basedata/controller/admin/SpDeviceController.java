@@ -55,8 +55,8 @@ public class SpDeviceController {
     @ResponseBody
     public Result delete(@RequestBody Map<String, String> params) {
         String id = params.get("id");
-        if (spDeviceService.hasOrders(id)) {
-            return Result.failure("设备已关联生产作业，无法删除");
+        if (spDeviceService.isReferencedByGroup(id)) {
+            return Result.failure("设备已被设备编组引用，请先从编组中移除后再删除");
         }
         SpDevice existing = spDeviceService.getById(id);
         if (existing == null) {
