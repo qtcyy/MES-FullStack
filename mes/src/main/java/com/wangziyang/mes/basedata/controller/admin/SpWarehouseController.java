@@ -7,9 +7,11 @@ import com.wangziyang.mes.basedata.request.SpWarehousePageReq;
 import com.wangziyang.mes.basedata.service.ISpWarehouseLocationService;
 import com.wangziyang.mes.basedata.service.ISpWarehouseService;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.common.util.SoftDeleteUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -62,6 +64,18 @@ public class SpWarehouseController {
     @ResponseBody
     @Transactional(rollbackFor = Exception.class)
     public Result addOrUpdate(@RequestBody SpWarehouse record) {
+        if (!StringUtils.hasText(record.getCode())) {
+            return Result.failure("库房编码不能为空");
+        }
+        // 未删除记录中校验 code 唯一，给出友好提示，避免命中唯一索引抛原始 SQL 异常
+        QueryWrapper<SpWarehouse> dup = new QueryWrapper<>();
+        dup.eq("code", record.getCode()).ne("is_deleted", "1");
+        if (StringUtils.hasText(record.getId())) {
+            dup.ne("id", record.getId());
+        }
+        if (spWarehouseService.count(dup) > 0) {
+            return Result.failure("库房编码已存在：" + record.getCode());
+        }
         // 取旧记录维度,判断库位是否需要重建(避免改名等也重建 → 库位 id 全变孤儿化 2a 库存引用)
         SpWarehouse old = record.getId() == null ? null : spWarehouseService.getById(record.getId());
         spWarehouseService.saveOrUpdate(record);
@@ -90,9 +104,16 @@ public class SpWarehouseController {
     @PostMapping("/delete")
     @ResponseBody
     public Result delete(@RequestBody Map<String, String> params) {
+        String id = params.get("id");
+        SpWarehouse existing = spWarehouseService.getById(id);
+        if (existing == null) {
+            return Result.failure("库房不存在");
+        }
         SpWarehouse wh = new SpWarehouse();
-        wh.setId(params.get("id"));
+        wh.setId(id);
         wh.setDeleted("1");
+        // 释放 code 唯一索引，避免软删除后再新增同编码库房触发唯一键冲突（code 列 varchar(32)）
+        wh.setCode(SoftDeleteUtil.freeUniqueValue(existing.getCode(), id, 32));
         spWarehouseService.updateById(wh);
         return Result.success(null);
     }

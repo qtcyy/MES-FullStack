@@ -3,6 +3,7 @@ package com.wangziyang.mes.system.controller.admin;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangziyang.mes.common.BaseController;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.common.util.SoftDeleteUtil;
 import com.wangziyang.mes.system.entity.SpTeam;
 import com.wangziyang.mes.system.entity.SpTeamUser;
 import com.wangziyang.mes.system.entity.SysUser;
@@ -61,6 +62,18 @@ public class SpTeamController extends BaseController {
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(SpTeam record) {
+        if (record.getCode() == null || record.getCode().trim().isEmpty()) {
+            return Result.failure("班组代码不能为空");
+        }
+        // 未删除记录中校验 code 唯一，给出友好提示，避免命中唯一索引抛原始 SQL 异常
+        QueryWrapper<SpTeam> dup = new QueryWrapper<>();
+        dup.eq("code", record.getCode()).ne("is_deleted", "1");
+        if (record.getId() != null && !record.getId().trim().isEmpty()) {
+            dup.ne("id", record.getId());
+        }
+        if (spTeamService.count(dup) > 0) {
+            return Result.failure("班组代码已存在：" + record.getCode());
+        }
         spTeamService.saveOrUpdate(record);
         return Result.success(record.getId());
     }
@@ -69,9 +82,15 @@ public class SpTeamController extends BaseController {
     @ResponseBody
     public Result delete(@RequestBody Map<String, String> params) {
         String id = params.get("id");
+        SpTeam existing = spTeamService.getById(id);
+        if (existing == null) {
+            return Result.failure("班组不存在");
+        }
         SpTeam team = new SpTeam();
         team.setId(id);
         team.setDeleted("1");
+        // 释放 code 唯一索引，避免软删除后再新增同代码班组触发唯一键冲突（code 列 varchar(32)）
+        team.setCode(SoftDeleteUtil.freeUniqueValue(existing.getCode(), id, 32));
         spTeamService.updateById(team);
         return Result.success(null);
     }

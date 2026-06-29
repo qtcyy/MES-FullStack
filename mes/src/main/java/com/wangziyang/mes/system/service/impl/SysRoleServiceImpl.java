@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wangziyang.mes.common.enums.CommonEnum;
+import com.wangziyang.mes.common.util.SoftDeleteUtil;
 import com.wangziyang.mes.system.dto.SysRoleDTO;
 import com.wangziyang.mes.system.dto.SysUserDTO;
 import com.wangziyang.mes.system.entity.SysRole;
@@ -81,14 +82,32 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateWithMenus(SysRoleDTO record) throws Exception {
+        // 未删除角色中校验 name / code 唯一，给出友好提示，避免命中唯一索引抛原始 SQL 异常
+        assertUnique("name", record.getName(), record.getId(), "角色名称");
+        assertUnique("code", record.getCode(), record.getId(), "角色编码");
         this.saveOrUpdate(record);
         if (record.getSysMenuIds() != null) {
             sysRoleMenuService.rebuild(record.getId(), record.getSysMenuIds());
         }
     }
 
+    /** 校验未删除角色中 column 值唯一（编辑时排除自身），冲突则抛出友好异常 */
+    private void assertUnique(String column, String value, String selfId, String label) {
+        if (StringUtils.isEmpty(value)) {
+            throw new RuntimeException(label + "不能为空");
+        }
+        QueryWrapper<SysRole> qw = new QueryWrapper<>();
+        qw.eq(column, value).ne("is_deleted", "1");
+        if (StringUtils.isNotEmpty(selfId)) {
+            qw.ne("id", selfId);
+        }
+        if (this.count(qw) > 0) {
+            throw new RuntimeException(label + "已存在：" + value);
+        }
+    }
+
     /**
-     * 软删除角色（is_deleted = '1'）
+     * 软删除角色（is_deleted = '1'，同时释放 name / code 唯一索引避免冲突）
      *
      * @param id 角色ID
      * @return 是否成功
@@ -97,8 +116,15 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Transactional(rollbackFor = Exception.class)
     public boolean softDelete(String id) {
         if (id == null || id.trim().isEmpty()) throw new RuntimeException("id 不能为空");
+        SysRole role = this.getById(id);
+        if (role == null) return false;
+        // name(varchar64) / code(varchar32) 均为 NOT NULL 唯一索引，软删除时改名释放，
+        // 避免再新增同名/同编码角色触发唯一键冲突
         UpdateWrapper<SysRole> uw = new UpdateWrapper<>();
-        uw.eq("id", id).set("is_deleted", "1");
+        uw.eq("id", id)
+          .set("is_deleted", "1")
+          .set("name", SoftDeleteUtil.freeUniqueValue(role.getName(), id, 64))
+          .set("code", SoftDeleteUtil.freeUniqueValue(role.getCode(), id, 32));
         return this.update(uw);
     }
 

@@ -10,6 +10,7 @@ import com.wangziyang.mes.system.mapper.SysUserMapper;
 import com.wangziyang.mes.system.service.ISysMenuService;
 import com.wangziyang.mes.system.service.ISysRoleService;
 import com.wangziyang.mes.system.service.ISysUserService;
+import com.wangziyang.mes.common.util.SoftDeleteUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     /**
-     * 软删除用户（is_deleted = '1'，同时释放 username 避免唯一索引冲突）
+     * 软删除用户（is_deleted = '1'，同时释放 username / mobile 唯一索引避免冲突）
      *
      * @param id 用户ID
      * @return 是否成功
@@ -110,7 +111,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         UpdateWrapper<SysUser> uw = new UpdateWrapper<>();
         uw.eq("id", id)
           .set("is_deleted", "1")
-          .set("username", user.getUsername() + "#" + id);
+          .set("username", SoftDeleteUtil.freeUniqueValue(user.getUsername(), id, 128));
+        // mobile 唯一索引允许多个 NULL，仅在非空时释放（空值/NULL 不占索引，改名反而制造脏值）
+        if (user.getMobile() != null && !user.getMobile().trim().isEmpty()) {
+            uw.set("mobile", SoftDeleteUtil.freeUniqueValue(user.getMobile(), id, 32));
+        }
         return this.update(uw);
     }
 

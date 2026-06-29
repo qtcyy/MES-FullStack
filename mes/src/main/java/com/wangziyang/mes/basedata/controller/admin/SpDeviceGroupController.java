@@ -9,8 +9,10 @@ import com.wangziyang.mes.basedata.service.ISpDeviceGroupItemService;
 import com.wangziyang.mes.basedata.service.ISpDeviceGroupService;
 import com.wangziyang.mes.basedata.service.ISpDeviceService;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.common.util.SoftDeleteUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -51,6 +53,18 @@ public class SpDeviceGroupController {
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(@RequestBody SpDeviceGroup record) {
+        if (!StringUtils.hasText(record.getCode())) {
+            return Result.failure("编组代码不能为空");
+        }
+        // 未删除记录中校验 code 唯一，给出友好提示，避免命中唯一索引抛原始 SQL 异常
+        QueryWrapper<SpDeviceGroup> dup = new QueryWrapper<>();
+        dup.eq("code", record.getCode()).ne("is_deleted", "1");
+        if (StringUtils.hasText(record.getId())) {
+            dup.ne("id", record.getId());
+        }
+        if (spDeviceGroupService.count(dup) > 0) {
+            return Result.failure("编组代码已存在：" + record.getCode());
+        }
         spDeviceGroupService.saveOrUpdate(record);
         return Result.success(record.getId());
     }
@@ -59,9 +73,15 @@ public class SpDeviceGroupController {
     @ResponseBody
     public Result delete(@RequestBody Map<String, String> params) {
         String id = params.get("id");
+        SpDeviceGroup existing = spDeviceGroupService.getById(id);
+        if (existing == null) {
+            return Result.failure("设备编组不存在");
+        }
         SpDeviceGroup group = new SpDeviceGroup();
         group.setId(id);
         group.setDeleted("1");
+        // 释放 code 唯一索引，避免软删除后再新增同代码编组触发唯一键冲突（code 列 varchar(32)）
+        group.setCode(SoftDeleteUtil.freeUniqueValue(existing.getCode(), id, 32));
         spDeviceGroupService.updateById(group);
         return Result.success(null);
     }

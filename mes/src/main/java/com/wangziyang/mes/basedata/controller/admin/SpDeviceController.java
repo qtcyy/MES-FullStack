@@ -5,6 +5,7 @@ import com.wangziyang.mes.basedata.entity.SpDevice;
 import com.wangziyang.mes.basedata.request.SpDevicePageReq;
 import com.wangziyang.mes.basedata.service.ISpDeviceService;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.common.util.SoftDeleteUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -65,26 +66,9 @@ public class SpDeviceController {
         SpDevice device = new SpDevice();
         device.setId(id);
         device.setDeleted("1");
-        // 释放 code 唯一索引，避免软删除后再新增同编号设备触发唯一键冲突；
-        // code 列为 varchar(32)，id 为雪花串，截断前缀后拼接完整 id 以保证唯一且不超长
-        device.setCode(buildDeletedCode(existing.getCode(), id));
+        // 释放 code 唯一索引，避免软删除后再新增同编号设备触发唯一键冲突（code 列 varchar(32)）
+        device.setCode(SoftDeleteUtil.freeUniqueValue(existing.getCode(), id, 32));
         spDeviceService.updateById(device);
         return Result.success(null);
-    }
-
-    private static final int CODE_MAX_LEN = 32;
-
-    private String buildDeletedCode(String code, String id) {
-        String suffix = "#" + id;
-        String prefix = code == null ? "" : code;
-        int maxPrefix = CODE_MAX_LEN - suffix.length();
-        if (maxPrefix < 0) {
-            // 极端情况下 id 本身超长，直接截断整体
-            return suffix.substring(0, CODE_MAX_LEN);
-        }
-        if (prefix.length() > maxPrefix) {
-            prefix = prefix.substring(0, maxPrefix);
-        }
-        return prefix + suffix;
     }
 }

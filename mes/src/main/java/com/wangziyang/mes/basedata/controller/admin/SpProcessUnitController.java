@@ -7,10 +7,12 @@ import com.wangziyang.mes.basedata.request.SpProcessUnitPageReq;
 import com.wangziyang.mes.basedata.service.ISpProcessUnitService;
 import com.wangziyang.mes.basedata.service.ISpProcessUnitTeamService;
 import com.wangziyang.mes.common.Result;
+import com.wangziyang.mes.common.util.SoftDeleteUtil;
 import com.wangziyang.mes.system.entity.SpTeam;
 import com.wangziyang.mes.system.service.ISpTeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -56,6 +58,18 @@ public class SpProcessUnitController {
     @PostMapping("/add-or-update")
     @ResponseBody
     public Result addOrUpdate(@RequestBody SpProcessUnit record) {
+        if (!StringUtils.hasText(record.getCode())) {
+            return Result.failure("加工单元代码不能为空");
+        }
+        // 未删除记录中校验 code 唯一，给出友好提示，避免命中唯一索引抛原始 SQL 异常
+        QueryWrapper<SpProcessUnit> dup = new QueryWrapper<>();
+        dup.eq("code", record.getCode()).ne("is_deleted", "1");
+        if (StringUtils.hasText(record.getId())) {
+            dup.ne("id", record.getId());
+        }
+        if (spProcessUnitService.count(dup) > 0) {
+            return Result.failure("加工单元代码已存在：" + record.getCode());
+        }
         spProcessUnitService.saveOrUpdate(record);
         return Result.success(record.getId());
     }
@@ -63,9 +77,16 @@ public class SpProcessUnitController {
     @PostMapping("/delete")
     @ResponseBody
     public Result delete(@RequestBody Map<String, String> params) {
+        String id = params.get("id");
+        SpProcessUnit existing = spProcessUnitService.getById(id);
+        if (existing == null) {
+            return Result.failure("加工单元不存在");
+        }
         SpProcessUnit pu = new SpProcessUnit();
-        pu.setId(params.get("id"));
+        pu.setId(id);
         pu.setDeleted("1");
+        // 释放 code 唯一索引，避免软删除后再新增同代码加工单元触发唯一键冲突（code 列 varchar(32)）
+        pu.setCode(SoftDeleteUtil.freeUniqueValue(existing.getCode(), id, 32));
         spProcessUnitService.updateById(pu);
         return Result.success(null);
     }
