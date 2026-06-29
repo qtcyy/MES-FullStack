@@ -143,6 +143,16 @@ public class SpProcessContentController extends BaseController {
     public Result complete(@PathVariable String id) {
         SpProcessContent c = contentService.getById(id);
         if (c == null) return Result.failure("工艺文件不存在");
+        if ("completed".equals(c.getStatus())) {
+            return Result.failure("工艺文件已完成，请勿重复提交");
+        }
+        // 完成编制前校验必填项（主信息、工序内容），避免空内容被标记为已完成
+        if (c.getMainInfo() == null || c.getMainInfo().trim().isEmpty()) {
+            return Result.failure("请先填写并保存『主信息』后再完成编制");
+        }
+        if (c.getContent() == null || c.getContent().trim().isEmpty()) {
+            return Result.failure("请先填写并保存『工序内容』后再完成编制");
+        }
         c.setStatus("completed");
         contentService.updateById(c);
         return Result.success(null);

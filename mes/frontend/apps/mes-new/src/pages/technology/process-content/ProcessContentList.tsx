@@ -311,7 +311,12 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
   )
 
   // ===== 主信息表单,默认值直接 seed 自 content =====
-  const { register, handleSubmit, control } = useForm<MainFormValues>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<MainFormValues>({
     defaultValues: {
       mainInfo: content?.mainInfo ?? '',
       procContent: content?.content ?? '',
@@ -357,6 +362,18 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
   })
 
   // ===== 完成编制 =====
+  // 完成编制作用于「已保存内容」,故校验 content(已存) 而非未保存的表单值;缺必填则拦住不开弹窗
+  const requestComplete = () => {
+    if (!content?.mainInfo?.trim()) {
+      toast.error('请先在『主信息』填写主信息并保存')
+      return
+    }
+    if (!content?.content?.trim()) {
+      toast.error('请先在『主信息』填写工序内容并保存')
+      return
+    }
+    setCompleting(true)
+  }
   const confirmComplete = async () => {
     if (!contentId) return
     try {
@@ -531,7 +548,7 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
                 size="sm"
                 disabled={!contentId}
                 title={contentId ? undefined : '请先保存主信息'}
-                onClick={() => setCompleting(true)}
+                onClick={requestComplete}
               >
                 <CheckCircle2 className="size-4" />
                 完成编制
@@ -556,11 +573,22 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
 
           {/* 主信息 */}
           <TabsContent value="main" className="space-y-4 pt-2">
-            <FormField label="主信息" htmlFor="pc-main-info" required>
-              <Input id="pc-main-info" disabled={isCompleted} {...register('mainInfo')} />
+            <FormField label="主信息" htmlFor="pc-main-info" required error={errors.mainInfo?.message}>
+              <Input
+                id="pc-main-info"
+                disabled={isCompleted}
+                aria-invalid={!!errors.mainInfo}
+                {...register('mainInfo', { required: '请输入主信息' })}
+              />
             </FormField>
-            <FormField label="工序内容" htmlFor="pc-content" required>
-              <Textarea id="pc-content" rows={5} disabled={isCompleted} {...register('procContent')} />
+            <FormField label="工序内容" htmlFor="pc-content" required error={errors.procContent?.message}>
+              <Textarea
+                id="pc-content"
+                rows={5}
+                disabled={isCompleted}
+                aria-invalid={!!errors.procContent}
+                {...register('procContent', { required: '请输入工序内容' })}
+              />
             </FormField>
             <div className="space-y-1.5">
               <span className="text-sm font-medium">工序图片</span>
