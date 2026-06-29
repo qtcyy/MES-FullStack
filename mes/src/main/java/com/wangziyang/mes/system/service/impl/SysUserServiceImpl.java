@@ -96,7 +96,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     /**
-     * 软删除用户（is_deleted = '1'）
+     * 软删除用户（is_deleted = '1'，同时释放 username 避免唯一索引冲突）
      *
      * @param id 用户ID
      * @return 是否成功
@@ -105,8 +105,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Transactional(rollbackFor = Exception.class)
     public boolean softDelete(String id) {
         if (id == null || id.trim().isEmpty()) throw new RuntimeException("id 不能为空");
+        SysUser user = this.getById(id);
+        if (user == null) return false;
         UpdateWrapper<SysUser> uw = new UpdateWrapper<>();
-        uw.eq("id", id).set("is_deleted", "1");
+        uw.eq("id", id)
+          .set("is_deleted", "1")
+          .set("username", user.getUsername() + "#" + id);
         return this.update(uw);
     }
 
