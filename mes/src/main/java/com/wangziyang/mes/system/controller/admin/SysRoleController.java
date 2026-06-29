@@ -53,6 +53,9 @@ public class SysRoleController extends BaseController {
     public Result page(SysRolePageReq req) {
         QueryWrapper qw = new QueryWrapper();
         qw.ne("is_deleted", "1");
+        if (StringUtils.isNotEmpty(req.getNameLike())) {
+            qw.like("name", req.getNameLike());
+        }
         qw.orderByDesc(req.getOrderBy());
         IPage result = sysRoleService.page(req, qw);
         return Result.success(result);

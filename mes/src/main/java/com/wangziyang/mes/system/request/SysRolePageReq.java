@@ -4,7 +4,7 @@ import com.wangziyang.mes.common.BasePageReq;
 
 /**
  * <p>
- * 系统用户分页查询参数
+ * 系统角色分页查询参数
  * </p>
  *
  * @author SongPeng
@@ -12,4 +12,16 @@ import com.wangziyang.mes.common.BasePageReq;
  */
 public class SysRolePageReq extends BasePageReq {
 
+    /**
+     * 角色名（模糊匹配）
+     */
+    private String nameLike;
+
+    public String getNameLike() {
+        return nameLike;
+    }
+
+    public void setNameLike(String nameLike) {
+        this.nameLike = nameLike;
+    }
 }
