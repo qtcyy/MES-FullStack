@@ -46,7 +46,7 @@ export default function AppSidebar() {
         </span>
         {!collapsed && <span className="text-sidebar-foreground">章鱼MES</span>}
       </div>
-      <nav className="flex-1 space-y-4 overflow-y-auto px-2 py-3">
+      <nav className="scrollbar-thin flex-1 space-y-4 overflow-y-auto px-2 py-3">
         {menuInfo &&
           Object.values(menuInfo).map((group) => {
             const children = (group.children ?? []).filter((c) => toReactRoute(c.url))
