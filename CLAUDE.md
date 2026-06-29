@@ -113,7 +113,7 @@ The active SPA lives in `mes/frontend/apps/mes-new` inside the `mes/frontend/` p
 
 ### Database
 
-- Schema: `scripts/sql/MySQL-20210225.sql`
+- Schema + data: `scripts/sql/mes_data-full-2026-06-29.sql` (mysqldump 全量导出，52 表，含 `CREATE DATABASE mes_data` + 结构 + 数据，可直接 `mysql < ` 一键还原)
 - MyBatis-Plus `SpMetaObjectHandler` auto-fills `createTime`, `createUsername`, `updateTime`, `updateUsername` from the current Shiro principal.
 - ID strategy: `IdType.ID_WORKER_STR` (snowflake algorithm).
 

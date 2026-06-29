@@ -57,11 +57,11 @@
 ### 1. 初始化数据库
 
 ```bash
-# 一键导入全部 39 张表结构 + 种子数据
-mysql -h localhost -u root -p < scripts/sql/MySQL-init-all.sql
+# 一键导入全部 52 张表结构 + 数据
+mysql -h localhost -u root -p < scripts/sql/mes_data-full-2026-06-29.sql
 ```
 
-该脚本包含完整的数据库初始化（自动创建数据库 `mes_data`），无需单独执行其他 SQL 文件。
+该脚本为 mysqldump 全量导出，自动创建数据库 `mes_data` 并导入完整表结构与数据，无需单独执行其他 SQL 文件。
 
 ### 2. 配置数据库连接
 
@@ -182,12 +182,7 @@ MES-FullStack/
 ├── LICENSE                            # AGPL-3.0
 ├── docs/                              # 开发文档（FreeMarker/Layui 参考）
 ├── scripts/sql/                       # 数据库脚本
-│   ├── MySQL-init-all.sql            # 完整初始化（推荐，39 表 + 种子数据）
-│   ├── MySQL-20210225.sql            # 原始主表结构
-│   ├── product-bom.sql               # 产品 BOM 扩展
-│   ├── device-management.sql         # 设备管理扩展
-│   ├── team-management.sql           # 班组管理扩展
-│   └── role-management-update.sql    # 角色管理更新
+│   └── mes_data-full-2026-06-29.sql  # 全量 dump（52 表，结构 + 数据，一键还原）
 └── mes/                               # 主 Maven 模块
     ├── pom.xml                        # Maven 配置
     ├── src/main/java/com/wangziyang/mes/
@@ -256,7 +251,7 @@ pnpm --filter mes-new exec tsc --noEmit # 单独检查 TS 错误
 ### 后端启动失败
 - 检查 MySQL 是否运行且数据库 `mes_data` 已创建
 - 检查 `application-dev.yml` 中数据库密码是否正确
-- 确认已执行 `scripts/sql/MySQL-init-all.sql` 初始化脚本
+- 确认已执行 `scripts/sql/mes_data-full-2026-06-29.sql` 初始化脚本
 
 ### API 返回 302 重定向
 - Shiro 认证拦截，确认已通过 `/login` 登录
