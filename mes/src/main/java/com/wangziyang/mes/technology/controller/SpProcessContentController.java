@@ -158,6 +158,40 @@ public class SpProcessContentController extends BaseController {
         return Result.success(null);
     }
 
+    @PostMapping("/delete")
+    @ResponseBody
+    public Result delete(@RequestBody Map<String, String> params) {
+        String id = params.get("id");
+        if (id == null || id.trim().isEmpty()) return Result.failure("id 不能为空");
+        SpProcessContent content = contentService.getById(id);
+        if (content == null) return Result.failure("工艺文件不存在");
+        // 删 DB 前先收集待清理的 MinIO key（删除后就查不到了）
+        List<String> minioKeys = new ArrayList<>();
+        for (SpProcessDocument doc : documentService.list(
+                new QueryWrapper<SpProcessDocument>().eq("content_id", id))) {
+            if (doc.getFilePath() != null && !doc.getFilePath().trim().isEmpty()) {
+                minioKeys.add(doc.getFilePath().trim());
+            }
+        }
+        collectImageKeys(content.getContentImages(), minioKeys);
+        collectImageKeys(content.getInspectionImages(), minioKeys);
+        // 级联删除子表 + 自身（事务）
+        contentService.deleteCascade(id);
+        // 删 DB 成功后清理 MinIO，失败仅忽略不影响主流程
+        for (String key : minioKeys) {
+            try { minioUtil.delete(key); } catch (Exception ignore) { /* 仅清理 */ }
+        }
+        return Result.success(null);
+    }
+
+    /** 拆分逗号分隔的图片 key 列表，trim 去空后追加到 keys */
+    private void collectImageKeys(String images, List<String> keys) {
+        if (images == null || images.trim().isEmpty()) return;
+        for (String k : images.split(",")) {
+            if (k != null && !k.trim().isEmpty()) keys.add(k.trim());
+        }
+    }
+
     @PostMapping("/equipment/save")
     @ResponseBody
     public Result saveEquipment(@RequestBody SpProcessEquipment record) {

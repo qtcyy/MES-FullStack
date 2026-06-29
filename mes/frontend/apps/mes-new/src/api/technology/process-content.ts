@@ -33,6 +33,9 @@ export function processContentSave(body: Partial<SpProcessContent>) {
 export function processContentComplete(id: string) {
   return http.post<null>(`/technology/process-content/complete/${encodeURIComponent(id)}`, {}, JSON_HEADERS)
 }
+export function processContentDelete(id: string) {
+  return http.post<null>('/technology/process-content/delete', { id }, JSON_HEADERS)
+}
 export function processEquipmentSave(body: Partial<SpProcessEquipment>) {
   return http.post<string>('/technology/process-content/equipment/save', body, JSON_HEADERS)
 }

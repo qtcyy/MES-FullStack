@@ -54,6 +54,7 @@ import {
   processContentBomItems,
   processContentSave,
   processContentComplete,
+  processContentDelete,
   processEquipmentDelete,
   processDocumentDelete,
   PROCESS_UPLOAD_IMAGE_URL,
@@ -288,6 +289,7 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
   const [deletingEquip, setDeletingEquip] = useState<SpProcessEquipment | null>(null)
   const [deletingDoc, setDeletingDoc] = useState<SpProcessDocument | null>(null)
   const [completing, setCompleting] = useState(false)
+  const [deletingContent, setDeletingContent] = useState(false)
 
   // ===== 图片状态(key/url 等长),初始化器直接 seed 自 detail =====
   const [contentImageKeys, setContentImageKeys] = useState<string[]>(() =>
@@ -332,6 +334,9 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
   )
   const { mutate: complete, loading: completeLoading } = useMutation$((id: string) =>
     processContentComplete(id),
+  )
+  const { mutate: deleteContent, loading: deleteContentLoading } = useMutation$((id: string) =>
+    processContentDelete(id),
   )
   const { mutate: deleteEquip, loading: deleteEquipLoading } = useMutation$((id: string) =>
     processEquipmentDelete(id),
@@ -384,6 +389,20 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
       /* toast by interceptor */
     } finally {
       setCompleting(false)
+    }
+  }
+
+  // ===== 删除整条工艺文件(级联子表) =====
+  const confirmDeleteContent = async () => {
+    if (!contentId) return
+    try {
+      await deleteContent(contentId)
+      toast.success('已删除工艺文件')
+      invalidate(INVALIDATE)
+    } catch {
+      /* toast by interceptor */
+    } finally {
+      setDeletingContent(false)
     }
   }
 
@@ -554,6 +573,16 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
                 完成编制
               </Button>
             </>
+          )}
+          {contentId && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setDeletingContent(true)}
+            >
+              <Trash2 className="size-4" />
+              删除工艺文件
+            </Button>
           )}
         </div>
       </div>
@@ -756,6 +785,25 @@ function ProcessContentEditor({ bomId, nodeName, detail }: ProcessContentEditorP
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction onClick={confirmComplete} disabled={completeLoading}>
               完成编制
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={deletingContent} onOpenChange={(o) => !o && setDeletingContent(false)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除工艺文件</AlertDialogTitle>
+            <AlertDialogDescription>
+              {isCompleted
+                ? `该工艺文件「${nodeName}」已完成，删除后不可恢复，且会一并删除其工装设备与技术文档。确定删除吗?`
+                : `确定删除「${nodeName}」的工艺文件吗?将一并删除其工装设备与技术文档，此操作不可撤销。`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteContent} disabled={deleteContentLoading}>
+              删除
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
