@@ -9,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  ScrollArea,
   Separator,
 } from '@workspace/ui'
 
@@ -41,8 +40,8 @@ export default function FormDialog({
 }: FormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`gap-0 overflow-hidden p-0 ${contentClassName}`}>
-        <DialogHeader className="space-y-0 px-6 py-4 text-left">
+      <DialogContent className={`flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 ${contentClassName}`}>
+        <DialogHeader className="shrink-0 space-y-0 px-6 py-4 text-left">
           <div className="flex items-center gap-3">
             {Icon && (
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
@@ -55,13 +54,11 @@ export default function FormDialog({
             </div>
           </div>
         </DialogHeader>
-        <Separator />
-        <form onSubmit={(e) => { e.preventDefault(); onSubmit() }}>
-          <ScrollArea className="max-h-[70vh]">
-            <div className="space-y-5 px-6 py-5">{children}</div>
-          </ScrollArea>
-          <Separator />
-          <DialogFooter className="px-6 py-4">
+        <Separator className="shrink-0" />
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit() }} className="flex min-h-0 flex-1 flex-col">
+          <div className="scrollbar-thin min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">{children}</div>
+          <Separator className="shrink-0" />
+          <DialogFooter className="shrink-0 px-6 py-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
             <Button type="submit" disabled={submitting}>
               {submitting ? '提交中…' : <><Check className="size-4" />{submitText}</>}
